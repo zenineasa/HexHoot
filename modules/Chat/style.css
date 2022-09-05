@@ -61,17 +61,6 @@
     background: rgba(255,255,255,0.1);
     display: none; /* Will be 'flex' when active */
 }
-#mainContent #messageComposer .input {
-    border: 0;
-    border-bottom: 1px solid #ccc;
-    background: none;
-    border-radius: 0;
-    width: calc(100% - 1em);
-    padding: 0.5em;
-    margin: 0.5em auto;
-    display: block;
-    color: #fff;
-}
 #mainContent #messageComposer .send {
     margin-left: 20px;
     display: block;

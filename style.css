@@ -49,7 +49,17 @@ body {
     border-radius: 0;
     width: calc(100% - 1em);
     padding: 0.5em;
-    margin: auto;
+    margin: 0.5em auto;
     display: block;
-    color: #fff;
+    color: inherit;
+    text-overflow: ellipsis;
+}
+.HexHoot_Input_label {
+    font-size: 0.75em;
+    text-align: left;
+    padding-left: 2em;
+    padding-top: 2em;
+}
+.HexHoot_Input_label span {
+    color: #ff0000;
 }

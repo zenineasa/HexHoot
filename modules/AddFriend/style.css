@@ -36,14 +36,3 @@
     align-items: center;
     flex-direction: column;
 }
-#mainContent .tabContent .input {
-    border: 0;
-    border-bottom: 1px solid #ccc;
-    background: none;
-    border-radius: 0;
-    width: calc(100% - 1em);
-    padding: 0.5em;
-    margin: auto;
-    display: block;
-    color: #fff;
-}

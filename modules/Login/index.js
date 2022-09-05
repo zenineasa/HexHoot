@@ -43,7 +43,8 @@ class Login {
         // Login button
         document.getElementById('loginButton').onclick = function() {
             const info = {};
-            const inputs = containerDOM.getElementsByClassName('input');
+            const inputs = containerDOM.querySelectorAll(
+                'input[type=text],textarea');
             for (let i = 0; i < inputs.length; i++) {
                 info[inputs[i].name] = inputs[i].value;
             }

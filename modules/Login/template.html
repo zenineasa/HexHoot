@@ -3,11 +3,11 @@
     ${Logo.getHTML()}
     <div id="login">
         <div class="privateKey">
-            <input class="input" name="privateKey" type="text" placeholder="${i18n.getText('Login.privateKey')}" />
+            <input class="HexHoot_Input" name="privateKey" type="text" placeholder="${i18n.getText('Login.privateKey')}" />
             <button class="HexHoot_Button" id="generatePrivateKey">&#8634;</button>
         </div>
-        <input class="input" name="displayName" type="text" placeholder="${i18n.getText('Login.displayName')}" />
-        <textarea class="input" name="about" placeholder="${i18n.getText('Login.aboutYou')}"></textarea>
+        <input class="HexHoot_Input" name="displayName" type="text" placeholder="${i18n.getText('Login.displayName')}" />
+        <textarea class="HexHoot_Input" name="about" placeholder="${i18n.getText('Login.aboutYou')}"></textarea>
         <button class="HexHoot_Button" id="loginButton">${i18n.getText('Login.login')}</button>
         <div>OR</div>
         <button class="HexHoot_Button" id="loginWithJSONButton">${i18n.getText('Login.loginUsingBackup')}</button>

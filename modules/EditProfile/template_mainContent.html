@@ -1,17 +1,17 @@
 <!-- Copyright (c) 2022 Zenin Easa Panthakkalakath -->
 <div id="title">${i18n.getText('EditProfile.editProfile')}</div>
 <div id="editProfile">
-    <div class="label">${i18n.getText('EditProfile.privateKey')} &nbsp; <span>${i18n.getText('EditProfile.warningNotToShare')}</span></div>
-    <input class="input" name="privateKey" type="password" value="${userInfo.privateKey}" readonly/>
+    <div class="HexHoot_Input_label">${i18n.getText('EditProfile.privateKey')} &nbsp; <span>${i18n.getText('EditProfile.warningNotToShare')}</span></div>
+    <input class="HexHoot_Input" name="privateKey" type="password" value="${userInfo.privateKey}" readonly/>
 
-    <div class="label">${i18n.getText('EditProfile.displayName')}</div>
-    <input class="input" name="displayName" type="text" value="${userInfo.displayName}" />
+    <div class="HexHoot_Input_label">${i18n.getText('EditProfile.displayName')}</div>
+    <input class="HexHoot_Input" name="displayName" type="text" value="${userInfo.displayName}" />
 
-    <div class="label">${i18n.getText('EditProfile.aboutYou')}</div>
-    <textarea class="input" name="about">${userInfo.about}</textarea>
+    <div class="HexHoot_Input_label">${i18n.getText('EditProfile.aboutYou')}</div>
+    <textarea class="HexHoot_Input" name="about">${userInfo.about}</textarea>
 
-    <div class="label">${i18n.getText('EditProfile.photo')}</div>
-    <input class="input" name="photo" type="file" accept="image/*"/>
+    <div class="HexHoot_Input_label">${i18n.getText('EditProfile.photo')}</div>
+    <input class="HexHoot_Input" name="photo" type="file" accept="image/*"/>
 
     <button class="HexHoot_Button" id="editButton">${i18n.getText('EditProfile.applyEdit')}</button>
     <button class="HexHoot_Button" id="downloadProfile">${i18n.getText('EditProfile.downloadProfile')}</button>

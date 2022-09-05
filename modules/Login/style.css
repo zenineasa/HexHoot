@@ -4,24 +4,15 @@
     border-radius: 0.2em;
     background: rgba(0,0,0,0.8);
 }
-#login .input {
+#login input, #login textarea {
     font-size: 1.5em;
-    border: 0;
-    border-bottom: 1px solid #ccc;
-    background: none;
-    border-radius: 0;
-    width: 90%;
-    padding: 0.5em;
-    margin: 0.5em auto;
-    display: block;
-    text-overflow: ellipsis;
 }
 #login .privateKey {
     display: flex;
     flex-direction: row;
 }
-#login .privateKey .input {
-    margin-left: 1em;
+#login .privateKey input {
+    margin-left: 0.5em;
 }
 #login #generatePrivateKey {
     width: 4em;

@@ -5,23 +5,9 @@
     padding: 1em;
     display: flex;
 }
-#mainContent #viewProfile .label {
-    font-size: 0.75em;
-    text-align: left;
-    padding-left: 2em;
-    padding-top: 2em;
-}
-#mainContent #viewProfile .value {
+#mainContent #viewProfile input, #mainContent #viewProfile textarea {
     font-size: 1.5em;
-    border: 0;
-    border-bottom: 1px solid #ccc;
-    background: none;
-    border-radius: 0;
     width: 90%;
-    padding: 0.5em;
-    margin: auto;
-    display: block;
-    user-select: text;
 }
 #mainContent #viewProfile .value img {
     max-width: 300px;

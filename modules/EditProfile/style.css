@@ -5,25 +5,9 @@
     padding: 1em;
     display: flex;
 }
-#mainContent #editProfile .label {
-    font-size: 0.75em;
-    text-align: left;
-    padding-left: 2em;
-    padding-top: 2em;
-}
-#mainContent #editProfile .label span {
-    color: #ff0000;
-}
-#mainContent #editProfile .input {
+#mainContent #editProfile input, #mainContent #editProfile textarea {
     font-size: 1.5em;
-    border: 0;
-    border-bottom: 1px solid #ccc;
-    background: none;
-    border-radius: 0;
     width: 90%;
-    padding: 0.5em;
-    margin: auto;
-    display: block;
 }
 #mainContent #editButton {
     margin-top: 2em;
