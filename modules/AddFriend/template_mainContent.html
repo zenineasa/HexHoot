@@ -1,0 +1,18 @@
+<!-- Copyright (c) 2022 Zenin Easa Panthakkalakath -->
+<div id="title">Add friend</div>
+<div id="tabs">
+    <div class="tabContentContainer">
+        <div class="tabContent" id="myCode">
+            <input class="input" name="myPublicKey" type="text" value="${publicKey}" readonly />
+            <button id="copyToClipboardButton" type="button">${i18n.getText('AddFriend.copyToClipboard')}</button>
+        </div>
+        <div class="tabContent" id="theirCode">
+            <input class="input" id="theirPublicKey" name="theirPublicKey" type="text" placeholder="${i18n.getText('AddFriend.publicKey')}" />
+            <button id="addFriendButton" type="button">${i18n.getText('AddFriend.add')}</button>
+        </div>
+    </div>
+    <div class="tabContainer">
+        <div class="tab" name="myCode">${i18n.getText('AddFriend.myCode')}</div>
+        <div class="tab" name="theirCode">${i18n.getText('AddFriend.theirCode')}</div>
+    </div>
+</div>

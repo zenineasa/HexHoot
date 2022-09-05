@@ -1,0 +1,12 @@
+<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>Layer 1</title>
+  <g stroke-width="20" id="svg_16">
+   <line x1="0" y1="800" id="svg_5" y2="400" x2="400" stroke="#00b4ff" fill="none"/>
+   <line x1="0" y1="0" id="svg_7" y2="400" x2="400" stroke="#00b4ff" fill="none"/>
+   <line x1="0" y1="0" id="svg_14" y2="400" x2="800" stroke="#00b4ff" fill="none"/>
+   <line x1="6" y1="800" id="svg_15" y2="400" x2="800" stroke="#00b4ff" fill="none"/>
+  </g>
+ </g>
+</svg>

@@ -1,0 +1,9 @@
+{
+    "coprightMessage": "Copyright © 2022 Zenin Easa Panthakkalakath",
+    "internal": [],
+    "external": [
+        "indexeddb-export-import",
+        "hyperswarm",
+        "ecdh"
+    ]
+}

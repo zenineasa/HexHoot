@@ -1,0 +1,62 @@
+/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+
+#mainContent #title {
+    height: 2.5em;
+    padding: 1em;
+    display: flex;
+}
+#mainContent #tabs {
+    height: calc(100% - 2em - 5em);
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column-reverse;
+}
+#mainContent .tabContainer {
+    width: 100%;
+    display: flex;
+}
+#mainContent .tab {
+    width: 100%;
+    padding: 0.5em;
+    text-transform: uppercase;
+}
+#mainContent .tab:hover {
+    background:rgba(255, 255, 255, 0.1);
+}
+#mainContent .tabContentContainer {
+    width: 100%;
+    height: 100%;
+}
+#mainContent .tabContent {
+    background:rgba(255, 255, 255, 0.1);
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+#mainContent .tabContent .input {
+    border: 0;
+    border-bottom: 1px solid #ccc;
+    background: none;
+    border-radius: 0;
+    width: calc(100% - 1em);
+    padding: 0.5em;
+    margin: auto;
+    display: block;
+    color: #fff;
+}
+#mainContent .tabContent button {
+    background: rgba(0, 180, 255, 0.8);
+    padding: 0.5em;
+    margin-bottom: 1em;
+    width: 90%;
+    border-radius: 0.2em;
+	color: inherit;
+	border: none;
+	font: inherit;
+}
+#mainContent .tabContent button:hover {
+    opacity: 0.5;
+}

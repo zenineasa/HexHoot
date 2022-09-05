@@ -1,0 +1,11 @@
+{
+    "coprightMessage": "Copyright © 2022 Zenin Easa Panthakkalakath",
+    "internal": [
+        "Layout",
+        "DBMessenger",
+        "I18n"
+    ],
+    "external": [
+        "require-text"
+    ]
+}

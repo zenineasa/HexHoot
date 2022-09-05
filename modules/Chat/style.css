@@ -1,0 +1,86 @@
+/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+
+#mainContent #messageSenderInfo {
+    height: 2.5em;
+    padding: 1em;
+    display: flex;
+    background: rgba(255,255,255,0.1);
+}
+#mainContent #messageSenderInfo .photo {
+    margin-left: 20px;
+    display: block;
+    width: 45px;
+    height: 45px;
+    background: #E6E7ED;
+    border-radius: 50%;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+#mainContent #messageSenderInfo .name {
+    padding: 0.5em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#mainContent #messageReader {
+    height: calc(100% - 2em - 5em);
+    overflow-y: scroll;
+    display:flex;
+    flex-direction:column-reverse;
+    user-select: text;
+}
+#mainContent #messageReader .receivedMessage {
+    background: rgba(0, 180, 255, 0.8);
+    margin: 1em;
+    padding: 0.5em;
+    max-width: 80%;
+    margin-left: 0.5em;
+    margin-right: auto;
+}
+#mainContent #messageReader .sentMessage {
+    position: relative;
+    background-color: rgba(255,255,255,0.1);
+    margin: 1em;
+    padding: 0.5em;
+    max-width: 80%;
+    right: 0;
+    margin-left: auto;
+    margin-right: 0.5em;
+}
+#mainContent #messageReader span {
+    display: block;
+    font-size: 0.5em;
+    width: 100%;
+    text-align: right;
+    opacity: 0.8;
+}
+
+#mainContent #messageComposer {
+    height: 5em;
+    background: rgba(255,255,255,0.1);
+    display: none; /* Will be 'flex' when active */
+}
+#mainContent #messageComposer .input {
+    border: 0;
+    border-bottom: 1px solid #ccc;
+    background: none;
+    border-radius: 0;
+    width: calc(100% - 1em);
+    padding: 0.5em;
+    margin: 0.5em auto;
+    display: block;
+    color: #fff;
+}
+#mainContent #messageComposer .send {
+    margin-left: 20px;
+    display: block;
+    width: 5em;
+    height: 5em;
+    background-position: center;
+    background-size: 75%;
+    background-repeat: no-repeat;
+}
+#mainContent #messageComposer .send:hover {
+    background-color: #E6E7ED;
+}

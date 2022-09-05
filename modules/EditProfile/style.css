@@ -1,0 +1,48 @@
+/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+
+#mainContent #title {
+    height: 2.5em;
+    padding: 1em;
+    display: flex;
+}
+#mainContent #editProfile .label {
+    font-size: 0.75em;
+    text-align: left;
+    padding-left: 2em;
+    padding-top: 2em;
+}
+#mainContent #editProfile .label span {
+    color: #ff0000;
+}
+#mainContent #editProfile .input {
+    font-size: 1.5em;
+    border: 0;
+    border-bottom: 1px solid #ccc;
+    background: none;
+    border-radius: 0;
+    width: 90%;
+    padding: 0.5em;
+    margin: auto;
+    display: block;
+}
+#mainContent #editProfile .button {
+    font-size: 100%;
+    border: 0;
+    padding: 0.5em 1em;
+    margin: 1em;
+    border-radius: 0.2em;
+    width: 90%;
+    color: #fff;
+}
+#mainContent #editProfile .button:hover {
+    opacity: 0.5;
+}
+#mainContent #editButton {
+    background: rgba(0, 180, 255, 0.8);
+}
+#mainContent #downloadProfile {
+    background: rgba(0, 180, 255, 0.8);
+}
+#mainContent #logout {
+    background: rgba(255, 180, 0, 0.8);
+}

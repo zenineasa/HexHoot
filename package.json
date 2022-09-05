@@ -1,0 +1,29 @@
+{
+    "name": "hexhoot",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "test": "karma start ./test/karma.conf.js"
+    },
+    "author": "Zenin Easa Panthakkalakath (@zenineasa)",
+    "license": "AGPLV3",
+    "devDependencies": {
+        "copyright-header": "^0.4.6",
+        "electron": "^20.1.1",
+        "eslint": "^8.23.0",
+        "eslint-config-google": "^0.14.0",
+        "glob": "^8.0.3",
+        "karma-electron": "^7.3.0",
+        "karma-qunit": "^4.1.2",
+        "qunit": "^2.19.1"
+    },
+    "dependencies": {
+        "ecdh": "^0.1.1",
+        "hyperswarm": "^4.2.0",
+        "indexeddb-export-import": "^2.1.5",
+        "require-text": "^0.0.1",
+        "tone": "^14.7.77"
+    }
+}

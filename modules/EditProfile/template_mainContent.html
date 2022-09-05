@@ -1,0 +1,19 @@
+<!-- Copyright (c) 2022 Zenin Easa Panthakkalakath -->
+<div id="title">${i18n.getText('EditProfile.editProfile')}</div>
+<div id="editProfile">
+    <div class="label">${i18n.getText('EditProfile.privateKey')} &nbsp; <span>${i18n.getText('EditProfile.warningNotToShare')}</span></div>
+    <input class="input" name="privateKey" type="password" value="${userInfo.privateKey}" readonly/>
+
+    <div class="label">${i18n.getText('EditProfile.displayName')}</div>
+    <input class="input" name="displayName" type="text" value="${userInfo.displayName}" />
+
+    <div class="label">${i18n.getText('EditProfile.aboutYou')}</div>
+    <textarea class="input" name="about">${userInfo.about}</textarea>
+
+    <div class="label">${i18n.getText('EditProfile.photo')}</div>
+    <input class="input" name="photo" type="file" accept="image/*"/>
+
+    <button id="editButton" class="button" type="button">${i18n.getText('EditProfile.applyEdit')}</button>
+    <button id="downloadProfile" class="button" type="button">${i18n.getText('EditProfile.downloadProfile')}</button>
+    <button id="logout" class="button" type="button">${i18n.getText('EditProfile.logout')}</button>
+</div>

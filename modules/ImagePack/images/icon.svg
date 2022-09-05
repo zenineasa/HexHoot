@@ -1,0 +1,20 @@
+<svg xmlns:osb="http://www.openswatchbook.org/uri/2009/osb" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="100%" height="100%" viewBox="0 0 101.689 103.249" version="1.1" id="svg8" inkscape:version="1.0.2 (e86c870879, 2021-01-15)" sodipodi:docname="logoWhite.svg">
+    <defs id="defs2">
+        <linearGradient id="linearGradient2759" osb:paint="solid">
+            <stop style="stop-color:#000;stop-opacity:1" offset="0" id="stop2757" />
+        </linearGradient>
+    </defs>
+    <sodipodi:namedview id="base" pagecolor="#000000" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:zoom="0.7" inkscape:cx="253.45454" inkscape:cy="222.95799" inkscape:document-units="mm" inkscape:current-layer="layer1" inkscape:document-rotation="0" showgrid="false" inkscape:window-width="1366" inkscape:window-height="684" inkscape:window-x="0" inkscape:window-y="27" inkscape:window-maximized="1" showborder="true" />
+    <metadata id="metadata5">
+        <rdf:RDF>
+            <cc:Work rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                <dc:title/>
+            </cc:Work>
+        </rdf:RDF>
+    </metadata>
+    <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1">
+        <path id="path2805" style="fill:none;fill-rule:evenodd;stroke:#fff;stroke-width:2.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 76.617383,33.510491 h -3.204081 l -1.60204,-2.774815 1.602041,-2.774815 h 3.20408 l 1.60204,2.774815 z m -48.341762,-8.19e-4 h -3.20424 l -1.60212,-2.774672 1.60212,-2.774672 h 3.204241 l 1.60212,2.774673 z M 99.18691,72.5122 50.84478,100.36359 2.5026501,72.5122 2.5026511,44.660795 50.84478,72.5122 99.18691,44.660795 Z M 2.5019531,44.660156 V 72.511719 L 50.845703,100.36328 99.1875,72.511719 V 44.660156 L 50.845703,72.511719 Z M 99.186358,44.660805 75.0155,58.586506 50.84464,44.660805 50.844641,16.809399 75.0155,2.883697 99.186358,16.809399 Z m -48.341579,-7e-6 L 26.673715,58.586493 2.5026505,44.660798 2.5026508,16.809404 26.673716,2.8837085 50.844779,16.809405 Z" />
+    </g>
+</svg>

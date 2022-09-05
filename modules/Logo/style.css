@@ -1,0 +1,22 @@
+/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+
+#logoWithText {
+    margin: 2em;
+}
+#logoWithText .logo {
+    width: 6em;
+    height: 6em;
+    display: inline-block;
+    vertical-align: middle;
+}
+#logoWithText .text {
+    font-size: 4em;
+    display: inline-block;
+    vertical-align: middle;
+    font-weight: bold;
+}
+#logoWithText .version {
+    font-size: 1.5em;
+    display: inline-block;
+    vertical-align: bottom;
+}

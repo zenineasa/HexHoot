@@ -1,0 +1,15 @@
+<!-- Copyright (c) 2022 Zenin Easa Panthakkalakath -->
+<div id="title">${i18n.getText('ViewProfile.viewProfile')}</div>
+<div id="viewProfile">
+    <div class="label">${i18n.getText('ViewProfile.publicKey')}</div>
+    <div class="value">${userInfo.key}</div>
+
+    <div class="label">${i18n.getText('ViewProfile.displayName')}</div>
+    <div class="value">${userInfo.displayName}</div>
+
+    <div class="label">${i18n.getText('ViewProfile.aboutPerson')}</div>
+    <div class="value">${userInfo.about}</div>
+
+    <div class="label">${i18n.getText('ViewProfile.photo')}</div>
+    <div class="value"><img src="${this.getProfilePic(userInfo.photo)}"></div>
+</div>

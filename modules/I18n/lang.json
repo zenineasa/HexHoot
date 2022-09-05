@@ -1,0 +1,164 @@
+{
+    "coprightMessage": "Copyright © 2022 Zenin Easa Panthakkalakath",
+
+    "I18n": {
+        "language": {
+            "en": "English",
+            "ml": "മലയാളം"
+        },
+        "chooseLanguage": {
+            "en": "Choose a Language",
+            "ml": "ഭാഷ തിരഞ്ഞെടുക്കുക"
+        }
+    },
+    "AddFriend": {
+        "addFriend": {
+            "en": "Add friend",
+            "ml": "സുഹൃത്തിനെ ചേർക്കുക"
+        },
+        "copyToClipboard": {
+            "en": "Copy to clipboard",
+            "ml": "ക്ലിപ്പ്ബോർഡിലേയ്ക്ക് കോപ്പി ചെയ്യുക"
+        },
+        "publicKey": {
+            "en": "Public key (32 characters)",
+            "ml": "പബ്ലിക് കീ (32 പ്രതീകങ്ങൾ)"
+        },
+        "add": {
+            "en": "Add",
+            "ml": "ചേർക്കുക"
+        },
+        "myCode": {
+            "en": "My code",
+            "ml": "എന്റെ കോഡ്"
+        },
+        "theirCode": {
+            "en": "Their code",
+            "ml": "അവരുടെ കോഡ്"
+        },
+        "back": {
+            "en": "Back",
+            "ml": "ബാക്ക്"
+        }
+    },
+    "Chat": {
+        "at": {
+            "en": "at",
+            "ml": "ചെയ്തത്"
+        },
+        "addFriend": {
+            "en": "Add friend",
+            "ml": "സുഹൃത്തിനെ ചേർക്കുക"
+        },
+        "search": {
+            "en": "Search",
+            "ml": "തിരയുക"
+        },
+        "typeInYourMessage": {
+            "en": "Type in you message here...",
+            "ml": "താങ്കളുടെ സന്ദേശം ഇവിടെ എഴുതുക..."
+        }
+    },
+    "EditProfile": {
+        "editProfile": {
+            "en": "Edit profile",
+            "ml": "വ്യക്തിവിവരങ്ങൾ എഡിറ്റ് ചെയ്യുവാൻ"
+        },
+        "logoutConfirmation": {
+            "en": "Logging out will delete all the data in your system. We recommend that you backup the same.",
+            "ml": "ലോഗ് ഔട്ട് ചെയ്താൽ നിങ്ങളുടെ സിസ്റ്റത്തിലെ എല്ലാ ഡാറ്റയും ഡിലീറ്റ് ചെയ്യപ്പെടും. ആയതിനാൽ ലോഗൗട്ട് ചെയ്യുന്നതിന് മുന്നോടിയായി ഇതെല്ലാം ബാക്കപ്പ് ചെയ്യാൻ ഞങ്ങൾ ശുപാർശ ചെയ്യുന്നു."
+        },
+        "privateKey": {
+            "en": "Private key (32 characters)",
+            "ml": "പ്രൈവറ്റ് കീ (32 പ്രതീകങ്ങൾ)"
+        },
+        "warningNotToShare": {
+            "en": "Do not share it with anyone",
+            "ml": "യാതൊരു കാരണവശയാലും ഇത് മറ്റൊരാൾക്ക് പറഞ്ഞുകൊടുക്കരുത്"
+        },
+        "displayName": {
+            "en": "Display name",
+            "ml": "പ്രദർശന നാമം"
+        },
+        "aboutYou": {
+            "en": "About you",
+            "ml": "നിങ്ങളെ കുറിച്ച്"
+        },
+        "photo": {
+            "en": "Photo",
+            "ml": "ഫോട്ടോ"
+        },
+        "applyEdit": {
+            "en": "Apply edit",
+            "ml": "എഡിറ്റ് ചെയ്യുക"
+        },
+        "downloadProfile": {
+            "en": "Download profile backup",
+            "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക"
+        },
+        "logout": {
+            "en": "Logout",
+            "ml": "ലോഗ്ഔട്ട് ചെയ്യുക"
+        },
+        "back": {
+            "en": "Back",
+            "ml": "ബാക്ക്"
+        }
+    },
+    "Login": {
+        "privateKeyLength": {
+            "en": "Private key has to be a hexadecimal value of size 32 characters.",
+            "ml": "പ്രൈവറ്റ് കീ കൃത്യം 32 പ്രതീകങ്ങളുള്ള ഹെക്സാഡെസിമൽ ആയിരിക്കണം."
+        },
+        "minimumCharacters": {
+            "en": "Display name should have atleast 4 characters.",
+            "ml": "പ്രദർശന നാമത്തിൽ കുറഞ്ഞത് 4 പ്രതീകമെങ്കിലുമുണ്ടായിരിക്കണം."
+        },
+        "privateKey": {
+            "en": "Private key (32 characters)",
+            "ml": "പ്രൈവറ്റ് കീ (32 പ്രതീകങ്ങൾ)"
+        },
+        "displayName": {
+            "en": "Display name",
+            "ml": "പ്രദർശന നാമം"
+        },
+        "aboutYou": {
+            "en": "About you",
+            "ml": "നിങ്ങളെ കുറിച്ച്"
+        },
+        "login": {
+            "en": "Login",
+            "ml": "ലോഗിൻ ചെയ്യുക"
+        },
+        "loginUsingBackup": {
+            "en": "Login using profile backup",
+            "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യുക"
+        }
+    },
+    "ViewProfile": {
+        "viewProfile": {
+            "en": "View profile",
+            "ml": "വ്യക്തിവിവരങ്ങൾ"
+        },
+        "publicKey": {
+            "en": "Public key",
+            "ml": "പബ്ലിക് കീ"
+        },
+        "displayName": {
+            "en": "Display name",
+            "ml": "പ്രദർശന നാമം"
+        },
+        "aboutPerson": {
+            "en": "About the person",
+            "ml": "വ്യക്തിയെക്കുറിച്ച്"
+        },
+        "photo": {
+            "en": "Photo",
+            "ml": "ഫോട്ടോ"
+        },
+        "back": {
+            "en": "Back",
+            "ml": "ബാക്ക്"
+        }
+    }
+}
