@@ -13,8 +13,8 @@ clean:
 
 lint:
 	npx eslint *.js modules/**/*.js test/*.js test/**/*.js
-	npx copyright-header --copyrightHolder "HexHoot"
+	npx copyright-header --copyrightHolder "Zenin Easa Panthakkalakath"
 
 lintfix:
 	npx eslint *.js modules/**/*.js test/*.js test/**/*.js --fix
-	npx copyright-header --fix --copyrightHolder "HexHoot"
+	npx copyright-header --fix --copyrightHolder "Zenin Easa Panthakkalakath"
