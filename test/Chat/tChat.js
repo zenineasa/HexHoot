@@ -27,7 +27,7 @@ QUnit.test('Render login and check the elements within', function(assert) {
     assert.strictEqual(messageComposers.length, 1,
         'There should be exactly one DIV with the id "messageComposers".');
     assert.strictEqual(
-        messageComposers[0].getElementsByClassName('input').length, 1,
+        messageComposers[0].getElementsByTagName('textarea').length, 1,
         'There should be a textarea to type in the message.');
     assert.strictEqual(
         messageComposers[0].getElementsByClassName('send').length, 1,
