@@ -16,19 +16,6 @@
     display: block;
     text-overflow: ellipsis;
 }
-#login .button {
-    font-size: 100%;
-    border: 0;
-    padding: 0.5em 1em;
-    margin: 1em;
-    border-radius: 0.2em;
-    width: 90%;
-    background: rgba(0, 180, 255, 0.8);
-    color: #fff;
-}
-#login .button:hover {
-    opacity: 0.5;
-}
 #login .privateKey {
     display: flex;
     flex-direction: row;
@@ -36,6 +23,6 @@
 #login .privateKey .input {
     margin-left: 1em;
 }
-#login .privateKey .button {
+#login #generatePrivateKey {
     width: 4em;
 }

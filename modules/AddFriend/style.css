@@ -47,16 +47,3 @@
     display: block;
     color: #fff;
 }
-#mainContent .tabContent button {
-    background: rgba(0, 180, 255, 0.8);
-    padding: 0.5em;
-    margin-bottom: 1em;
-    width: 90%;
-    border-radius: 0.2em;
-	color: inherit;
-	border: none;
-	font: inherit;
-}
-#mainContent .tabContent button:hover {
-    opacity: 0.5;
-}

@@ -25,22 +25,13 @@
     margin: auto;
     display: block;
 }
-#mainContent #editProfile .button {
-    font-size: 100%;
-    border: 0;
-    padding: 0.5em 1em;
-    margin: 1em;
-    border-radius: 0.2em;
-    width: 90%;
-    color: #fff;
-}
-#mainContent #editProfile .button:hover {
-    opacity: 0.5;
-}
 #mainContent #editButton {
+    margin-top: 2em;
+    margin-bottom: 0.5em;
     background: rgba(0, 180, 255, 0.8);
 }
 #mainContent #downloadProfile {
+    margin-bottom: 0.5em;
     background: rgba(0, 180, 255, 0.8);
 }
 #mainContent #logout {

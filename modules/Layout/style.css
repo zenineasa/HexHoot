@@ -26,18 +26,6 @@
     min-width: 10em;
     overflow-y: scroll;
 }
-#sidebar button {
-    background: rgba(0, 180, 255, 0.8);
-    padding: 0.5em;
-    width: 90%;
-    border-radius: 0.2em;
-	color: inherit;
-	border: none;
-	font: inherit;
-}
-#sidebar button:hover {
-    opacity: 0.5;
-}
 #sidebar input {
     border: 0;
     border-bottom: 1px solid #ccc;

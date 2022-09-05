@@ -18,7 +18,7 @@ QUnit.test('Render login and check the forms', function(assert) {
     const logins = document.querySelectorAll('#login');
     assert.strictEqual(logins.length, 1,
         'There should be exactly one DIV with the id "login".');
-    const inputs = document.querySelectorAll('.input');
+    const inputs = document.querySelectorAll('input[type=text],textarea');
     assert.strictEqual(inputs.length, 3,
         'There should be exactly three input fields.');
     const buttons = document.querySelectorAll('button');
@@ -57,7 +57,7 @@ QUnit.test('Fill in the form and check', async function(assert) {
         'about': 'About the person!',
     };
 
-    const inputs = document.querySelectorAll('.input');
+    const inputs = document.querySelectorAll('input[type=text],textarea');
     for (let i = 0; i < inputs.length; i++) {
         if (inputs[i].name === 'privateKey') {
             inputs[i].value = testUserInfoValues.privateKey;

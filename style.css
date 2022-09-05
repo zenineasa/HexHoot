@@ -23,3 +23,33 @@ body {
     height: 80%;
     text-align: center;
 }
+
+/** For Button **/
+
+.HexHoot_Button {
+    background: rgba(0, 180, 255, 0.8);
+    padding: 0.5em 1em;
+    width: 90%;
+    border-radius: 0.2em;
+    color: inherit;
+    border: none;
+    font: inherit;
+    margin: 1em;
+}
+.HexHoot_Button:hover {
+    opacity: 0.5;
+}
+
+/** For Input **/
+
+.HexHoot_Input {
+    border: 0;
+    border-bottom: 1px solid #ccc;
+    background: none;
+    border-radius: 0;
+    width: calc(100% - 1em);
+    padding: 0.5em;
+    margin: auto;
+    display: block;
+    color: #fff;
+}

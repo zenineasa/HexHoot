@@ -22,7 +22,6 @@ class Chat {
         }
         Chat._instance = this;
         Chat._instance.initialize();
-        console.log(ViewProfile);
     }
 
     /**

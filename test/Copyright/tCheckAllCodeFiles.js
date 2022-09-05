@@ -22,7 +22,9 @@ QUnit.test('Check code files for copyright message', async function(assert) {
                 const fileContent =
                     requireText(path.join('./../../../', files[i]), require);
                 assert.ok(fileContent.includes(
-                    '<!-- Copyright (c) 2022 Zenin Easa Panthakkalakath -->'));
+                    '<!-- Copyright (c) 2022 Zenin Easa Panthakkalakath -->'),
+                'Copyright message not found in: ' + files[i],
+                );
             }
             resolve('All good');
         });
@@ -35,8 +37,11 @@ QUnit.test('Check code files for copyright message', async function(assert) {
             for (let i = 0; i < files.length; i++) {
                 const fileContent =
                     requireText(path.join('./../../../', files[i]), require);
-                assert.ok(fileContent.includes(
-                    '/* Copyright (c) 2022 Zenin Easa Panthakkalakath */'));
+                assert.ok(
+                    fileContent.includes(
+                        '/* Copyright (c) 2022 Zenin Easa Panthakkalakath */'),
+                    'Copyright message not found in: ' + files[i],
+                );
             }
             resolve('All good');
         });
@@ -49,9 +54,11 @@ QUnit.test('Check code files for copyright message', async function(assert) {
             for (let i = 0; i < files.length; i++) {
                 const fileContent =
                     requireText(path.join('./../../../', files[i]), require);
-                assert.ok(fileContent.includes(
-                    '"coprightMessage": ' +
-                    '"Copyright © 2022 Zenin Easa Panthakkalakath"'));
+                assert.ok(
+                    fileContent.includes('"coprightMessage": ' +
+                        '"Copyright © 2022 Zenin Easa Panthakkalakath"'),
+                    'Copyright message not found in: ' + files[i],
+                );
             }
             resolve('All good');
         });
