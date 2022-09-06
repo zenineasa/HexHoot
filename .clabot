@@ -1,0 +1,6 @@
+{
+    "contributors": ["zenineasa"],
+    "message": "We require contributors to sign our Contributor License Agreement. For more information, please <a href='https://hexhootcla.herokuapp.com/'>click here</a>.",
+    "label": "cla-signed",
+    "recheckComment": "Rechecking pull request"
+}
