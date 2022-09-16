@@ -1,0 +1,19 @@
+/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+
+#mainContent #addPost {
+    height: 5em;
+    background: rgba(255,255,255,0.1);
+    display: none; /* Will be 'flex' when active */
+}
+#mainContent #addPost .send {
+    margin-left: 20px;
+    display: block;
+    width: 5em;
+    height: 5em;
+    background-position: center;
+    background-size: 75%;
+    background-repeat: no-repeat;
+}
+#mainContent #addPost .send:hover {
+    background-color: #E6E7ED;
+}

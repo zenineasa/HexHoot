@@ -106,23 +106,20 @@ class EditProfile {
      * when the icon is clicked.
      */
     async renderToIconBar(clickCallback) {
-        const iconBarDOMNode = document.getElementById('iconbar');
-        iconBarDOMNode.innerHTML += eval('`' +
+        // For profile photo on the icon
+        const info = await dbMessenger.getLoggedInUserInfoPrivate();
+
+        const holderDOM = document.createElement('div');
+        holderDOM.innerHTML = eval('`' +
             requireText('./template_iconbar.html', require) + '`');
-        const profilePicIconDOMNode = document.getElementById('ownProfilePic');
-        profilePicIconDOMNode.onclick = function() {
+
+        const iconDOMNode = holderDOM.querySelector('#ownProfilePic');
+        iconDOMNode.onclick = function() {
             this.render(clickCallback);
         }.bind(this);
 
-        // Profile photo on the icon
-        const info = await dbMessenger.getLoggedInUserInfoPrivate();
-        if (info.photo) {
-            profilePicIconDOMNode.style.backgroundImage =
-                'url(' + info.photo + ')';
-        } else {
-            profilePicIconDOMNode.style.backgroundImage = 'url("' +
-                imagePack.getPath('interface.defaultProfilePic') + '")';
-        }
+        const iconBarDOMNode = document.getElementById('iconbar');
+        iconBarDOMNode.appendChild(holderDOM);
     }
 }
 

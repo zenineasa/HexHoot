@@ -4,6 +4,7 @@ const requireText = require('require-text');
 const Layout = require('./../Layout');
 const dbMessenger = require('./../DBMessenger')();
 const addFriend = require('./../AddFriend');
+const Wall = require('./../Wall');
 const EditProfile = require('./../EditProfile');
 const ViewProfile = require('./../ViewProfile');
 const imagePack = require('../ImagePack');
@@ -47,6 +48,7 @@ class Chat {
     render() {
         Layout.render();
         EditProfile.renderToIconBar(this.render.bind(this));
+        Wall.renderToIconBar();
 
         // Link css
         const link = document.createElement('link');
