@@ -158,7 +158,7 @@ utils.signMessage = function(message, privateKeyString) {
     const signature = privateKey.sign(hashedMessage, algorithm);
 
     return signature.toString('hex');
-}
+};
 /**
  * Verify the signature for a message using public key
  * @param {string} message message was signed
@@ -173,6 +173,6 @@ utils.verifySignature = function(message, signature, publicKeyString) {
     const hashedMessage = crypto.createHash(algorithm)
         .update(Buffer.from(message)).digest();
     return publicKey.verifySignature(hashedMessage, signature);
-}
+};
 
 module.exports = utils;

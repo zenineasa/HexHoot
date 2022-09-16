@@ -3,7 +3,8 @@
 const requireText = require('require-text');
 const Layout = require('./../Layout');
 const dbMessenger = require('./../DBMessenger')();
-const imagePack = require('../ImagePack');
+// eslint-disable-next-line no-unused-vars
+const imagePack = require('../ImagePack'); // used in template
 const i18n = require('./../I18n')();
 
 /**
@@ -106,7 +107,8 @@ class EditProfile {
      * when the icon is clicked.
      */
     async renderToIconBar(clickCallback) {
-        // For profile photo on the icon
+        // For profile photo on the icon; used in the template file
+        // eslint-disable-next-line no-unused-vars
         const info = await dbMessenger.getLoggedInUserInfoPrivate();
 
         const holderDOM = document.createElement('div');

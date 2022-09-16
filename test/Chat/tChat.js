@@ -9,7 +9,7 @@ QUnit.test('Check if Chat module is available', function(assert) {
     assert.ok(typeof(Chat) !== 'undefined');
 });
 
-QUnit.test('Render login and check the elements within', async function(assert) {
+QUnit.test('Render login and check the children', async function(assert) {
     utils.setFixtureWithContainerDOMElemenent();
 
     await chat.render();

@@ -2,14 +2,17 @@
 
 const requireText = require('require-text');
 const Layout = require('./../Layout');
+// eslint-disable-next-line no-unused-vars
 const dbMessenger = require('./../DBMessenger')();
+// eslint-disable-next-line no-unused-vars
 const imagePack = require('../ImagePack');
+// eslint-disable-next-line no-unused-vars
 const i18n = require('./../I18n')();
 
 /**
  * This class implements the functionality for posting on public walls.
  */
- class Wall {
+class Wall {
     /** This is the constructor (note the singleton implementation) */
     constructor() {
         if (Wall._instance) {
@@ -43,7 +46,6 @@ const i18n = require('./../I18n')();
         const mainContentDOMNode = document.getElementById('mainContent');
         mainContentDOMNode.innerHTML += eval('`' +
             requireText('./template_mainContent.html', require) + '`');
-
     }
 
     /**
