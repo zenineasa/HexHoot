@@ -124,6 +124,15 @@ class DBWrapper {
         );
         addTable(
             event.target.result,
+            'Wall',
+            ['key', 'timestamp'],
+            {
+                'post': {},
+                'signature': {},
+            },
+        );
+        addTable(
+            event.target.result,
             'LoggedInUserInfo',
             'key',
             {

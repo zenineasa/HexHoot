@@ -143,4 +143,36 @@ utils.decryptMessage = function(encryptedString, sharedKeyString, iv) {
     return decrypted.toString();
 };
 
+/**
+ * Sign a message using private key
+ * @param {string} message message that need to be signed
+ * @param {string} privateKeyString private key of a user
+ * @return {string} signature
+ */
+utils.signMessage = function(message, privateKeyString) {
+    const algorithm = 'sha512';//utils.getEncryptionAlgorithm();
+    const privateKey = utils.getPrivateKeyHandle(privateKeyString);
+
+    const hashedMessage = crypto.createHash(algorithm)
+        .update(Buffer.from(message)).digest();
+    const signature = privateKey.sign(hashedMessage, algorithm);
+
+    return signature.toString('hex');
+};
+/**
+ * Verify the signature for a message using public key
+ * @param {string} message message was signed
+ * @param {string} signature signature corresponding to the message
+ * @param {string} publicKeyString public key of a user
+ * @return {boolean} whether the signature if valid or not
+ */
+utils.verifySignature = function(message, signature, publicKeyString) {
+    const algorithm = 'sha512';//utils.getEncryptionAlgorithm();
+    const publicKey = utils.getPublicKeyHandle(publicKeyString);
+
+    const hashedMessage = crypto.createHash(algorithm)
+        .update(Buffer.from(message)).digest();
+    return publicKey.verifySignature(hashedMessage, signature);
+};
+
 module.exports = utils;

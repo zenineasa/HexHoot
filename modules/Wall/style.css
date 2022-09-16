@@ -1,0 +1,54 @@
+/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+
+#mainContent #addPost {
+    height: 5em;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+}
+#mainContent #addPost .send {
+    margin-left: 20px;
+    display: block;
+    width: 5em;
+    height: 5em;
+    background-position: center;
+    background-size: 75%;
+    background-repeat: no-repeat;
+}
+#mainContent #addPost .send:hover {
+    background-color: #E6E7ED;
+}
+
+#mainContent #posts {
+    height: 100%;
+    overflow-y: scroll;
+    padding: 0.5em;
+}
+#mainContent #posts .post {
+    margin: 0.5em;
+    padding: 0.5em;
+    background: rgba(255,255,255,0.1);
+}
+#mainContent #posts .post .senderInfo {
+    display: flex;
+}
+#mainContent #posts .post .senderInfo .photo {
+    margin-left: 20px;
+    display: block;
+    width: 45px;
+    height: 45px;
+    background: #E6E7ED;
+    border-radius: 50%;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+#mainContent #posts .post .senderInfo .displayName {
+    margin: auto 0.5em;
+}
+#mainContent #posts .post .postContent {
+    text-align: left;
+    padding: 1em;
+}
+#mainContent #posts .post .buttons {
+    display: flex;
+}
