@@ -9,10 +9,10 @@ QUnit.test('Check if Chat module is available', function(assert) {
     assert.ok(typeof(Chat) !== 'undefined');
 });
 
-QUnit.test('Render login and check the elements within', function(assert) {
+QUnit.test('Render login and check the elements within', async function(assert) {
     utils.setFixtureWithContainerDOMElemenent();
 
-    chat.render();
+    await chat.render();
 
     // Check the elements within
     const messageSenderInfos = document.querySelectorAll('#messageSenderInfo');

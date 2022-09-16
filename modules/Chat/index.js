@@ -45,10 +45,10 @@ class Chat {
     /**
      * This function renders the template into the UI.
      */
-    render() {
+    async render() {
         Layout.render();
-        EditProfile.renderToIconBar(this.render.bind(this));
-        Wall.renderToIconBar();
+        await EditProfile.renderToIconBar(this.render.bind(this));
+        await Wall.renderToIconBar(this.render.bind(this));
 
         // Link css
         const link = document.createElement('link');
@@ -177,10 +177,6 @@ class Chat {
             // some content
             messageComposer.style.display = 'flex';
             messageComposer.getElementsByTagName('textarea')[0].value = '';
-
-            // Get the icon for 'messageSendButton'
-            messageSendButton.style.backgroundImage = 'url("' +
-                imagePack.getPath('interface.sendButton') + '")';
 
             // Update the active chat
             this.activeChat = friend.key;

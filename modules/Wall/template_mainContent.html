@@ -1,6 +1,16 @@
 <!-- Copyright (c) 2022 Zenin Easa Panthakkalakath -->
 <div id="addPost">
     <textarea class="HexHoot_Input" placeholder="${i18n.getText('Chat.typeInYourMessage')}"></textarea>
-    <div class="send"></div>
+    <div class="send" style="background-image:url('${imagePack.getPath('interface.sendButton')}')"></div>
 </div>
-<div id="posts"></div>
+<div id="posts">
+    <!-- TODO: To be removed once CSS is ready -->
+    <div class="post">
+        <div class="senderInfo">
+            <div class="photo" style="background-image: url(/Users/zenin/Documents/GitHub/hexhoot/modules/ImagePack/images/default_profile.svg);"></div>
+            <div class="displayName">Batman</div>
+        </div>
+        <div class="postContent">Mafia shashi had a little lamb</div>
+        <div class="buttons">Like | Comment</div>
+    </div>
+</div>

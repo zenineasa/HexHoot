@@ -20,8 +20,10 @@ const i18n = require('./../I18n')();
 
     /**
      * This function renders the template into the UI.
+     * @param {function} backCallback the callback function that is executed
+     * when back button is clicked.
      */
-    async render() {
+    async render(backCallback) {
         // Render the layout
         Layout.render();
 
@@ -31,7 +33,17 @@ const i18n = require('./../I18n')();
         link.href = __dirname + '/style.css';
         document.body.appendChild(link);
 
-        debugger; // TODO:///
+        // Sidebar related
+        const sidebarDOMNode = document.getElementById('sidebar');
+        sidebarDOMNode.innerHTML += eval('`' +
+            requireText('./template_sidebar.html', require) + '`');
+        document.getElementById('backButton').onclick = backCallback;
+
+        // Main content related
+        const mainContentDOMNode = document.getElementById('mainContent');
+        mainContentDOMNode.innerHTML += eval('`' +
+            requireText('./template_mainContent.html', require) + '`');
+
     }
 
     /**
@@ -40,15 +52,14 @@ const i18n = require('./../I18n')();
      * @param {function} clickCallback the callback function that is executed
      * when the icon is clicked.
      */
-    async renderToIconBar() {
+    async renderToIconBar(clickCallback) {
         const holderDOM = document.createElement('div');
         holderDOM.innerHTML = eval('`' +
             requireText('./template_iconbar.html', require) + '`');
 
         const iconDOMNode = holderDOM.querySelector('#wallIcon');
         iconDOMNode.onclick = function() {
-            console.log('asd');
-            this.render();
+            this.render(clickCallback);
         }.bind(this);
 
         const iconBarDOMNode = document.getElementById('iconbar');
