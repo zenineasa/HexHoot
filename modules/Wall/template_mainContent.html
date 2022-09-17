@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2022 Zenin Easa Panthakkalakath -->
 <div id="addPost">
-    <textarea class="HexHoot_Input" placeholder="${i18n.getText('Chat.typeInYourMessage')}"></textarea>
+    <textarea class="HexHoot_Input" placeholder="${i18n.getText('Wall.typeInYourMessage')}"></textarea>
     <div class="send" style="background-image:url('${imagePack.getPath('interface.sendButton')}')"></div>
 </div>
 <div id="posts">
@@ -11,6 +11,9 @@
             <div class="displayName">Batman</div>
         </div>
         <div class="postContent">Mafia shashi had a little lamb</div>
-        <div class="buttons">Like | Comment</div>
+        <div class="buttons">
+            <button class="HexHoot_Button" id="likeButton">${i18n.getText('Wall.like')}</button>
+            <button class="HexHoot_Button" id="commentButton">${i18n.getText('Wall.comment')}</button>
+        </div>
     </div>
 </div>

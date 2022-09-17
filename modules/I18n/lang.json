@@ -160,5 +160,23 @@
             "en": "Back",
             "ml": "ബാക്ക്"
         }
+    },
+    "Wall": {
+        "typeInYourMessage": {
+            "en": "Type in you message here...",
+            "ml": "താങ്കളുടെ സന്ദേശം ഇവിടെ എഴുതുക..."
+        },
+        "like": {
+            "en": "Like",
+            "ml": "ലൈക്ക്"
+        },
+        "comment": {
+            "en": "Comment",
+            "ml": "കമന്റ്"
+        },
+        "back": {
+            "en": "Back",
+            "ml": "ബാക്ക്"
+        }
     }
 }
