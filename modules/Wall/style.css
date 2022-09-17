@@ -24,6 +24,7 @@
     padding: 0.5em;
 }
 #mainContent #posts .post {
+    margin: 0.5em;
     padding: 0.5em;
     background: rgba(255,255,255,0.1);
 }
