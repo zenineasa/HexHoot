@@ -150,7 +150,7 @@ utils.decryptMessage = function(encryptedString, sharedKeyString, iv) {
  * @return {string} signature
  */
 utils.signMessage = function(message, privateKeyString) {
-    const algorithm = utils.getEncryptionAlgorithm();
+    const algorithm = 'sha512';//utils.getEncryptionAlgorithm();
     const privateKey = utils.getPrivateKeyHandle(privateKeyString);
 
     const hashedMessage = crypto.createHash(algorithm)
@@ -167,7 +167,7 @@ utils.signMessage = function(message, privateKeyString) {
  * @return {boolean} whether the signature if valid or not
  */
 utils.verifySignature = function(message, signature, publicKeyString) {
-    const algorithm = utils.getEncryptionAlgorithm();
+    const algorithm = 'sha512';//utils.getEncryptionAlgorithm();
     const publicKey = utils.getPublicKeyHandle(publicKeyString);
 
     const hashedMessage = crypto.createHash(algorithm)

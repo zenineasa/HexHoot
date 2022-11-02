@@ -46,6 +46,13 @@ class Wall {
         const mainContentDOMNode = document.getElementById('mainContent');
         mainContentDOMNode.innerHTML += eval('`' +
             requireText('./template_mainContent.html', require) + '`');
+
+        const addPost = document.getElementById('addPost');
+        const postTextArea = addPost.getElementsByTagName('textarea')[0];
+        const postSendButton = addPost.getElementsByClassName('send')[0];
+        postSendButton.onclick = function(event) {
+            this.addWallPost(postTextArea);
+        }.bind(this);
     }
 
     /**
@@ -66,6 +73,62 @@ class Wall {
 
         const iconBarDOMNode = document.getElementById('iconbar');
         iconBarDOMNode.appendChild(holderDOM);
+
+        this.loadWallPosts();
+    }
+
+    /**
+     * Load all posts in the wall
+     */
+    async loadWallPosts() {
+        const wallPosts = await dbMessenger.getAllWallPosts();
+        //debugger;
+        // TODO: ...
+    }
+
+    /**
+     * Add wall post
+     * @param {object} postTextArea DOM element for the textarea where the
+     * message is composed
+     */
+    async addWallPost(postTextArea) {
+        const userInfo = await dbMessenger.getLoggedInUserInfoPublic();
+        const wallPost = {
+            timestamp: Date.now(),
+            post: postTextArea.value.trim(),
+            senderKey: userInfo.key,
+        };
+        dbMessenger.addWallPost(wallPost);
+        this.insertPostToDOM(wallPost);
+        postTextArea.value = '';
+    }
+
+    /**
+     * Insert wall post to DOM
+     * @param {Object} wallPost the post and other information associated with
+     * it.
+     */
+    async insertPostToDOM(wallPost) {
+        // Get user info of the poster
+        const userInfo = await dbMessenger.getUserInfo(wallPost.senderKey);
+
+        const postsDOMNode = document.getElementById('posts');
+        postsDOMNode.innerHTML += eval('`' +
+            requireText('./template_post.html', require) + '`');
+    }
+
+    /**
+     * Get the profile pic
+     * @param {string} photo either an empty string or a string that contains
+     * the entire image (base64 encoded image, data URL)
+     * @return {string} an image that can be used as CSS background URL
+     */
+    getProfilePic(photo) {
+        if (photo) {
+            return photo;
+        } else {
+            return imagePack.getPath('interface.defaultProfilePic');
+        }
     }
 }
 
