@@ -1,12 +1,27 @@
 # HexHoot
-
+<style>
+@media (prefers-color-scheme: light) {
+    img {
+        max-width:100%;
+        background:inherit;
+        filter:invert(1);
+    }
+}
+@media (prefers-color-scheme: dark) {
+    img {
+        max-width:100%;
+        background:inherit;
+        filter:invert(0);
+    }
+}
+</style>
 <p align="center">
-    <a href="//hexhoot.com"><img src="https://raw.githubusercontent.com/zenineasa/hexhoot/main/modules/ImagePack/images/icon.svg" width="200" height="200"></a>
+    <a href="//hexhoot.com"><img src="./modules/ImagePack/images/icon.svg" width="200" height="200"></a>
 </p>
 
 This is an attempt to create an Opensource Peer-to-peer Social Network with Zero-Knowledge-Proof based authentication. The objective is to democratize social networking by eliminating any form of central servers.
 
-The initial target is to release a desktop version that can be installed and run on Linux, macOS and Windows.
+The initial target is to release a desktop version that can be installed and run on Linux, macOS and Windows, wherein people can chat with each other.
 
 
 ## About
@@ -38,18 +53,16 @@ A social network that:
 ### F - Functionalities / Functional Design
 
 1. Ability to create and share profiles
-2. Ability to connect two profiles (add as a friend or follow) by scanning a QR code.
+2. Ability to connect two profiles (add as a friend or follow).
 3. Send private messages.
-4. Form groups and send messages.
-5. Write a post and share a photo or video that is viewable to anyone to whom the profile is connected.
+4. Form groups and send messages (not implemented yet).
+5. Write a post and share a photo or video that is viewable to anyone to whom the profile is connected (not implemented yet).
 
 ### A - Architecture
 
 Everything shall be modules, including the engine. Each module will be written in a Model-View-Controller design. Modules shall have a JSON file that informs which other modules the module is dependent on.
 
 For message communication, we could use Hyperswarm (based on Hypercore).
-
-TODO: Architecture diagrams need to be added here
 
 ## Tasks
 
