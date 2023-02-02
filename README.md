@@ -3,7 +3,7 @@
     <a href="//hexhoot.com">
         <picture>
             <source media="(prefers-color-scheme: light)" srcset="./modules/ImagePack/images/icon_lightmode.svg">
-            <img src="./modules/ImagePack/images/icon.svg">
+            <img src="./modules/ImagePack/images/icon.svg" width="200" height="200">
         </picture>
     </a>
 </p>
