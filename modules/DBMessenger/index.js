@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
 
 const dbWrapper = require('./DBWrapper')();
 const messenger = require('./Messenger')();
@@ -30,7 +30,6 @@ class DBMessenger {
             chat: 'Chat',
             loggedInUser: 'LoggedInUserInfo',
             preferences: 'Preferences',
-            wall: 'Wall',
         };
 
         // Message types; like enum
@@ -332,29 +331,6 @@ class DBMessenger {
             this.tableNames.preferences,
             name,
         );
-    }
-
-    /**
-     * Get all wall posts
-     * @return {Array} all wall posts
-     */
-    async getAllWallPosts() {
-        return await dbWrapper.getAll(this.tableNames.wall);
-    }
-
-    /**
-     * Add a wall posts
-     */
-    async addWallPost(wallPost) {
-        // TODO: Add signature to the post
-        const userInfo = await this.getLoggedInUserInfoPrivate();
-        const signature = utils.signMessage(JSON.stringify(wallPost), userInfo.privateKey);
-        debugger;
-        utils.verifySignature(JSON.stringify(wallPost), signature, utils.getPublicKeyFromPrivateKey(userInfo.privateKey));
-
-        // TODO: Store the post in the 'Wall' datatable
-
-        // TODO: Stream the post to friends
     }
 }
 

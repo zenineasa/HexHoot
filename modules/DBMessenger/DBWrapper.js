@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
 
 const IDBExportImport = require('indexeddb-export-import');
 
@@ -120,15 +120,6 @@ class DBWrapper {
             ['key', 'timestamp'],
             {
                 'messages': {unique: false},
-            },
-        );
-        addTable(
-            event.target.result,
-            'Wall',
-            ['key', 'timestamp'],
-            {
-                'post': {},
-                'signature': {},
             },
         );
         addTable(

@@ -1,5 +1,5 @@
 {
-    "coprightMessage": "Copyright © 2022 Zenin Easa Panthakkalakath",
+    "coprightMessage": "Copyright © 2022-2023 Zenin Easa Panthakkalakath",
 
     "I18n": {
         "language": {
@@ -155,24 +155,6 @@
         "photo": {
             "en": "Photo",
             "ml": "ഫോട്ടോ"
-        },
-        "back": {
-            "en": "Back",
-            "ml": "ബാക്ക്"
-        }
-    },
-    "Wall": {
-        "typeInYourMessage": {
-            "en": "Type in you message here...",
-            "ml": "താങ്കളുടെ സന്ദേശം ഇവിടെ എഴുതുക..."
-        },
-        "like": {
-            "en": "Like",
-            "ml": "ലൈക്ക്"
-        },
-        "reply": {
-            "en": "Reply",
-            "ml": "മറുപടി"
         },
         "back": {
             "en": "Back",

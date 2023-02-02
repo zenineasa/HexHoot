@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
 
 /**
  * This file contains maps to all the images that are used in the UI and helper
@@ -13,7 +13,6 @@ imagePack = {
     'interface': {
         'sendButton': 'send.svg',
         'defaultProfilePic': 'default_profile.svg',
-        'wallIcon': 'wall.svg',
     },
     'social': {
         'facebook': 'Social/Facebook.png',
