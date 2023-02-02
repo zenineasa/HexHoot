@@ -13,6 +13,7 @@ imagePack = {
     'interface': {
         'sendButton': 'send.svg',
         'defaultProfilePic': 'default_profile.svg',
+        'wallIcon': 'wall.svg',
     },
     'social': {
         'facebook': 'Social/Facebook.png',

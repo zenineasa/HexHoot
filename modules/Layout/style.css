@@ -11,6 +11,7 @@
 }
 #iconbar .icon {
     height: 4em;
+    margin-bottom: 0.5em;
     background: #E6E7ED;
     border-radius: 50%;
     background-position: center;
