@@ -4,7 +4,6 @@ const requireText = require('require-text');
 const Layout = require('./../Layout');
 const dbMessenger = require('./../DBMessenger')();
 const addFriend = require('./../AddFriend');
-const Wall = require('./../Wall');
 const EditProfile = require('./../EditProfile');
 const ViewProfile = require('./../ViewProfile');
 const imagePack = require('../ImagePack');
@@ -45,10 +44,9 @@ class Chat {
     /**
      * This function renders the template into the UI.
      */
-    async render() {
+    render() {
         Layout.render();
-        await EditProfile.renderToIconBar(this.render.bind(this));
-        await Wall.renderToIconBar(this.render.bind(this));
+        EditProfile.renderToIconBar(this.render.bind(this));
 
         // Link css
         const link = document.createElement('link');
@@ -177,6 +175,10 @@ class Chat {
             // some content
             messageComposer.style.display = 'flex';
             messageComposer.getElementsByTagName('textarea')[0].value = '';
+
+            // Get the icon for 'messageSendButton'
+            messageSendButton.style.backgroundImage = 'url("' +
+                imagePack.getPath('interface.sendButton') + '")';
 
             // Update the active chat
             this.activeChat = friend.key;
