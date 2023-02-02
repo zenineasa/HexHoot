@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
 
 const i18n = require('./modules/I18n')();
 const Social = require('./modules/Social');

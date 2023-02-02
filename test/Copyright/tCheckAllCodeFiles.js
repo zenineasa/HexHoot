@@ -1,9 +1,9 @@
-/* Copyright (c) 2022 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
 
 const path = require('path');
 const glob = require('glob');
 const requireText = require('require-text');
-var regex = require('copyright-regex');
+const regex = require('copyright-regex');
 
 QUnit.test('Check code files for copyright message', async function(assert) {
     // All files to ignore in the following checks
@@ -23,7 +23,7 @@ QUnit.test('Check code files for copyright message', async function(assert) {
                     requireText(path.join('./../../../', files[i]), require);
                 const matches = fileContent.match(regex());
                 assert.ok(matches[5].trim() == 'Zenin Easa Panthakkalakath',
-                'Copyright message not found in: ' + files[i],
+                    'Copyright message not found in: ' + files[i],
                 );
             }
             resolve('All good');
