@@ -1,22 +1,11 @@
 # HexHoot
-<style>
-@media (prefers-color-scheme: light) {
-    img {
-        max-width:100%;
-        background:inherit;
-        filter:invert(1);
-    }
-}
-@media (prefers-color-scheme: dark) {
-    img {
-        max-width:100%;
-        background:inherit;
-        filter:invert(0);
-    }
-}
-</style>
 <p align="center">
-    <a href="//hexhoot.com"><img src="./modules/ImagePack/images/icon.svg" width="200" height="200"></a>
+    <a href="//hexhoot.com">
+        <picture>
+            <source media="(prefers-color-scheme: light)" srcset="./modules/ImagePack/images/icon_lightmode.svg">
+            <img src="./modules/ImagePack/images/icon.svg">
+        </picture>
+    </a>
 </p>
 
 This is an attempt to create an Opensource Peer-to-peer Social Network with Zero-Knowledge-Proof based authentication. The objective is to democratize social networking by eliminating any form of central servers.
