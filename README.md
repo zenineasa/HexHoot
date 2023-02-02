@@ -106,4 +106,4 @@ Run the following command to ensure that all the tests are running fine
 npm run test
 ```
 
-Copyright &copy; 2022 Zenin Easa Panthakkalakath
+Copyright &copy; 2022-2023 Zenin Easa Panthakkalakath
