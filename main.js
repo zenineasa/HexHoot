@@ -2,6 +2,7 @@
 
 const {app, BrowserWindow} = require('electron');
 const path = require('path');
+const imagePack = require('./modules/ImagePack');
 
 /**
  * Creates CEF window in which the app runs
@@ -10,7 +11,7 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
-        icon: path.join(__dirname, 'images', 'favicon.png'),
+        icon: imagePack.getPath('branding.favicon'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,

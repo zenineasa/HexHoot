@@ -52,7 +52,8 @@ class EditProfile {
         // Button callbacks
         document.getElementById('editButton').onclick = async function() {
             const info = {};
-            const inputs = mainContentDOMNode.getElementsByClassName('HexHoot_Input');
+            const inputs =
+                mainContentDOMNode.getElementsByClassName('HexHoot_Input');
             for (let i = 0; i < inputs.length; i++) {
                 if (inputs[i].name === 'photo') {
                     // If there is a photo being uploaded
