@@ -4,161 +4,272 @@
     "I18n": {
         "language": {
             "en": "English",
-            "ml": "മലയാളം"
+            "ml": "മലയാളം",
+            "de": "Deutsch",
+            "fr": "Français",
+            "it": "Italiano"
         },
         "chooseLanguage": {
             "en": "Choose a Language",
-            "ml": "ഭാഷ തിരഞ്ഞെടുക്കുക"
+            "ml": "ഭാഷ തിരഞ്ഞെടുക്കുക",
+            "de": "Sprache auswählen",
+            "fr": "Sélectionnez votre langue",
+            "it": "Seleziona la lingua"
         }
     },
     "AddFriend": {
         "addFriend": {
             "en": "Add friend",
-            "ml": "സുഹൃത്തിനെ ചേർക്കുക"
+            "ml": "സുഹൃത്തിനെ ചേർക്കുക",
+            "de": "Freund hinzufügen",
+            "fr": "Ajouter ame",
+            "it": "Aggiungi amico"
         },
         "copyToClipboard": {
             "en": "Copy to clipboard",
-            "ml": "ക്ലിപ്പ്ബോർഡിലേയ്ക്ക് കോപ്പി ചെയ്യുക"
+            "ml": "ക്ലിപ്പ്ബോർഡിലേയ്ക്ക് കോപ്പി ചെയ്യുക",
+            "de": "In die Zwischenablage kopieren",
+            "fr": "Copier dans le presse-papier",
+            "it": "Copia negli appunti"
         },
         "publicKey": {
             "en": "Public key (32 characters)",
-            "ml": "പബ്ലിക് കീ (32 പ്രതീകങ്ങൾ)"
+            "ml": "പബ്ലിക് കീ (32 പ്രതീകങ്ങൾ)",
+            "de": "Öffentlicher Schlüssel (32 Zeichen)",
+            "fr": "Clé publique (32 caractères)",
+            "it": "Chiave pubblica (32 caratteri)"
         },
         "add": {
             "en": "Add",
-            "ml": "ചേർക്കുക"
+            "ml": "ചേർക്കുക",
+            "de": "Hinzufügen",
+            "fr": "Ajouter",
+            "it": "Aggiungere"
         },
         "myCode": {
             "en": "My code",
-            "ml": "എന്റെ കോഡ്"
+            "ml": "എന്റെ കോഡ്",
+            "de": "Mein Code",
+            "fr": "Mon code",
+            "it": "Il mio codice"
         },
         "theirCode": {
             "en": "Their code",
-            "ml": "അവരുടെ കോഡ്"
+            "ml": "അവരുടെ കോഡ്",
+            "de": "Ihr Code",
+            "fr": "Leur code",
+            "it": "Il loro codice"
         },
         "back": {
             "en": "Back",
-            "ml": "ബാക്ക്"
+            "ml": "ബാക്ക്",
+            "de": "Zurück",
+            "fr": "Retour",
+            "it": "Ritorno"
         }
     },
     "Chat": {
         "at": {
             "en": "at",
-            "ml": "ചെയ്തത്"
+            "ml": "ചെയ്തത്",
+            "de": "um",
+            "fr": "À",
+            "it": "A"
         },
         "addFriend": {
             "en": "Add friend",
-            "ml": "സുഹൃത്തിനെ ചേർക്കുക"
+            "ml": "സുഹൃത്തിനെ ചേർക്കുക",
+            "de": "Freund hinzufügen",
+            "fr": "Ajouter ame",
+            "it": "Aggiungi amico"
         },
         "search": {
             "en": "Search",
-            "ml": "തിരയുക"
+            "ml": "തിരയുക",
+            "de": "Suchen",
+            "fr": "Ricerca",
+            "it": "Cercare"
         },
         "typeInYourMessage": {
             "en": "Type in you message here...",
-            "ml": "താങ്കളുടെ സന്ദേശം ഇവിടെ എഴുതുക..."
+            "ml": "താങ്കളുടെ സന്ദേശം ഇവിടെ എഴുതുക...",
+            "de": "Deine Nachricht hier eintippen...",
+            "fr": "Tapez votre message ici...",
+            "it": "Digita qui il tuo messaggio..."
         }
     },
     "EditProfile": {
         "editProfile": {
             "en": "Edit profile",
-            "ml": "വ്യക്തിവിവരങ്ങൾ എഡിറ്റ് ചെയ്യുവാൻ"
+            "ml": "വ്യക്തിവിവരങ്ങൾ എഡിറ്റ് ചെയ്യുവാൻ",
+            "de": "Profil anpassen",
+            "fr": "Editer le profil",
+            "it": "Modifica Profilo"
         },
         "logoutConfirmation": {
             "en": "Logging out will delete all the data in your system. We recommend that you backup the same.",
-            "ml": "ലോഗ് ഔട്ട് ചെയ്താൽ നിങ്ങളുടെ സിസ്റ്റത്തിലെ എല്ലാ ഡാറ്റയും ഡിലീറ്റ് ചെയ്യപ്പെടും. ആയതിനാൽ ലോഗൗട്ട് ചെയ്യുന്നതിന് മുന്നോടിയായി ഇതെല്ലാം ബാക്കപ്പ് ചെയ്യാൻ ഞങ്ങൾ ശുപാർശ ചെയ്യുന്നു."
+            "ml": "ലോഗ് ഔട്ട് ചെയ്താൽ നിങ്ങളുടെ സിസ്റ്റത്തിലെ എല്ലാ ഡാറ്റയും ഡിലീറ്റ് ചെയ്യപ്പെടും. ആയതിനാൽ ലോഗൗട്ട് ചെയ്യുന്നതിന് മുന്നോടിയായി ഇതെല്ലാം ബാക്കപ്പ് ചെയ്യാൻ ഞങ്ങൾ ശുപാർശ ചെയ്യുന്നു.",
+            "de": "Durch das Abmelden werden alle Daten in Ihrem System gelöscht. Wir empfehlen, einen backup zu kreieren.",
+            "fr": "La déconnexion supprimera toutes les données de votre système. Nous vous recommandons de sauvegarder le même.",
+            "it": "La disconnessione eliminerà tutti i dati nel sistema. Ti consigliamo di eseguire il backup dello stesso."
         },
         "privateKey": {
             "en": "Private key (32 characters)",
-            "ml": "പ്രൈവറ്റ് കീ (32 പ്രതീകങ്ങൾ)"
+            "ml": "പ്രൈവറ്റ് കീ (32 പ്രതീകങ്ങൾ)",
+            "de": "Privater Schlüssel (32 Zeichen)",
+            "fr": "Clé privée (32 caractères)",
+            "it": "Chiave privata (32 caratteri)"
         },
         "warningNotToShare": {
             "en": "Do not share it with anyone",
-            "ml": "യാതൊരു കാരണവശയാലും ഇത് മറ്റൊരാൾക്ക് പറഞ്ഞുകൊടുക്കരുത്"
+            "ml": "യാതൊരു കാരണവശയാലും ഇത് മറ്റൊരാൾക്ക് പറഞ്ഞുകൊടുക്കരുത്",
+            "de": "Mit niemanden teilen",
+            "fr": "Ne le partagez avec personne",
+            "it": "Non condividerlo con nessuno"
         },
         "displayName": {
             "en": "Display name",
-            "ml": "പ്രദർശന നാമം"
+            "ml": "പ്രദർശന നാമം",
+            "de": "Anzeigename",
+            "fr": "Afficher un nom",
+            "it": "Nome da visualizzare"
         },
         "aboutYou": {
             "en": "About you",
-            "ml": "നിങ്ങളെ കുറിച്ച്"
+            "ml": "നിങ്ങളെ കുറിച്ച്",
+            "de": "Über dich",
+            "fr": "Au propos de vous",
+            "it": "A proposito di te"
         },
         "photo": {
             "en": "Photo",
-            "ml": "ഫോട്ടോ"
+            "ml": "ഫോട്ടോ",
+            "de": "Foto",
+            "fr": "Photo",
+            "it": "Foto"
         },
         "applyEdit": {
             "en": "Apply edit",
-            "ml": "എഡിറ്റ് ചെയ്യുക"
+            "ml": "എഡിറ്റ് ചെയ്യുക",
+            "de": "Änderungen anwenden",
+            "fr": "Appliquer la modification",
+            "it": "Applica modifica"
         },
         "downloadProfile": {
             "en": "Download profile backup",
-            "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക"
+            "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക",
+            "de": "Profilsicherung herunterladen",
+            "fr": "Télécharger la sauvegarde du profil",
+            "it": "Scarica il backup del profilo"
         },
         "logout": {
             "en": "Logout",
-            "ml": "ലോഗ്ഔട്ട് ചെയ്യുക"
+            "ml": "ലോഗ്ഔട്ട് ചെയ്യുക",
+            "de": "Ausloggen",
+            "fr": "Se déconnecter",
+            "it": "Disconnettersi"
         },
         "back": {
             "en": "Back",
-            "ml": "ബാക്ക്"
+            "ml": "ബാക്ക്",
+            "de": "Zurück",
+            "fr": "Retour",
+            "it": "Ritorno"
         }
     },
     "Login": {
         "privateKeyLength": {
             "en": "Private key has to be a hexadecimal value of size 32 characters.",
-            "ml": "പ്രൈവറ്റ് കീ കൃത്യം 32 പ്രതീകങ്ങളുള്ള ഹെക്സാഡെസിമൽ ആയിരിക്കണം."
+            "ml": "പ്രൈവറ്റ് കീ കൃത്യം 32 പ്രതീകങ്ങളുള്ള ഹെക്സാഡെസിമൽ ആയിരിക്കണം.",
+            "de": "Privater Schlüssel muss aus 32 hexadezimalen Zeichen bestehen.",
+            "fr": "La clé privée doit être une valeur hexadécimale de 32 caractères.",
+            "it": "La chiave privata deve essere un valore esadecimale di dimensione 32 caratteri."
         },
         "minimumCharacters": {
             "en": "Display name should have atleast 4 characters.",
-            "ml": "പ്രദർശന നാമത്തിൽ കുറഞ്ഞത് 4 പ്രതീകമെങ്കിലുമുണ്ടായിരിക്കണം."
+            "ml": "പ്രദർശന നാമത്തിൽ കുറഞ്ഞത് 4 പ്രതീകമെങ്കിലുമുണ്ടായിരിക്കണം.",
+            "de": "Anzeigename muss mindestens 4 Zeichen enthalten",
+            "fr": "Le nom à afficher doit comporter au moins 4 caractères.",
+            "it": "Il nome visualizzato deve contenere almeno 4 caratteri."
         },
         "privateKey": {
             "en": "Private key (32 characters)",
-            "ml": "പ്രൈവറ്റ് കീ (32 പ്രതീകങ്ങൾ)"
+            "ml": "പ്രൈവറ്റ് കീ (32 പ്രതീകങ്ങൾ)",
+            "de": "Privater Schlüssel (32 Zeichen)",
+            "fr": "Clé privée (32 caractères)",
+            "it": "Chiave privata (32 caratteri)"
         },
         "displayName": {
             "en": "Display name",
-            "ml": "പ്രദർശന നാമം"
+            "ml": "പ്രദർശന നാമം",
+            "de": "Anzeigename",
+            "fr": "Afficher un nom",
+            "it": "Nome da visualizzare"
         },
         "aboutYou": {
             "en": "About you",
-            "ml": "നിങ്ങളെ കുറിച്ച്"
+            "ml": "നിങ്ങളെ കുറിച്ച്",
+            "de": "Über dich",
+            "fr": "Au propos de vous",
+            "it": "A proposito di te"
         },
         "login": {
             "en": "Login",
-            "ml": "ലോഗിൻ ചെയ്യുക"
+            "ml": "ലോഗിൻ ചെയ്യുക",
+            "de": "Anmelden",
+            "fr": "Se connecter",
+            "it": "Accedi"
         },
         "loginUsingBackup": {
             "en": "Login using profile backup",
-            "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യുക"
+            "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യുക",
+            "de": "Anmeldung mit Profilsicherung",
+            "fr": "Connectez-vous en utilisant la sauvegarde du profil",
+            "it": "Accedi utilizzando il backup del profilo"
         }
     },
     "ViewProfile": {
         "viewProfile": {
             "en": "View profile",
-            "ml": "വ്യക്തിവിവരങ്ങൾ"
+            "ml": "വ്യക്തിവിവരങ്ങൾ",
+            "de": "Profil anzeigen",
+            "fr": "Voir le profil",
+            "it": "Vedi profilo"
         },
         "publicKey": {
             "en": "Public key",
-            "ml": "പബ്ലിക് കീ"
+            "ml": "പബ്ലിക് കീ",
+            "de": "Öffentlicher Schlüssel (32 Zeichen)",
+            "fr": "Clé publique",
+            "it": "Chiave pubblica"
         },
         "displayName": {
             "en": "Display name",
-            "ml": "പ്രദർശന നാമം"
+            "ml": "പ്രദർശന നാമം",
+            "de": "Anzeigename",
+            "fr": "Afficher un nom",
+            "it": "Nome da visualizzare"
         },
         "aboutPerson": {
             "en": "About the person",
-            "ml": "വ്യക്തിയെക്കുറിച്ച്"
+            "ml": "വ്യക്തിയെക്കുറിച്ച്",
+            "de": "Über die Person",
+            "fr": "À propos de la personne",
+            "it": "Sulla persona"
         },
         "photo": {
             "en": "Photo",
-            "ml": "ഫോട്ടോ"
+            "ml": "ഫോട്ടോ",
+            "de": "Foto",
+            "fr": "Photo",
+            "it": "Foto"
         },
         "back": {
             "en": "Back",
-            "ml": "ബാക്ക്"
+            "ml": "ബാക്ക്",
+            "de": "Zurück",
+            "fr": "Retour",
+            "it": "Ritorno"
         }
     }
 }
