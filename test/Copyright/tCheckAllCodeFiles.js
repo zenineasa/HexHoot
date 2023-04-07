@@ -9,8 +9,8 @@ QUnit.test('Check code files for copyright message', async function(assert) {
     // All files to ignore in the following checks
     const options = {
         ignore: [
+            'out/**/*',
             'node_modules/**/*',
-            'package.json',
             'package-lock.json',
         ],
     };
