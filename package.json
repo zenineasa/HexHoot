@@ -1,7 +1,11 @@
 {
     "name": "hexhoot",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/zenineasa/hexhoot.git"
+    },
     "main": "main.js",
     "scripts": {
         "start": "electron .",
