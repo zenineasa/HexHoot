@@ -23,7 +23,7 @@
             "ml": "സുഹൃത്തിനെ ചേർക്കുക",
             "de": "Freund hinzufügen",
             "fr": "Ajouter ame",
-            "it": "Aggiungi amico"
+            "it": "Aggiungi un amico"
         },
         "copyToClipboard": {
             "en": "Copy to clipboard",
@@ -58,14 +58,14 @@
             "ml": "അവരുടെ കോഡ്",
             "de": "Ihr Code",
             "fr": "Leur code",
-            "it": "Il loro codice"
+            "it": "Il suo codice"
         },
         "back": {
             "en": "Back",
             "ml": "ബാക്ക്",
             "de": "Zurück",
             "fr": "Retour",
-            "it": "Ritorno"
+            "it": "Indietro"
         }
     },
     "Chat": {
@@ -81,7 +81,7 @@
             "ml": "സുഹൃത്തിനെ ചേർക്കുക",
             "de": "Freund hinzufügen",
             "fr": "Ajouter ame",
-            "it": "Aggiungi amico"
+            "it": "Aggiungi un amico"
         },
         "search": {
             "en": "Search",
@@ -125,21 +125,21 @@
             "ml": "യാതൊരു കാരണവശയാലും ഇത് മറ്റൊരാൾക്ക് പറഞ്ഞുകൊടുക്കരുത്",
             "de": "Mit niemanden teilen",
             "fr": "Ne le partagez avec personne",
-            "it": "Non condividerlo con nessuno"
+            "it": "Non condividerla con nessuno"
         },
         "displayName": {
             "en": "Display name",
             "ml": "പ്രദർശന നാമം",
             "de": "Anzeigename",
             "fr": "Afficher un nom",
-            "it": "Nome da visualizzare"
+            "it": "Nome pubblico"
         },
         "aboutYou": {
             "en": "About you",
             "ml": "നിങ്ങളെ കുറിച്ച്",
             "de": "Über dich",
             "fr": "Au propos de vous",
-            "it": "A proposito di te"
+            "it": "Una tua descrizione"
         },
         "photo": {
             "en": "Photo",
@@ -153,14 +153,14 @@
             "ml": "എഡിറ്റ് ചെയ്യുക",
             "de": "Änderungen anwenden",
             "fr": "Appliquer la modification",
-            "it": "Applica modifica"
+            "it": "Applica modifiche"
         },
         "downloadProfile": {
             "en": "Download profile backup",
             "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക",
             "de": "Profilsicherung herunterladen",
             "fr": "Télécharger la sauvegarde du profil",
-            "it": "Scarica il backup del profilo"
+            "it": "Scarica il file di backup del profilo"
         },
         "logout": {
             "en": "Logout",
@@ -174,7 +174,7 @@
             "ml": "ബാക്ക്",
             "de": "Zurück",
             "fr": "Retour",
-            "it": "Ritorno"
+            "it": "Indietro"
         }
     },
     "Login": {
@@ -204,14 +204,14 @@
             "ml": "പ്രദർശന നാമം",
             "de": "Anzeigename",
             "fr": "Afficher un nom",
-            "it": "Nome da visualizzare"
+            "it": "Nome pubblico"
         },
         "aboutYou": {
             "en": "About you",
             "ml": "നിങ്ങളെ കുറിച്ച്",
             "de": "Über dich",
             "fr": "Au propos de vous",
-            "it": "A proposito di te"
+            "it": "Una tua descrizione"
         },
         "login": {
             "en": "Login",
@@ -220,12 +220,19 @@
             "fr": "Se connecter",
             "it": "Accedi"
         },
+        "or": {
+            "en": "OR",
+            "ml": "അല്ലെങ്കിൽ",
+            "de": "ODER",
+            "fr": "OU",
+            "it": "OPPURE"
+        },
         "loginUsingBackup": {
             "en": "Login using profile backup",
             "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യുക",
             "de": "Anmeldung mit Profilsicherung",
             "fr": "Connectez-vous en utilisant la sauvegarde du profil",
-            "it": "Accedi utilizzando il backup del profilo"
+            "it": "Accedi utilizzando il file di backup del profilo"
         }
     },
     "ViewProfile": {
@@ -248,14 +255,14 @@
             "ml": "പ്രദർശന നാമം",
             "de": "Anzeigename",
             "fr": "Afficher un nom",
-            "it": "Nome da visualizzare"
+            "it": "Nome pubblico"
         },
         "aboutPerson": {
             "en": "About the person",
             "ml": "വ്യക്തിയെക്കുറിച്ച്",
             "de": "Über die Person",
             "fr": "À propos de la personne",
-            "it": "Sulla persona"
+            "it": "La tua descrizione"
         },
         "photo": {
             "en": "Photo",
@@ -269,7 +276,7 @@
             "ml": "ബാക്ക്",
             "de": "Zurück",
             "fr": "Retour",
-            "it": "Ritorno"
+            "it": "Indietro"
         }
     }
 }
