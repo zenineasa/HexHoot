@@ -5,6 +5,9 @@ const utils = require('./utils');
 
 // TODO: See if this dependency can be removed
 const dbWrapper = require('./DBWrapper');
+// const intranetCommunicator = require('./../IntranetCommunicator')();
+// TODO: Whenever you send a message through Hyperswarm, do the same through
+// intranetCommunicator.
 
 /**
  * This class contains methods to send and receive messages from peers

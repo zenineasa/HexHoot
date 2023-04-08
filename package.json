@@ -1,7 +1,7 @@
 {
     "coprightMessage": "Copyright © 2022-2023 Zenin Easa Panthakkalakath",
     "name": "hexhoot",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "HexHoot: An Opensource Peer-to-peer Social Network with Zero-Knowledge-Proof based authentication.",
     "repository": {
         "type": "git",
@@ -33,6 +33,8 @@
         "qunit": "^2.19.4"
     },
     "dependencies": {
+        "arptable-js": "^0.0.2",
+        "arpulate": "^0.1.0",
         "copyright-regex": "^1.1.6",
         "ecdh": "^0.2.0",
         "electron-squirrel-startup": "^1.0.0",

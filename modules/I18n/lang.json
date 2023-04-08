@@ -17,6 +17,22 @@
             "it": "Seleziona la lingua"
         }
     },
+    "Logo": {
+        "hexhoot": {
+            "en": "HexHoot",
+            "ml": "ഹെക്സ്ഹൂട്ട്",
+            "de": "HexHoot",
+            "fr": "HexHoot",
+            "it": "HexHoot"
+        },
+        "alpha": {
+            "en": "ALPHA",
+            "ml": "ആൽഫ",
+            "de": "ALPHA",
+            "fr": "ALPHA",
+            "it": "ALPHA"
+        }
+    },
     "AddFriend": {
         "addFriend": {
             "en": "Add friend",

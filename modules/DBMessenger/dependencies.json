@@ -1,6 +1,8 @@
 {
     "coprightMessage": "Copyright © 2022-2023 Zenin Easa Panthakkalakath",
-    "internal": [],
+    "internal": [
+        "IntranetCommunicator"
+    ],
     "external": [
         "indexeddb-export-import",
         "hyperswarm",
