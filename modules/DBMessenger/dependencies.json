@@ -1,11 +1,14 @@
 {
     "coprightMessage": "Copyright © 2022-2023 Zenin Easa Panthakkalakath",
-    "internal": [
-        "IntranetCommunicator"
-    ],
+    "internal": [],
     "external": [
         "indexeddb-export-import",
         "hyperswarm",
-        "ecdh"
+        "ecdh",
+        "ip",
+        "http",
+        "arptable-js",
+        "url",
+        "assert"
     ]
 }

@@ -2,6 +2,7 @@
 
 const dbWrapper = require('./DBWrapper')();
 const messenger = require('./Messenger')();
+const intranetMessenger = require('./IntranetMessenger')();
 const utils = require('./utils.js');
 
 /**
@@ -43,6 +44,8 @@ class DBMessenger {
         // arrive
         this.listOfMessageReceiveCallbackFunctions = [];
         messenger.setMessageReceiveCallbackFunction(
+            this.messageReceivedCallback.bind(this));
+        intranetMessenger.setMessageReceiveCallbackFunction(
             this.messageReceivedCallback.bind(this));
     }
 
@@ -118,6 +121,7 @@ class DBMessenger {
         // If there is a change in the private key, then the public key also
         // changes, which means that we need to subscribe to the new channel.
         messenger.initialize();
+        intranetMessenger.initialize();
     }
 
     /**
@@ -140,8 +144,13 @@ class DBMessenger {
             type: this.messageType.chat,
             message: message,
         };
-        await messenger.sendMessageToChannel(
+        messenger.sendMessageToChannel(
             otherUserPublicKey, messageToChannel);
+        intranetMessenger.sendMessageToChannel(
+            otherUserPublicKey, messageToChannel);
+
+        // TODO: Need a better way here. We should not be waiting for one to
+        // complete before sending the other. This causes a lot of lag.
 
         // Update last message received and read flag
         dbWrapper.addOrEditEntry(
@@ -257,6 +266,8 @@ class DBMessenger {
             senderInfo: await this.getLoggedInUserInfoPublic(),
         };
         await messenger.sendMessageToChannel(
+            otherUserInfo.key, messageToChannel);
+        await intranetMessenger.sendMessageToChannel(
             otherUserInfo.key, messageToChannel);
     }
 

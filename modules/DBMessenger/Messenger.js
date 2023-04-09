@@ -1,13 +1,9 @@
 /* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
 
 const Hyperswarm = require('hyperswarm');
-const utils = require('./utils');
 
-// TODO: See if this dependency can be removed
+const utils = require('./utils');
 const dbWrapper = require('./DBWrapper');
-// const intranetCommunicator = require('./../IntranetCommunicator')();
-// TODO: Whenever you send a message through Hyperswarm, do the same through
-// intranetCommunicator.
 
 /**
  * This class contains methods to send and receive messages from peers
@@ -60,14 +56,6 @@ class Messenger {
         console.log(messageObj);
 
         this.messageReceiveCallbackFunction(messageObj);
-    }
-
-    /**
-     * Display error message in the console
-     * @param {*} err Error message
-     */
-    errorCallback(err) {
-        console.log(err);
     }
 
     /**
@@ -136,8 +124,7 @@ class Messenger {
             'message': message,
         });
 
-        console.log('Sending message to channel: ' +
-            utils.bufferToString(channelName));
+        console.log('Sending message to channel: ' + channelNameStr);
 
         if (typeof(this.connMap[channelNameStr]) === 'undefined') {
             const tempSwarm = new Hyperswarm();
@@ -165,6 +152,14 @@ class Messenger {
      */
     setMessageReceiveCallbackFunction(func) {
         this.messageReceiveCallbackFunction = func;
+    }
+
+    /**
+     * Display error message in the console
+     * @param {*} err Error message
+     */
+    errorCallback(err) {
+        console.log(err);
     }
 }
 

@@ -1,9 +1,0 @@
-{
-    "coprightMessage": "Copyright © 2023 Zenin Easa Panthakkalakath",
-    "internal": [],
-    "external": [
-        "ip",
-        "http",
-        "arptable-js"
-    ]
-}
