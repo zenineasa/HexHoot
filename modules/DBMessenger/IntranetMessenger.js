@@ -1,10 +1,11 @@
 /* Copyright (c) 2023 Zenin Easa Panthakkalakath */
 
+const os = require('os');
 const ip = require('ip');
 const http = require('http');
 const arp = require('arptable-js');
 const arpulate = require('arpulate');
-const assert = require('assert');
+const {networkInterfaces} = require('@leichtgewicht/network-interfaces');
 
 const utils = require('./utils');
 const dbWrapper = require('./DBWrapper');
@@ -28,23 +29,33 @@ class IntranetMessenger {
         }
         IntranetMessenger._instance = this;
 
-        // Populate the system ARP table by pinging a range of surrounding
-        // IP addresses
-        arpulate(ip.address(), 254, async function() {
-            console.log('Pinged a few surrounding IP Addresses');
-        });
-
-        this.hostsWithHexHoot = {};
         this.listOfChannelsSubscribedTo = [];
         this.messageReceiveCallbackFunction = function() {};
 
+        this.lastInitTimestamp = Date.now();
         IntranetMessenger._instance.initialize();
+
+        // If there is a network change detected, re-initialize
+        networkInterfaces.on('change', async function(e) {
+            if (this.lastInitTimestamp + 2000 < Date.now()) {
+                this.lastInitTimestamp = Date.now();
+                await IntranetMessenger._instance.initialize();
+            }
+        }.bind(this));
     }
 
     /**
      * Initialize IntranetMessenger
      */
     async initialize() {
+        console.log('Initializing intranet messenger');
+        this.ipAddresses = [];
+        await this.populateARPTableAndIpAddresses();
+        this.hostsWithHexHootMap = {};
+
+        this.startServer(preferedServerPort);
+        this.findDevicesRunningHexHoot();
+
         this.userInfo = (await dbWrapper().getAll('LoggedInUserInfo'))[0];
         if (this.userInfo) {
             this.userPublicKey =
@@ -52,9 +63,38 @@ class IntranetMessenger {
             this.subscribeToChannel(
                 utils.stringToBuffer(this.userPublicKey), true);
         }
+    }
 
-        this.startServer(preferedServerPort);
-        this.findDevicesRunningHexHoot();
+    /**
+     * Ping surrounding IP Addresses to populate the ARP table
+     * @return {Promise} promise that resolves once pinging the range is
+     * complete
+     */
+    populateARPTableAndIpAddresses() {
+        // Get all IP Addresses that is associated with this system
+        const net = os.networkInterfaces();
+        const promises = [];
+        Object.values(net).forEach(function(netInterface) {
+            netInterface.forEach(function(info) {
+                if (
+                    info.address.startsWith('192.') ||
+                    info.address.startsWith('172.') ||
+                    info.address.startsWith('10.')
+                ) {
+                    this.ipAddresses.push(info.address);
+                    promises.push(new Promise(function(resolve, reject) {
+                        // Populate the system ARP table by pinging a range of
+                        // surrounding IP addresses
+                        arpulate(info.address, 254, async function() {
+                            console.log(`Pinged around ${info.address}`);
+                            resolve('ARP Table loaded');
+                        });
+                    }));
+                }
+            }.bind(this));
+        }.bind(this));
+
+        return Promise.allSettled(promises);
     }
 
     /**
@@ -66,8 +106,9 @@ class IntranetMessenger {
         info.application = process.env.npm_package_name;
         info.version = process.env.npm_package_version;
         info.ip = ip.address();
+        info.ips = this.ipAddresses;
         info.port = this.port;
-        info.hostsWithHexHoot = this.hostsWithHexHoot;
+        info.hostsWithHexHootMap = this.hostsWithHexHootMap;
         info.listOfChannelsSubscribedTo = this.listOfChannelsSubscribedTo;
         return info;
     }
@@ -96,8 +137,9 @@ class IntranetMessenger {
 
                         // Assert that the data response has the same URL
                         // information as the URL we sent to
-                        assert(req.connection.remoteAddress.includes(data.ip));
-                        // TODO: How do we take care of proxy forwarding???
+                        data.ip = this.assertIPInArrayAndReturn(
+                            req.connection.remoteAddress, data.ips
+                        );
 
                         // Extract information about this
                         this.saveInfoAboutPeers(data);
@@ -116,8 +158,9 @@ class IntranetMessenger {
 
                         // Assert that the data response has the same URL
                         // information as the URL we sent to
-                        assert(req.connection.remoteAddress.includes(data.ip));
-                        // TODO: How do we take care of proxy forwarding???
+                        data.ip = this.assertIPInArrayAndReturn(
+                            req.connection.remoteAddress, data.ips
+                        );
 
                         // Add the channel to the peer
                         this.addChannelToPeer(data.ip, data.channelNames);
@@ -190,16 +233,16 @@ class IntranetMessenger {
      */
     saveInfoAboutPeers(info) {
         // Extract information on other hosts with HexHoot
-        const otherHostsWithHexHoot = info.hostsWithHexHoot;
+        const otherhostsWithHexHootMap = info.hostsWithHexHootMap;
 
         // Remove the other hosts information and store the rest
-        delete info.hostsWithHexHoot;
-        this.hostsWithHexHoot[info.ip] = info;
+        delete info.hostsWithHexHootMap;
+        this.hostsWithHexHootMap[info.ip] = info;
 
         // Collect the latest information from the other hosts; not
         // just copy over the information.
-        Object.keys(otherHostsWithHexHoot).forEach(function(ip) {
-            if (!ip in this.hostsWithHexHoot) {
+        Object.keys(otherhostsWithHexHootMap).forEach(function(ip) {
+            if (!ip in this.hostsWithHexHootMap) {
                 this.fetchInfo(this.getURLFromIP(ip));
             }
         }.bind(this));
@@ -211,7 +254,7 @@ class IntranetMessenger {
      * @return {string} url to the corresponding server instance
      */
     getURLFromIP(ip) {
-        const info = this.hostsWithHexHoot[ip];
+        const info = this.hostsWithHexHootMap[ip];
         return `http://${info.ip}:${info.port}`;
     }
 
@@ -223,9 +266,9 @@ class IntranetMessenger {
      */
     addChannelToPeer(ip, channelNames) {
         channelNames.forEach(function(channelNameStr) {
-            if (!this.hostsWithHexHoot[ip].listOfChannelsSubscribedTo
+            if (!this.hostsWithHexHootMap[ip].listOfChannelsSubscribedTo
                 .includes(channelNameStr)) {
-                this.hostsWithHexHoot[ip].listOfChannelsSubscribedTo.push(
+                this.hostsWithHexHootMap[ip].listOfChannelsSubscribedTo.push(
                     channelNameStr);
             }
         }.bind(this));
@@ -253,7 +296,9 @@ class IntranetMessenger {
                 if (data.application === 'hexhoot') {
                     // Assert that the data response has the same URL
                     // information as the URL we sent to
-                    assert(url.includes(data.ip));
+                    data.ip = this.assertIPInArrayAndReturn(
+                        url, data.ips
+                    );
 
                     // Extract information about this
                     this.saveInfoAboutPeers(data);
@@ -269,6 +314,30 @@ class IntranetMessenger {
             // likely due to inexistence of HexHoot in the device
             // being pinged.
         });
+    }
+
+    /**
+     * Ensure that the sender IP address exist in the given array of IPs
+     * @param {string} url sender IP extracted through request metadata
+     * @param {Array} ipAddresses array of IP addresses passed thourhg the
+     * request message
+     * @return {string} url, if it exists in the list
+     */
+    assertIPInArrayAndReturn(url, ipAddresses) {
+        const parsedURL = require('url').parse(url);
+        var hostname = '';
+        if (parsedURL.hostname === null) {
+            // Example: url = '::ffff:172.16.29.1'
+            hostname = url.slice(url.lastIndexOf(':') + 1);
+        } else {
+            // Example: url = 'http://172.16.29.1'
+            hostname = parsedURL.hostname;
+        }
+
+        if(!ipAddresses.includes(hostname)) {
+            throw new Error("Sender IP doesn't match the data provided");
+        }
+        return hostname;
     }
 
     /**
@@ -347,7 +416,7 @@ class IntranetMessenger {
         message.ip = ip.address();
         message.channelNames = [channelNameStr];
         message = JSON.stringify(message);
-        Object.keys(this.hostsWithHexHoot).forEach(function(ip) {
+        Object.keys(this.hostsWithHexHootMap).forEach(function(ip) {
             this.sendMessage(
                 this.getURLFromIP(ip) + '/subscribeChannels',
                 message,
@@ -391,7 +460,7 @@ class IntranetMessenger {
         console.log('Sending message to channel (intranet): ' +
             channelNameStr);
 
-        for (const [ip, info] of Object.entries(this.hostsWithHexHoot)) {
+        for (const [ip, info] of Object.entries(this.hostsWithHexHootMap)) {
             if (info.listOfChannelsSubscribedTo.includes(channelNameStr)) {
                 this.sendMessage(
                     this.getURLFromIP(ip) + '/message',

@@ -33,6 +33,7 @@
         "qunit": "^2.19.4"
     },
     "dependencies": {
+        "@leichtgewicht/network-interfaces": "^1.0.3",
         "arptable-js": "^0.0.2",
         "arpulate": "^0.1.0",
         "copyright-regex": "^1.1.6",

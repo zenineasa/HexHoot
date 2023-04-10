@@ -289,6 +289,12 @@ class Chat {
      */
     async receiveMessageCallback(message) {
         if (message.message.type === dbMessenger.messageType.chat) {
+            // TODO: Check if the message has already reached via any other
+            // routes.
+            // If intranet message receives first, then the internet message is
+            // received, then we don't have to push it into the DOM or play the
+            // sound.
+
             // Add it to the database
             message.message.message.type = this.messageType.received;
             dbMessenger.receivedChatMessage(message);

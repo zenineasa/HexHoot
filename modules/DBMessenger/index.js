@@ -144,13 +144,11 @@ class DBMessenger {
             type: this.messageType.chat,
             message: message,
         };
-        messenger.sendMessageToChannel(
+        const promise1 = messenger.sendMessageToChannel(
             otherUserPublicKey, messageToChannel);
-        intranetMessenger.sendMessageToChannel(
+        const promise2 = intranetMessenger.sendMessageToChannel(
             otherUserPublicKey, messageToChannel);
-
-        // TODO: Need a better way here. We should not be waiting for one to
-        // complete before sending the other. This causes a lot of lag.
+        await Promise.allSettled([promise1, promise2]);
 
         // Update last message received and read flag
         dbWrapper.addOrEditEntry(
