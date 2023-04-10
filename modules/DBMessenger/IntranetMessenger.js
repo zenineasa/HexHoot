@@ -175,7 +175,6 @@ class IntranetMessenger {
                         body += chunk.toString();
                     });
                     req.on('end', function() {
-                        console.log('Message received (intranet): ' + body);
                         this.messageReceivedCallback(body);
                         res.end('ok');
                     }.bind(this));
@@ -414,6 +413,7 @@ class IntranetMessenger {
         // this channel
         let message = {};
         message.ip = ip.address();
+        message.ips = this.ipAddresses;
         message.channelNames = [channelNameStr];
         message = JSON.stringify(message);
         Object.keys(this.hostsWithHexHootMap).forEach(function(ip) {

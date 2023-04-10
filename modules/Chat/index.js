@@ -39,6 +39,10 @@ class Chat {
             sent: 'sent',
             received: 'received',
         };
+
+        this.messageIdentifierLog = [];
+        this.numMessagesEncountered = 0;
+        this.maxLogSize = 20;
     }
 
     /**
@@ -284,16 +288,37 @@ class Chat {
     }
 
     /**
+     * Checks if the incoming message identifier is already present in the log.
+     * If it is, then we return true. If it is not, we store the new message
+     * identifier.
+     * @param {string} messageIdentifier the identifier for the message. We use
+     * a concatenation of sender's public key and message timestamp for this.
+     * @return {boolean} returns true if the identifier was previously present
+     * in the log.
+     */
+    isMessageInIdentifierLog(messageIdentifier) {
+        const ret = this.messageIdentifierLog.includes(messageIdentifier);
+        if (!ret) {
+            this.messageIdentifierLog[
+                this.numMessagesEncountered++ % this.maxLogSize
+            ] = messageIdentifier;
+        }
+        return ret;
+    }
+
+    /**
      * Receive messages from different channels as callback
      * @param {Object} message message received from DBMessenger
      */
     async receiveMessageCallback(message) {
         if (message.message.type === dbMessenger.messageType.chat) {
-            // TODO: Check if the message has already reached via any other
-            // routes.
-            // If intranet message receives first, then the internet message is
-            // received, then we don't have to push it into the DOM or play the
-            // sound.
+            // If the new message being received is present in this log,
+            // then do not insert.
+            if (this.isMessageInIdentifierLog(
+                message.senderPublicKey + message.message.message.timestamp,
+            )) {
+                return;
+            }
 
             // Add it to the database
             message.message.message.type = this.messageType.received;
