@@ -1,9 +1,6 @@
 /* Copyright (c) 2023 Zenin Easa Panthakkalakath */
 
-const winIconURL = 'https://raw.githubusercontent.com/zenineasa/HexHoot/main/modules/ImagePack/images/DesktopIcons/icon_windows.ico';
-const winIconPath = './modules/ImagePack/images/DesktopIcons/icon_windows.ico';
-const macIconPath = './modules/ImagePack/images/DesktopIcons/icon_mac.icns';
-const linuxIconPath = './modules/ImagePack/images/DesktopIcons/icon_linux.png';
+const imagePack = require('./modules/ImagePack');
 
 module.exports = {
     packagerConfig: {},
@@ -13,15 +10,15 @@ module.exports = {
             // For windows:
             name: '@electron-forge/maker-squirrel',
             config: {
-                iconUrl: winIconURL,
-                setupIcon: winIconPath,
+                iconUrl: 'https://raw.githubusercontent.com/zenineasa/HexHoot/main/modules/ImagePack/images/DesktopIcons/icon_windows.ico',
+                setupIcon: imagePack.getPath('desktop.windows'),
             },
         },
         {
             // For mac:
             name: '@electron-forge/maker-dmg',
             config: {
-                icon: macIconPath,
+                icon: imagePack.getPath('desktop.mac'),
             },
         },
         {
@@ -29,7 +26,7 @@ module.exports = {
             name: '@electron-forge/maker-deb',
             config: {
                 options: {
-                    icon: linuxIconPath,
+                    icon: imagePack.getPath('desktop.linux'),
                 },
             },
         },
@@ -38,7 +35,7 @@ module.exports = {
             name: '@electron-forge/maker-rpm',
             config: {
                 options: {
-                    icon: linuxIconPath,
+                    icon: imagePack.getPath('desktop.linux'),
                 },
             },
         },

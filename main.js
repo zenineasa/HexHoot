@@ -11,6 +11,7 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        title: 'HexHoot',
         icon: imagePack.getPath('branding.favicon'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),

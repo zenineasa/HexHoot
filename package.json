@@ -25,9 +25,9 @@
         "@electron-forge/maker-zip": "^6.1.1",
         "copyright-header": "^0.4.6",
         "electron": "^24.0.0",
-        "eslint": "^8.37.0",
+        "eslint": "^8.38.0",
         "eslint-config-google": "^0.14.0",
-        "glob": "^8.0.3",
+        "glob": "^10.0.0",
         "karma-electron": "^7.3.0",
         "karma-qunit": "^4.1.2",
         "qunit": "^2.19.4"

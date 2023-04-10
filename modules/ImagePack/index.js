@@ -10,6 +10,11 @@ imagePack = {
         'logoIcon': 'icon.svg',
         'favicon': 'favicon.png',
     },
+    'desktop': {
+        'windows': 'DesktopIcons/icon_windows.ico',
+        'mac': 'DesktopIcons/icon_mac.icns',
+        'linux': 'DesktopIcons/icon_linux.png',
+    },
     'interface': {
         'sendButton': 'send.svg',
         'defaultProfilePic': 'default_profile.svg',
