@@ -3,6 +3,30 @@
 const path = require('path');
 const requireText = require('require-text');
 
+
+/**
+ * Sometimes, the fetch doesn't happen properly on GitHub CI. This function may
+ * help reduce sporadic failures caused by the same.
+ * @param {string} url the address to fetch from
+ * @param {number} retries the maximum number of times we retry
+ * @return {Object} the response from fetch
+ */
+function fetchJSONWithRetry(url, retries = 10) {
+    return fetch(url)
+        .then(function(response) {
+            if (response.ok) {
+                return response;
+            }
+            throw new Error('Network response was not ok');
+        })
+        .catch(function(error) {
+            if (retries <= 0) {
+                throw error;
+            }
+            return fetchJSONWithRetry(url, retries - 1);
+        });
+}
+
 QUnit.test('Check package name', function(assert) {
     // Read package.json
     const packageJson = JSON.parse(
@@ -29,7 +53,7 @@ QUnit.test('Version greater than in GitHub release', async function(assert) {
         '/releases/latest';
 
     // Fetch inofmration using GitHub API
-    const response = await fetch(apiURL);
+    const response = await fetchJSONWithRetry(apiURL);
     const data = await response.json();
 
     // The version names in package.json and latest GitHub release
