@@ -138,7 +138,7 @@ class IntranetMessenger {
                         // Assert that the data response has the same URL
                         // information as the URL we sent to
                         data.ip = this.assertIPInArrayAndReturn(
-                            req.connection.remoteAddress, data.ips
+                            req.connection.remoteAddress, data.ips,
                         );
 
                         // Extract information about this
@@ -159,7 +159,7 @@ class IntranetMessenger {
                         // Assert that the data response has the same URL
                         // information as the URL we sent to
                         data.ip = this.assertIPInArrayAndReturn(
-                            req.connection.remoteAddress, data.ips
+                            req.connection.remoteAddress, data.ips,
                         );
 
                         // Add the channel to the peer
@@ -297,7 +297,7 @@ class IntranetMessenger {
                     // Assert that the data response has the same URL
                     // information as the URL we sent to
                     data.ip = this.assertIPInArrayAndReturn(
-                        url, data.ips
+                        url, data.ips,
                     );
 
                     // Extract information about this
@@ -325,7 +325,7 @@ class IntranetMessenger {
      */
     assertIPInArrayAndReturn(url, ipAddresses) {
         const parsedURL = require('url').parse(url);
-        var hostname = '';
+        let hostname = '';
         if (parsedURL.hostname === null) {
             // Example: url = '::ffff:172.16.29.1'
             hostname = url.slice(url.lastIndexOf(':') + 1);
@@ -334,8 +334,8 @@ class IntranetMessenger {
             hostname = parsedURL.hostname;
         }
 
-        if(!ipAddresses.includes(hostname)) {
-            throw new Error("Sender IP doesn't match the data provided");
+        if (!ipAddresses.includes(hostname)) {
+            throw new Error('Sender IP doesn\'t match the data provided');
         }
         return hostname;
     }
