@@ -56,6 +56,17 @@
     opacity: 0.8;
 }
 
+#mainContent #messageEmojis {
+    height: 2em;
+    font-size: 2em;
+    width: auto;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    background: rgba(255,255,255,0.1);
+    display: none; /* Will be 'flex' when active */
+}
+
 #mainContent #messageComposer {
     height: 5em;
     background: rgba(255,255,255,0.1);

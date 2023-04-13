@@ -160,14 +160,14 @@ class Chat {
                 this.insertChatMessageToDOM(messages[i].message);
             }
 
-            const messageComposer =
-                document.getElementById('messageComposer');
+            const messageComposer = document.getElementById('messageComposer');
             const messageTextArea =
                 messageComposer.getElementsByTagName('textarea')[0];
             const messageSendButton =
                 messageComposer.getElementsByClassName('send')[0];
-            messageTextArea.onkeyup = function(event) {
+            messageTextArea.onkeydown = function(event) {
                 if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
                     this.sendMessage(friend.key, messageTextArea);
                 }
             }.bind(this);
@@ -179,6 +179,24 @@ class Chat {
             // some content
             messageComposer.style.display = 'flex';
             messageComposer.getElementsByTagName('textarea')[0].value = '';
+
+            // For emojis
+            const messageEmojis = document.getElementById('messageEmojis');
+            messageEmojis.style.display = 'flex';
+            messageEmojis.onclick = function(e) {
+                if (e.target.nodeName === 'SPAN') {
+                    const emoji = e.target.textContent;
+                    const start = messageTextArea.selectionStart;
+                    const end = messageTextArea.selectionEnd;
+                    messageTextArea.value =
+                        messageTextArea.value.substring(0, start) +
+                        emoji +
+                        messageTextArea.value.substring(end);
+                    messageTextArea.focus();
+                    messageTextArea.selectionStart = start + emoji.length;
+                    messageTextArea.selectionEnd = start + emoji.length;
+                }
+            };
 
             // Update the active chat
             this.activeChat = friend.key;
@@ -345,6 +363,36 @@ class Chat {
             // Reload the sidebar
             await this.loadFriendsInSidebar();
         }
+    }
+
+    /**
+     * Help load emoticons in the template
+     * @return {string} content for HTML template to render emojis
+     */
+    loadEmoticonsHTML() {
+        /**
+         * Each character in the range is returned inside a span tag
+         * @param {number} startRange start of range of characters
+         * @param {number} endRange end of range of characters
+         * @return {string} HTML content in string format
+         */
+        function returnCharactersInRangeAsSpan(startRange, endRange) {
+            let ret = '';
+            for (let i = startRange; i <= endRange; i++) {
+                ret += '<span>&#' + i + ';</span>';
+            }
+            return ret;
+        }
+
+        let ret = '';
+
+        ret += returnCharactersInRangeAsSpan(128512, 128591);
+        ret += returnCharactersInRangeAsSpan(9984, 10175);
+        ret += returnCharactersInRangeAsSpan(127744, 128511);
+        ret += returnCharactersInRangeAsSpan(128640, 128767);
+        ret += returnCharactersInRangeAsSpan(127462, 127487);
+
+        return ret;
     }
 }
 
