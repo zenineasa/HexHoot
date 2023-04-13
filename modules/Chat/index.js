@@ -50,7 +50,16 @@ class Chat {
      */
     async render() {
         Layout.render();
-        await EditProfile.renderToIconBar(this.render.bind(this));
+        EditProfile.renderToIconBar(this.render.bind(this));
+
+        // Get the stats for emoji counts
+        const emojiCounterMap =
+            await dbMessenger.getPreference('emojiCounterMap');
+        if (typeof(this.emojiCounterMap) === 'undefined') {
+            this.emojiCounterMap = {};
+        } else {
+            this.emojiCounterMap = emojiCounterMap.value;
+        }
 
         // Link css
         const link = document.createElement('link');
@@ -185,6 +194,7 @@ class Chat {
             messageEmojis.style.display = 'flex';
             messageEmojis.onclick = function(e) {
                 if (e.target.nodeName === 'SPAN') {
+                    // Insert emoji into textarea
                     const emoji = e.target.textContent;
                     const start = messageTextArea.selectionStart;
                     const end = messageTextArea.selectionEnd;
@@ -192,11 +202,23 @@ class Chat {
                         messageTextArea.value.substring(0, start) +
                         emoji +
                         messageTextArea.value.substring(end);
+
+                    // Ensure that the cursor is in the right position
                     messageTextArea.focus();
                     messageTextArea.selectionStart = start + emoji.length;
                     messageTextArea.selectionEnd = start + emoji.length;
+
+                    // Increment the emoji counter
+                    if (emoji in this.emojiCounterMap) {
+                        this.emojiCounterMap[emoji]++;
+                    } else {
+                        this.emojiCounterMap[emoji] = 1;
+                    }
+                    dbMessenger.setPreference(
+                        'emojiCounterMap', this.emojiCounterMap,
+                    );
                 }
-            };
+            }.bind(this);
 
             // Update the active chat
             this.activeChat = friend.key;
@@ -386,6 +408,19 @@ class Chat {
 
         let ret = '';
 
+        // Get the first five most frequently used emojis
+        const obj = this.emojiCounterMap;
+        const frequentlyUsed = Object.keys(obj).sort((a, b) => obj[b] - obj[a])
+            .slice(0, 5);
+
+        frequentlyUsed.forEach(function(emoji) {
+            ret += '<span>' + emoji + '</span>';
+        });
+
+        // Add a separator
+        ret += '&vellip;';
+
+        // Get all emojis
         ret += returnCharactersInRangeAsSpan(128512, 128591);
         ret += returnCharactersInRangeAsSpan(9984, 10175);
         ret += returnCharactersInRangeAsSpan(127744, 128511);

@@ -64,7 +64,17 @@
     overflow-y: hidden;
     white-space: nowrap;
     background: rgba(255,255,255,0.1);
+    opacity: 0.5;
     display: none; /* Will be 'flex' when active */
+}
+#mainContent #messageEmojis:hover {
+    opacity: 1;
+}
+#mainContent #messageEmojis span {
+    opacity: 0.8;
+}
+#mainContent #messageEmojis span:hover {
+    opacity: 1;
 }
 
 #mainContent #messageComposer {
