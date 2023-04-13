@@ -27,6 +27,7 @@ imagePack = {
         'reddit': 'Social/Reddit.png',
         'twitter': 'Social/Twitter.png',
         'youtube': 'Social/YouTube.png',
+        'blogger': 'Social/Blogger.png',
     },
 };
 
