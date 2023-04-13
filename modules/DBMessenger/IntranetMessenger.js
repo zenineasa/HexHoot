@@ -36,10 +36,20 @@ class IntranetMessenger {
         IntranetMessenger._instance.initialize();
 
         // If there is a network change detected, re-initialize
+        let isReinitializing = false;
         networkInterfaces.on('change', async function(e) {
-            if (this.lastInitTimestamp + 2000 < Date.now()) {
-                this.lastInitTimestamp = Date.now();
+            if (isReinitializing ||
+                this.lastInitTimestamp + 2000 < Date.now()) {
+                return;
+            }
+            isReinitializing = true;
+            try {
                 await IntranetMessenger._instance.initialize();
+                this.lastInitTimestamp = Date.now();
+            } catch (err) {
+                console.log(err);
+            } finally {
+                isReinitializing = false;
             }
         }.bind(this));
     }
