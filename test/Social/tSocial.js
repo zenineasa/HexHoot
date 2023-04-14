@@ -23,6 +23,10 @@ QUnit.test('Check the icons and links', function(assert) {
     images.forEach(function(image) {
         const filename = utils.getFileNameFromPath(image.src)
             .split('.png')[0].toLowerCase();
-        assert.ok(image.getAttribute('href').includes(filename));
+        if (filename === 'blogger') { // Blogger is the only exception
+            assert.equal(image.getAttribute('href'), 'https://blog.hexhoot.com');
+        } else {
+            assert.ok(image.getAttribute('href').includes(filename));
+        }
     });
 });
