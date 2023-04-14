@@ -25,6 +25,23 @@ body {
     text-align: center;
 }
 
+/** For scrollbar **/
+
+::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+}
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 180, 255, 0.5);
+    border-radius: 0.5em;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 180, 255, 0.8);
+}
+
 /** For Button **/
 
 .HexHoot_Button {
