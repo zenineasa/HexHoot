@@ -55,7 +55,7 @@ class Chat {
         // Get the stats for emoji counts
         const emojiCounterMap =
             await dbMessenger.getPreference('emojiCounterMap');
-        if (typeof(this.emojiCounterMap) === 'undefined') {
+        if (typeof(emojiCounterMap) === 'undefined') {
             this.emojiCounterMap = {};
         } else {
             this.emojiCounterMap = emojiCounterMap.value;
@@ -299,14 +299,17 @@ class Chat {
      * message is composed
      */
     sendMessage(userKey, messageTextArea) {
-        const message = {
-            timestamp: Date.now(),
-            type: this.messageType.sent,
-            message: messageTextArea.value.trim(),
-        };
-        this.insertChatMessageToDOM(message);
-        dbMessenger.sendChatMessage(userKey, message);
-        messageTextArea.value = '';
+        const textAreaValue = messageTextArea.value.trim();
+        if (textAreaValue !== '') {
+            const message = {
+                timestamp: Date.now(),
+                type: this.messageType.sent,
+                message: textAreaValue,
+            };
+            this.insertChatMessageToDOM(message);
+            dbMessenger.sendChatMessage(userKey, message);
+            messageTextArea.value = '';
+        }
     }
 
     /**
