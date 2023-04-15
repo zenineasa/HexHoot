@@ -270,8 +270,8 @@ class IntranetMessenger {
                     const address = row.PhysicalAddress
                         .substring(1, row.PhysicalAddress.length - 1);
 
-                    // Search through different ports that HexHoot can take to see
-                    // if the given address has HexHoot runnings
+                    // Search through different ports that HexHoot can take to
+                    // see if the given address has HexHoot runnings
                     for (let i = 0; i < maxTryDiffPorts; i++) {
                         this.fetchInfo(
                             `http://${address}:${preferedServerPort + i}`);
