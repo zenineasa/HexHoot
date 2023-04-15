@@ -5,7 +5,6 @@ const ip = require('ip');
 const http = require('http');
 const arp = require('arptable-js');
 const arpulate = require('arpulate');
-const {networkInterfaces} = require('@leichtgewicht/network-interfaces');
 
 const utils = require('./utils');
 const dbWrapper = require('./DBWrapper');
@@ -32,26 +31,8 @@ class IntranetMessenger {
         this.listOfChannelsSubscribedTo = [];
         this.messageReceiveCallbackFunction = function() {};
 
-        this.lastInitTimestamp = Date.now();
+        IntranetMessenger._instance.detectNetworkChanges();
         IntranetMessenger._instance.initialize();
-
-        // If there is a network change detected, re-initialize
-        let isReinitializing = false;
-        networkInterfaces.on('change', async function(e) {
-            if (isReinitializing ||
-                this.lastInitTimestamp + 2000 < Date.now()) {
-                return;
-            }
-            isReinitializing = true;
-            try {
-                await IntranetMessenger._instance.initialize();
-                this.lastInitTimestamp = Date.now();
-            } catch (err) {
-                console.log(err);
-            } finally {
-                isReinitializing = false;
-            }
-        }.bind(this));
     }
 
     /**
@@ -73,6 +54,35 @@ class IntranetMessenger {
             this.subscribeToChannel(
                 utils.stringToBuffer(this.userPublicKey), true);
         }
+    }
+
+    /**
+     * Cleanup IntranetMessenger
+     */
+    async cleanup() {
+        console.log('Cleaning up intranet messenger');
+        await this.stopServer();
+    }
+
+    /**
+     * Detect network changes and act accordingly
+     */
+    async detectNetworkChanges() {
+        let net = os.networkInterfaces();
+        /** Recursively check (infinite loop) if the interface has changed */
+        async function checkInterfaces() {
+            if (
+                JSON.stringify(net) !==
+                JSON.stringify(os.networkInterfaces())
+            ) {
+                console.log('Network interface change detected');
+                await IntranetMessenger._instance.cleanup();
+                await IntranetMessenger._instance.initialize();
+                net = os.networkInterfaces();
+            }
+            setTimeout(checkInterfaces, 5000); // Check again after 5 seconds
+        }
+        checkInterfaces();
     }
 
     /**
@@ -130,7 +140,7 @@ class IntranetMessenger {
      * @param {number} port the port in which we would like to start the server
      */
     startServer(port) {
-        const server = http.createServer(function(req, res) {
+        this.server = http.createServer(function(req, res) {
             if (req.url === '/') {
                 if (req.method === 'GET') {
                     const response = this.getInformationAboutSelf();
@@ -194,7 +204,7 @@ class IntranetMessenger {
             }
         }.bind(this));
 
-        server.on('error', function(err) {
+        this.server.on('error', function(err) {
             if (err.code === 'EADDRINUSE') {
                 console.log(`Port ${port} is already in use`);
                 if (port < preferedServerPort + maxTryDiffPorts) {
@@ -207,29 +217,65 @@ class IntranetMessenger {
             }
         }.bind(this));
 
-        server.on('listening', function() {
+        this.server.on('listening', function() {
             this.port = port;
             console.log(`Server: http://${ip.address()}:${port}`);
         }.bind(this));
 
-        server.listen(port);
+        this.server.listen(port);
     }
+
+    /**
+     * Stop the server
+     */
+    async stopServer() {
+        return new Promise(function(resolve, reject) {
+            this.server.close(function() {
+                resolve('Server closed');
+            });
+        }.bind(this));
+    }
+
 
     /**
      * Find all devices that run HexHoot.
      */
-    findDevicesRunningHexHoot() {
-        arp.get(function(table) {
-            table.forEach(async function(row) {
-                // The address is enclosed in brackets; we need to remove that
-                const address = row.PhysicalAddress
-                    .substring(1, row.PhysicalAddress.length - 1);
+    async findDevicesRunningHexHoot() {
+        /**
+         * Ensure that the server has started before attempting to find other
+         * devices. If this server is not running, then some of the requests in
+         * response would be missed.
+         * @param {Object} server
+         * @return {Promise}
+         */
+        function ensureServerRunning(server) {
+            return new Promise(function(resolve, reject) {
+                if (server.listening) {
+                    resolve();
+                } else {
+                    setTimeout(() => {
+                        ensureServerRunning(server)
+                            .then(() => resolve())
+                            .catch((err) => reject(err));
+                    }, 50);
+                }
+            });
+        }
+        await ensureServerRunning(this.server);
 
-                // Search through different ports that HexHoot can take to see
-                // if the given address has HexHoot runnings
-                for (let i = 0; i < maxTryDiffPorts; i++) {
-                    this.fetchInfo(
-                        `http://${address}:${preferedServerPort + i}`);
+        arp.get(function(table) {
+            table.forEach(function(row) {
+                if (row.InternetAddress !== '?') {
+                    // Remove the enclosing brackets along with the address
+                    const address = row.PhysicalAddress
+                        .substring(1, row.PhysicalAddress.length - 1);
+
+                    // Search through different ports that HexHoot can take to see
+                    // if the given address has HexHoot runnings
+                    for (let i = 0; i < maxTryDiffPorts; i++) {
+                        this.fetchInfo(
+                            `http://${address}:${preferedServerPort + i}`);
+                    }
                 }
             }.bind(this));
         }.bind(this));
@@ -241,6 +287,7 @@ class IntranetMessenger {
      * @param {Object} info information other HexHoot instance
      */
     saveInfoAboutPeers(info) {
+        console.log('Saving info about peer: ' + JSON.stringify(info));
         // Extract information on other hosts with HexHoot
         const otherhostsWithHexHootMap = info.hostsWithHexHootMap;
 
@@ -301,7 +348,13 @@ class IntranetMessenger {
 
             // The whole response has been received.
             response.on('end', function() {
-                data = JSON.parse(data);
+                try {
+                    data = JSON.parse(data);
+                } catch (err) {
+                    console.log('Invalid the response:');
+                    console.log(data);
+                    return;
+                }
                 if (data.application === 'hexhoot') {
                     // Assert that the data response has the same URL
                     // information as the URL we sent to
