@@ -8,104 +8,45 @@
     </a>
 </p>
 
-This is an attempt to create an Opensource Peer-to-peer Social Network with Zero-Knowledge-Proof based authentication. The objective is to democratize social networking by eliminating any form of central servers.
+This is an attempt to create an Opensource Peer-to-peer communication platform with Zero-Knowledge-Proof based authentication. The objective is to democratize communication by eliminating any form of central servers.
 
-The initial target is to release a desktop version that can be installed and run on Linux, macOS and Windows, wherein people can chat with each other.
-
-
-## About
-
-Internet is supposed to be free; free as in "libre" and not "gratis". There are plenty of implementations of social networks around. Most of them have central servers, run by their makers, that handle all aspects of it.
-
-The issue with having a centralized server is that there is an organization that holds on to all the information created by its users. In many cases, the users who created the content no longer own the content once posted; the ownership is transferred to the company that runs the social network. Furthermore, these platforms can take down any users or content as they choose to, (as some Youtubers have described) like a god.
-
-Even the best efforts to implement a social network in a peer-to-peer manner would have a centralized server to authenticate and verify the user. We would like to change that.
-
-Our goal is to create a social network wherein the users own, control and host their information. There is no central server involved even for authentication; we accomplish this by using Zero Knowledge Proof strategies.
+At the moment, we have a desktop version that can be installed and run on Linux, macOS and Windows, wherein people can chat with each other over the internet and the intranet.
 
 
-## RFA
+## Why HexHoot?
 
-### R - Requirements
+The following question is something that people would ask me quite often when I talk to them about HexHoot. If you look around, you can see quite a lot of software, like WhatsApp, Slack, Microsoft Teams, Zoom, etc., that helps in communication. Why would one attempt to create yet another tool that solves the same problem?
 
-A social network that:
+The thing is, we are not exactly trying to compete with the existing communication platforms head-on; rather, we are setting up a framework that would enable the concept of user authentication in applications that can run without any centralized servers.
 
-1. Values privacy of the users
-2. Collects no data from the users
-3. Users own and host all the data on their devices
-4. No servers are involved; not even for user authentication.
-5. Has essential features of a modern social network.
-6. Should be less addictive than modern social networks.
-7. Personalizable templates, themes, etc.
-8. Open-source, so that there would be no trust issues.
+Much of the traditional softwares that enabled Peer-to-Peer communication relied on a centralized server to authenticate users, not because they wanted to do this, but because that was probably the only way at the time. We, on the other hand, have accomplished to solve this using Zero-knowledge-proof strategies.
 
-### F - Functionalities / Functional Design
+Internet is supposed to be free; free as in "libre" and not "gratis". There is a tendancy in the world that certain closed source algorithms are actively deciding what content the people must be exposed to. You can't view their source code, while they read each and everything about you.
 
-1. Ability to create and share profiles
-2. Ability to connect two profiles (add as a friend or follow).
-3. Send private messages.
-4. Form groups and send messages (not implemented yet).
-5. Write a post and share a photo or video that is viewable to anyone to whom the profile is connected (not implemented yet).
-
-### A - Architecture
-
-Everything shall be modules, including the engine. Each module will be written in a Model-View-Controller design. Modules shall have a JSON file that informs which other modules the module is dependent on.
-
-For message communication, we could use Hyperswarm (based on Hypercore).
-
-## Tasks
-
-The following Trello board captures all the tasks that need to be done, that are actively worked upon and that have been completed.
-
-https://trello.com/b/cvbsEOpe/hexhoot
-
-## Try it out
-
-As a prerequisite to using Hexhoot, you would need to install Node.js on your computer. The following link would help you with the same.
-
-https://nodejs.dev/en/download/
-
-After that, you simply have to open your Terminal / CMD, go to the directory where you downloaded this source code and run the following commands:
-
-```
-npm install
-npm start
-```
-
-## Other Important commands
-
-Build everything:
-
-```
-make
-```
+We would like to reverse that. HexHoot is an Open Source project that is aimed at creating a platform for communication between people, while all data is stored locally on the users' computers.
 
 
-Clean the build:
+## Download the latest version
 
-```
-make clean
-```
+You can download and install the packaged (non-development) version from our release page linked below. This contains executables for Linux, macOS and Windows.
+
+https://github.com/zenineasa/HexHoot/releases/latest
 
 
-Start the application:
+## Try the development version
 
-```
-npm start
-```
+If you are someone who likes to run the most updated version that is still under development, you would not regret following the belowmentioned instructions.
 
-## Before submitting
-
-Run the following command to ensure that all the Javascript files follow the coding standards.
-
-```
-make lint
-```
-
-Run the following command to ensure that all the tests are running fine
-
-```
-npm run test
-```
+1. Prerequisite: Download and install Node.js from the following link.
+    https://nodejs.dev/en/download/
+2. Clone this repository to your computer.
+3. Go to the cloned repository using your Terminal/CMD, and run the following commands to install the necessary packages.
+   ```
+   make install
+   ```
+4. Now, use the following command to start HexHoot Development version.
+   ```
+   npm start
+   ```
 
 Copyright &copy; 2022-2023 Zenin Easa Panthakkalakath
