@@ -16,7 +16,8 @@ class Messenger {
         }
         Messenger._instance = this;
 
-        this.swarms = [];
+        this.subscribedSwarms = [];
+        this.senderSwarms = [];
         this.listOfChannelsSubscribedTo = [];
         this.messageReceiveCallbackFunction = function() {};
         this.connMap = [];
@@ -78,15 +79,15 @@ class Messenger {
             return;
         }
 
-        this.swarms.push(new Hyperswarm());
-        const idx = this.swarms.length - 1;
+        const idx = this.subscribedSwarms.length;
+        this.subscribedSwarms.push(new Hyperswarm());
 
-        this.swarms[idx].on('connection', function(conn, peerInfo) {
+        this.subscribedSwarms[idx].on('connection', function(conn, peerInfo) {
             conn.on('error', this.errorCallback.bind(this));
             conn.on('data', this.messageReceivedCallback.bind(this));
         }.bind(this));
 
-        const discovery = this.swarms[idx].join(
+        const discovery = this.subscribedSwarms[idx].join(
             channelName, {server: isServer, client: !isServer});
         await discovery.flushed();
 
@@ -127,18 +128,22 @@ class Messenger {
         console.log('Sending message to channel: ' + channelNameStr);
 
         if (typeof(this.connMap[channelNameStr]) === 'undefined') {
-            const tempSwarm = new Hyperswarm();
-            tempSwarm.on('connection', function(conn) {
+            const idx = this.senderSwarms.length;
+            this.senderSwarms.push(new Hyperswarm());
+            this.senderSwarms[idx].on('connection', function(conn) {
                 conn.on('error', this.errorCallback.bind(this));
                 conn.on('data', this.messageReceivedCallback.bind(this));
                 conn.write(message);
                 this.connMap[channelNameStr] = conn;
             }.bind(this));
 
-            tempSwarm.join(
+            this.senderSwarms[idx].join(
                 channelName, {server: false, client: true},
             );
-            await tempSwarm.flush();
+            await this.senderSwarms[idx].flush();
+            // TODO: Perhaps for a more reliable communication, we should not
+            // use a temporary connection. We could have a more premanent
+            // connection.
         } else {
             this.connMap[channelNameStr].write(message);
         }
