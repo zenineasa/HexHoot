@@ -34,13 +34,14 @@
     },
     "dependencies": {
         "arptable-js": "^0.0.2",
-        "arpulate": "^0.1.0",
         "copyright-regex": "^1.1.6",
         "ecdh": "^0.2.0",
         "electron-squirrel-startup": "^1.0.0",
         "hyperswarm": "^4.4.0",
         "indexeddb-export-import": "^2.1.5",
         "ip": "^2.0.0",
+        "ipv4-range": "^0.0.0",
+        "ping": "^0.4.4",
         "require-text": "^0.0.1",
         "tone": "^14.7.77"
     }

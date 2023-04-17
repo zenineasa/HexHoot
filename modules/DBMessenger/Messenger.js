@@ -39,6 +39,20 @@ class Messenger {
     }
 
     /**
+     * Cleanup Messenger
+     */
+    async cleanup() {
+    }
+
+    /**
+     * Re-initialize Messenger
+     */
+    async reInitialize() {
+        await Messenger._instance.cleanup();
+        await Messenger._instance.initialize();
+    }
+
+    /**
      * What to do when a channel receives a message
      * message arrives.
      * @param {*} message The message that was received in the channel

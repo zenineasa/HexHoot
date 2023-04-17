@@ -4,7 +4,8 @@ const os = require('os');
 const ip = require('ip');
 const http = require('http');
 const arp = require('arptable-js');
-const arpulate = require('arpulate');
+const ping = require('ping');
+const range = require('ipv4-range');
 
 const utils = require('./utils');
 const dbWrapper = require('./DBWrapper');
@@ -31,7 +32,6 @@ class IntranetMessenger {
         this.listOfChannelsSubscribedTo = [];
         this.messageReceiveCallbackFunction = function() {};
 
-        IntranetMessenger._instance.detectNetworkChanges();
         IntranetMessenger._instance.initialize();
     }
 
@@ -41,9 +41,9 @@ class IntranetMessenger {
     async initialize() {
         console.log('Initializing intranet messenger');
         this.ipAddresses = [];
-        await this.populateARPTableAndIpAddresses();
         this.hostsWithHexHootMap = {};
 
+        this.findIPAddressesAssignedToThisDevice();
         this.startServer(preferedServerPort);
         this.findDevicesRunningHexHoot();
 
@@ -65,35 +65,20 @@ class IntranetMessenger {
     }
 
     /**
-     * Detect network changes and act accordingly
+     * Re-initialize IntranetMessenger
      */
-    async detectNetworkChanges() {
-        let net = os.networkInterfaces();
-        /** Recursively check (infinite loop) if the interface has changed */
-        async function checkInterfaces() {
-            if (
-                JSON.stringify(net) !==
-                JSON.stringify(os.networkInterfaces())
-            ) {
-                console.log('Network interface change detected');
-                await IntranetMessenger._instance.cleanup();
-                await IntranetMessenger._instance.initialize();
-                net = os.networkInterfaces();
-            }
-            setTimeout(checkInterfaces, 5000); // Check again after 5 seconds
-        }
-        checkInterfaces();
+    async reInitialize() {
+        await IntranetMessenger._instance.cleanup();
+        await IntranetMessenger._instance.initialize();
     }
 
     /**
-     * Ping surrounding IP Addresses to populate the ARP table
-     * @return {Promise} promise that resolves once pinging the range is
-     * complete
+     * Find IP Addresses assigned to this device and store it all in the
+     * variable named 'this.ipAddresses'.
      */
-    populateARPTableAndIpAddresses() {
-        // Get all IP Addresses that is associated with this system
+    findIPAddressesAssignedToThisDevice() {
+        // Find the IP Addresses that the network interfaces have been assigned
         const net = os.networkInterfaces();
-        const promises = [];
         Object.values(net).forEach(function(netInterface) {
             netInterface.forEach(function(info) {
                 if (
@@ -102,19 +87,9 @@ class IntranetMessenger {
                     info.address.startsWith('10.')
                 ) {
                     this.ipAddresses.push(info.address);
-                    promises.push(new Promise(function(resolve, reject) {
-                        // Populate the system ARP table by pinging a range of
-                        // surrounding IP addresses
-                        arpulate(info.address, 254, async function() {
-                            console.log(`Pinged around ${info.address}`);
-                            resolve('ARP Table loaded');
-                        });
-                    }));
                 }
             }.bind(this));
         }.bind(this));
-
-        return Promise.allSettled(promises);
     }
 
     /**
@@ -236,7 +211,6 @@ class IntranetMessenger {
         }.bind(this));
     }
 
-
     /**
      * Find all devices that run HexHoot.
      */
@@ -263,6 +237,36 @@ class IntranetMessenger {
         }
         await ensureServerRunning(this.server);
 
+        /**
+         * Fetch through different ports that HexHoot can take to see if the
+         * given address has HexHoot runnings.
+         * @param {string} address of the remove device
+         */
+        const fetchViaDifferentPorts = function(address) {
+            for (let i = 0; i < maxTryDiffPorts; i++) {
+                this.fetchInfo(
+                    `http://${address}:${preferedServerPort + i}`);
+            }
+        }.bind(this);
+
+
+        // Ping around the IP addresses that this device is assigned with
+        this.ipAddresses.forEach(async function(ip) {
+            // Ping around this ip address
+            const addresses = range(ip, 255);
+            addresses.push(ip);
+            addresses.forEach(async function(address) {
+                const res = await ping.promise.probe(
+                    address, {timeout: 100, min_reply: 1});
+                if (res.alive) {
+                    console.log('Alive: ' + address);
+                    fetchViaDifferentPorts(address);
+                }
+            });
+        });
+
+        // Additionally, let's see if the ARP Table can come up with other
+        // connections.
         arp.get(function(table) {
             table.forEach(function(row) {
                 if (row.InternetAddress !== '?') {
@@ -270,15 +274,10 @@ class IntranetMessenger {
                     const address = row.PhysicalAddress
                         .substring(1, row.PhysicalAddress.length - 1);
 
-                    // Search through different ports that HexHoot can take to
-                    // see if the given address has HexHoot runnings
-                    for (let i = 0; i < maxTryDiffPorts; i++) {
-                        this.fetchInfo(
-                            `http://${address}:${preferedServerPort + i}`);
-                    }
+                    fetchViaDifferentPorts(address);
                 }
-            }.bind(this));
-        }.bind(this));
+            });
+        });
     }
 
     /**

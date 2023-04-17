@@ -1,5 +1,6 @@
 /* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
 
+const os = require('os');
 const dbWrapper = require('./DBWrapper')();
 const messenger = require('./Messenger')();
 const intranetMessenger = require('./IntranetMessenger')();
@@ -18,6 +19,8 @@ class DBMessenger {
             return DBMessenger._instance;
         }
         DBMessenger._instance = this;
+
+        DBMessenger._instance.detectNetworkChanges();
         DBMessenger._instance.initialize();
     }
 
@@ -47,6 +50,27 @@ class DBMessenger {
             this.messageReceivedCallback.bind(this));
         intranetMessenger.setMessageReceiveCallbackFunction(
             this.messageReceivedCallback.bind(this));
+    }
+
+    /**
+     * Detect network changes and act accordingly
+     */
+    async detectNetworkChanges() {
+        let net = os.networkInterfaces();
+        /** Recursively check (infinite loop) if the interface has changed */
+        async function checkInterfaces() {
+            if (
+                JSON.stringify(net) !==
+                JSON.stringify(os.networkInterfaces())
+            ) {
+                net = os.networkInterfaces();
+                console.log('Network interface change detected');
+                messenger.reInitialize();
+                intranetMessenger.reInitialize();
+            }
+            setTimeout(checkInterfaces, 5000); // Check again after 5 seconds
+        }
+        checkInterfaces();
     }
 
     /**
