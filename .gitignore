@@ -4,3 +4,4 @@ package-lock.json
 .vscode
 */node_modules/*
 out/
+appdmg.json
