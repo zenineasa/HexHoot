@@ -4,6 +4,7 @@
  * This file contains maps to all the images that are used in the UI and helper
  * functions that enable accessing them.
  */
+const path = require('path');
 
 imagePack = {
     'branding': {
@@ -48,7 +49,9 @@ imagePack.getPath = function(hierarchy) {
         console.log(new Error('Hierarchy does not exist'));
     }
 
-    return __dirname + '/images/' + value;
+    // Note: Even on windows, since we are loading this on chromium embedded
+    // framework, we need to use a '/' and not '\'.
+    return path.resolve(__dirname + '/images/' + value).replaceAll('\\', '/');
 };
 
 module.exports = imagePack;
