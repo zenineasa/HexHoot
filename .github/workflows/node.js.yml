@@ -14,8 +14,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest] # Add windows-latest at a later point
-        node-version: [16.x, 18.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
