@@ -25,10 +25,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install
-    - run: |
-            if [ "$RUNNER_OS" == "Linux" ]; then
-              export DISPLAY=:99
-              sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-            fi
-            npm test
+    - name: Setup display for Linux
+      if: runner.os == 'Linux'
+      run: |
+        export DISPLAY=:99
+        sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+    - run: npm test
     - run: make lint
