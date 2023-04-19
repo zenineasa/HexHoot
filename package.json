@@ -23,7 +23,6 @@
         "@electron-forge/maker-rpm": "^6.1.1",
         "@electron-forge/maker-squirrel": "^6.1.1",
         "@electron-forge/maker-zip": "^6.1.1",
-        "appdmg": "^0.6.6",
         "copyright-header": "^0.4.6",
         "electron": "^24.0.0",
         "eslint": "^8.38.0",
@@ -45,5 +44,8 @@
         "ping": "^0.4.4",
         "require-text": "^0.0.1",
         "tone": "^14.7.77"
+    },
+    "optionalDependencies": {
+        "appdmg": "^0.6.6"
     }
 }
