@@ -38,14 +38,14 @@
             "en": "Add friend",
             "ml": "സുഹൃത്തിനെ ചേർക്കുക",
             "de": "Freund hinzufügen",
-            "fr": "Ajouter ame",
+            "fr": "Ajouter un ami",
             "it": "Aggiungi un amico"
         },
         "copyToClipboard": {
             "en": "Copy to clipboard",
             "ml": "ക്ലിപ്പ്ബോർഡിലേയ്ക്ക് കോപ്പി ചെയ്യുക",
             "de": "In die Zwischenablage kopieren",
-            "fr": "Copier dans le presse-papier",
+            "fr": "Copier",
             "it": "Copia negli appunti"
         },
         "publicKey": {
@@ -96,14 +96,14 @@
             "en": "Add friend",
             "ml": "സുഹൃത്തിനെ ചേർക്കുക",
             "de": "Freund hinzufügen",
-            "fr": "Ajouter ame",
+            "fr": "Ajouter un ami",
             "it": "Aggiungi un amico"
         },
         "search": {
             "en": "Search",
             "ml": "തിരയുക",
             "de": "Suchen",
-            "fr": "Ricerca",
+            "fr": "Chercher",
             "it": "Cercare"
         },
         "typeInYourMessage": {
@@ -140,21 +140,21 @@
             "en": "Do not share it with anyone",
             "ml": "യാതൊരു കാരണവശയാലും ഇത് മറ്റൊരാൾക്ക് പറഞ്ഞുകൊടുക്കരുത്",
             "de": "Mit niemanden teilen",
-            "fr": "Ne le partagez avec personne",
+            "fr": "Ne partagez avec personne",
             "it": "Non condividerla con nessuno"
         },
         "displayName": {
             "en": "Display name",
             "ml": "പ്രദർശന നാമം",
             "de": "Anzeigename",
-            "fr": "Afficher un nom",
+            "fr": "Nom public",
             "it": "Nome pubblico"
         },
         "aboutYou": {
             "en": "About you",
             "ml": "നിങ്ങളെ കുറിച്ച്",
             "de": "Über dich",
-            "fr": "Au propos de vous",
+            "fr": "Mes infos",
             "it": "Una tua descrizione"
         },
         "photo": {
@@ -182,7 +182,7 @@
             "en": "Logout",
             "ml": "ലോഗ്ഔട്ട് ചെയ്യുക",
             "de": "Ausloggen",
-            "fr": "Se déconnecter",
+            "fr": "Déconnecter",
             "it": "Disconnettersi"
         },
         "back": {
@@ -233,7 +233,7 @@
             "en": "Login",
             "ml": "ലോഗിൻ ചെയ്യുക",
             "de": "Anmelden",
-            "fr": "Se connecter",
+            "fr": "Me connecter",
             "it": "Accedi"
         },
         "or": {
@@ -277,7 +277,7 @@
             "en": "About the person",
             "ml": "വ്യക്തിയെക്കുറിച്ച്",
             "de": "Über die Person",
-            "fr": "À propos de la personne",
+            "fr": "Infos de la personne",
             "it": "La tua descrizione"
         },
         "photo": {
