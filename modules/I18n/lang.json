@@ -202,11 +202,11 @@
             "it": "La chiave privata deve essere un valore esadecimale di dimensione 32 caratteri."
         },
         "minimumCharacters": {
-            "en": "Display name should have atleast 4 characters.",
-            "ml": "പ്രദർശന നാമത്തിൽ കുറഞ്ഞത് 4 പ്രതീകമെങ്കിലുമുണ്ടായിരിക്കണം.",
-            "de": "Anzeigename muss mindestens 4 Zeichen enthalten",
-            "fr": "Le nom à afficher doit comporter au moins 4 caractères.",
-            "it": "Il nome visualizzato deve contenere almeno 4 caratteri."
+            "en": "Display name should have atleast 5 characters.",
+            "ml": "പ്രദർശന നാമത്തിൽ കുറഞ്ഞത് 5 പ്രതീകമെങ്കിലുമുണ്ടായിരിക്കണം.",
+            "de": "Anzeigename muss mindestens 5 Zeichen enthalten",
+            "fr": "Le nom à afficher doit comporter au moins 5 caractères.",
+            "it": "Il nome visualizzato deve contenere almeno 5 caratteri."
         },
         "privateKey": {
             "en": "Private key (32 characters)",
