@@ -10,7 +10,6 @@ const imagePack = require('../ImagePack');
 const sounds = require('../Sounds');
 const i18n = require('./../I18n')();
 
-
 /**
  * This class implements the functionality for chatting
  */
@@ -105,27 +104,27 @@ class Chat {
         ul.innerHTML = ''; // Clear everything
 
         // Load friends from the DB
-        const allFriends = await dbMessenger.getAllFriends();
+        this.allFriends = await dbMessenger.getAllFriends();
 
         // Sort 'allFriends' by 'lastMessageTimestamp'
-        allFriends.sort(function(a, b) {
+        this.allFriends.sort(function(a, b) {
             return b.lastMessageTimestamp - a.lastMessageTimestamp;
         });
 
-        for (let i = 0; i < allFriends.length; i++) {
+        for (let i = 0; i < this.allFriends.length; i++) {
             const li = document.createElement('li');
-            li.id = this.sidebarLiIdPrefix + allFriends[i].key;
+            li.id = this.sidebarLiIdPrefix + this.allFriends[i].key;
             li.innerHTML = `
                 <div class="photo" style="background-image: url(
-                    ${this.getProfilePic(allFriends[i].photo)}
+                    ${this.getProfilePic(this.allFriends[i].photo)}
                 );"></div>
-                <div class="name">${allFriends[i].displayName}</div>
+                <div class="name">${this.allFriends[i].displayName}</div>
             `;
-            li.onclick = this.loadChat(allFriends[i]);
+            li.onclick = this.loadChat(this.allFriends[i]);
             ul.appendChild(li);
 
-            if (!allFriends[i].isRead) {
-                this.doNotify(allFriends[i].key);
+            if (!this.allFriends[i].isRead) {
+                this.doNotify(this.allFriends[i].key);
             }
         }
     }
@@ -383,6 +382,22 @@ class Chat {
 
             // Play sound for alert
             sounds().messageReceivedSound();
+            console.log(Notification);
+            const friend = this.allFriends.find(function(friend) {
+                return friend.key == message.senderPublicKey;
+            });
+            if (Notification.permission !== 'denied') {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const title = friend.displayName + ' sent you a message.';
+                    const body = message.message.message.message;
+                    const icon = this.getProfilePic(friend.photo);
+                    new Notification(title, {
+                        body: body,
+                        icon: icon,
+                    });
+                }
+            }
         } else if (message.message.type ===
             dbMessenger.messageType.userInfoResponse) {
             // Reload the sidebar
