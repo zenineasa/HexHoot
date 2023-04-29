@@ -82,7 +82,6 @@ class IntranetMessenger {
         Object.values(net).forEach(function(netInterface) {
             netInterface.forEach(function(info) {
                 if (
-                    info.address.startsWith('127.') ||
                     info.address.startsWith('192.') ||
                     info.address.startsWith('172.') ||
                     info.address.startsWith('10.')
