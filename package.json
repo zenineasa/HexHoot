@@ -1,5 +1,5 @@
 {
-    "coprightMessage": "Copyright © 2022-2023 Zenin Easa Panthakkalakath",
+    "coprightMessage": "Copyright © 2022-2024 Zenin Easa Panthakkalakath",
     "name": "hexhoot",
     "version": "1.0.4",
     "description": "HexHoot: An Opensource Peer-to-peer Social Network with Zero-Knowledge-Proof based authentication.",
@@ -17,33 +17,32 @@
     "author": "Zenin Easa Panthakkalakath (@zenineasa)",
     "license": "AGPLV3",
     "devDependencies": {
-        "@electron-forge/cli": "^6.4.0",
-        "@electron-forge/maker-deb": "^6.4.0",
-        "@electron-forge/maker-dmg": "^6.4.0",
-        "@electron-forge/maker-rpm": "^6.4.0",
-        "@electron-forge/maker-squirrel": "^6.4.0",
-        "@electron-forge/maker-zip": "^6.4.0",
+        "@electron-forge/cli": "^7.4.0",
+        "@electron-forge/maker-deb": "^7.4.0",
+        "@electron-forge/maker-dmg": "^7.4.0",
+        "@electron-forge/maker-rpm": "^7.4.0",
+        "@electron-forge/maker-squirrel": "^7.4.0",
+        "@electron-forge/maker-zip": "^7.4.0",
         "copyright-header": "^0.4.6",
-        "electron": "^26.0.0",
-        "eslint": "^8.47.0",
+        "electron": "^30.0.1",
+        "eslint": "^9.1.1",
         "eslint-config-google": "^0.14.0",
-        "glob": "^10.3.3",
+        "glob": "^10.3.12",
         "karma-electron": "^7.3.0",
-        "karma-qunit": "^4.1.2",
-        "qunit": "^2.19.4"
+        "karma-qunit": "^4.2.0",
+        "qunit": "^2.20.1"
     },
     "dependencies": {
         "arptable-js": "^0.0.2",
         "copyright-regex": "^1.1.6",
         "ecdh": "^0.2.0",
         "electron-squirrel-startup": "^1.0.0",
-        "hyperswarm": "^4.5.1",
+        "hyperswarm": "^4.7.14",
         "indexeddb-export-import": "^2.1.5",
-        "ip": "^2.0.0",
+        "ip": "^2.0.1",
         "ipv4-range": "^0.0.0",
         "ping": "^0.4.4",
-        "require-text": "^0.0.1",
-        "tone": "^14.7.77"
+        "require-text": "^0.0.1"
     },
     "optionalDependencies": {
         "appdmg": "^0.6.6"
