@@ -1,4 +1,4 @@
-### Copyright (c) 2022-2023 Zenin Easa Panthakkalakath ###
+### Copyright (c) 2022-2024 Zenin Easa Panthakkalakath ###
 
 all:
 	make clean
@@ -16,11 +16,11 @@ clean:
 	rm -rf node_modules bundle.js package-lock.json out
 
 lint:
-	npx eslint *.js modules/**/*.js test/*.js test/**/*.js
+	npx eslint --config eslint.config.js
 	npx copyright-header --copyrightHolder "Zenin Easa Panthakkalakath"
 
 lintfix:
-	npx eslint *.js modules/**/*.js test/*.js test/**/*.js --fix
+	npx eslint --config eslint.config.js --fix
 	npx copyright-header --fix --copyrightHolder "Zenin Easa Panthakkalakath"
 
 build-mac-intel:
