@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const os = require('os');
 const dbWrapper = require('./DBWrapper')();
@@ -129,6 +129,11 @@ class DBMessenger {
      * @param {Object} info information about the user
      */
     async writeLoggedInUserInfo(info) {
+        // Replace password with private key
+        const privateKey = utils.generatePrivateKey(info);
+        delete info.password
+        info.privateKey = privateKey;
+
         // Update it in the database
         info.key = 0;
         await dbWrapper.addOrEditEntry(this.tableNames.loggedInUser, info);

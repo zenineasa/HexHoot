@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const ecdh = require('ecdh');
 const crypto = require('crypto');
@@ -33,12 +33,27 @@ utils.generateIV = function() {
 };
 
 /**
- * Generate a new private key.
+ * Generate a new private key. Generate a random one if no argument is given;
+ * otherwise create something off of SHA256 hashing.
+ * @param {object} info an optional structure containing username and password
  * @return {string} a 32 character string depicting a private key
  */
-utils.generatePrivateKey = function() {
-    const newKey = ecdh.generateKeys(utils.getECDHCurve());
-    return newKey.privateKey.buffer.toString('hex');
+utils.generatePrivateKey = function(info) {
+    // If no argument, return a random private key
+    if (info === undefined) {
+        const newKey = ecdh.generateKeys(utils.getECDHCurve());
+        return newKey.privateKey.buffer.toString('hex');
+    }
+
+    // Create a SHA256 hash and take the first 32 elements
+    const saltPrefix = 'ഉപ്പിലിട്ട';
+    const saltSuffix = 'പാസ്സ്‌വേർഡ്';
+    const separator = '√';
+    const hash = crypto.createHash('sha256');
+    hash.update(
+        saltPrefix + info.password + separator + info.username + saltSuffix
+    );
+    return hash.digest('hex').substring(32);
 };
 
 /**

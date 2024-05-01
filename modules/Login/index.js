@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const requireText = require('require-text');
 const dbMessenger = require('./../DBMessenger')();
@@ -34,17 +34,11 @@ class Login {
         containerDOM.innerHTML = eval('`' +
         requireText('./template.html', require) + '`');
 
-        // Generate private key button
-        document.getElementById('generatePrivateKey').onclick = function() {
-            document.querySelector('input[name=privateKey]').value =
-                dbMessenger.generatePrivateKey();
-        };
-
         // Login button
         document.getElementById('loginButton').onclick = function() {
             const info = {};
             const inputs = containerDOM.querySelectorAll(
-                'input[type=text],textarea');
+                'input[type=text],input[type=password]');
             for (let i = 0; i < inputs.length; i++) {
                 info[inputs[i].name] = inputs[i].value;
             }
@@ -77,11 +71,9 @@ class Login {
      * @param {Object} info information extracted from the login form.
      */
     validateLoginForm(info) {
-        // Validate the private key
-        const privateKeyRegext = /^[0-9a-fA-F]+$/;
-        if (!(privateKeyRegext.test(info.privateKey) &&
-            info.privateKey.length == 32)) {
-            const message = i18n.getText('Login.privateKeyLength');
+        // Validate the password
+        if (info.password.length <= 8) {
+            const message = i18n.getText('Login.passwordLength');
             alert(message);
             throw new Error(message);
         }
@@ -93,14 +85,6 @@ class Login {
             alert(message);
             throw new Error(message);
         }
-
-        // For about, let's just escape all the HTML special characters
-        info.about = info.about
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
     }
 
     /**

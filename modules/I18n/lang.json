@@ -1,5 +1,5 @@
 {
-    "coprightMessage": "Copyright © 2022-2023 Zenin Easa Panthakkalakath",
+    "coprightMessage": "Copyright © 2022-2024 Zenin Easa Panthakkalakath",
 
     "I18n": {
         "language": {
@@ -194,13 +194,6 @@
         }
     },
     "Login": {
-        "privateKeyLength": {
-            "en": "Private key has to be a hexadecimal value of size 32 characters.",
-            "ml": "പ്രൈവറ്റ് കീ കൃത്യം 32 പ്രതീകങ്ങളുള്ള ഹെക്സാഡെസിമൽ ആയിരിക്കണം.",
-            "de": "Privater Schlüssel muss aus 32 hexadezimalen Zeichen bestehen.",
-            "fr": "La clé privée doit être une valeur hexadécimale de 32 caractères.",
-            "it": "La chiave privata deve essere un valore esadecimale di dimensione 32 caratteri."
-        },
         "minimumCharacters": {
             "en": "Display name should have atleast 5 characters.",
             "ml": "പ്രദർശന നാമത്തിൽ കുറഞ്ഞത് 5 പ്രതീകമെങ്കിലുമുണ്ടായിരിക്കണം.",
@@ -208,19 +201,26 @@
             "fr": "Le nom à afficher doit comporter au moins 5 caractères.",
             "it": "Il nome visualizzato deve contenere almeno 5 caratteri."
         },
-        "privateKey": {
-            "en": "Private key (32 characters)",
-            "ml": "പ്രൈവറ്റ് കീ (32 പ്രതീകങ്ങൾ)",
-            "de": "Privater Schlüssel (32 Zeichen)",
-            "fr": "Clé privée (32 caractères)",
-            "it": "Chiave privata (32 caratteri)"
+        "password": {
+            "en": "Password (minimum 8 characters)",
+            "ml": "പാസ്സ്‌വേർഡ് (ചുരുങ്ങിയത് 8 പ്രതീകങ്ങൾ)",
+            "de": "Passwort (mindestens 8 Zeichen)",
+            "fr": "Mot de passe (minimum 8 caractères)",
+            "it": "Password (minimo 8 caratteri)"
+        },
+        "passwordLength": {
+            "en": "Password must be at least 8 characters long.",
+            "ml": "പാസ്സ്‌വേർഡിൽ ചുരുങ്ങിയത് 8 പ്രതീകങ്ങളെങ്കിലും ഉണ്ടായിരിക്കണം.",
+            "de": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+            "fr": "Le mot de passe doit comporter au moins 8 caractères.",
+            "it": "La password deve contenere almeno 8 caratteri."
         },
         "displayName": {
-            "en": "Display name",
-            "ml": "പ്രദർശന നാമം",
-            "de": "Anzeigename",
-            "fr": "Afficher un nom",
-            "it": "Nome pubblico"
+            "en": "Display name (minimum 4 characters)",
+            "ml": "പ്രദർശന നാമം (ചുരുങ്ങിയത് 4 പ്രതീകങ്ങൾ)",
+            "de": "Anzeigename (mindestens 4 Zeichen)",
+            "fr": "Afficher un nom (minimum 4 caractères)",
+            "it": "Nome pubblico (minimo 4 caratteri)"
         },
         "aboutYou": {
             "en": "About you",

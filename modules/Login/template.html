@@ -1,13 +1,9 @@
-<!-- Copyright (c) 2022-2023 Zenin Easa Panthakkalakath -->
+<!-- Copyright (c) 2022-2024 Zenin Easa Panthakkalakath -->
 <div>
     ${Logo.getHTML()}
     <div id="login">
-        <div class="privateKey">
-            <input class="HexHoot_Input" name="privateKey" type="text" placeholder="${i18n.getText('Login.privateKey')}" />
-            <button class="HexHoot_Button" id="generatePrivateKey">&#8634;</button>
-        </div>
         <input class="HexHoot_Input" name="displayName" type="text" placeholder="${i18n.getText('Login.displayName')}" />
-        <textarea class="HexHoot_Input" name="about" placeholder="${i18n.getText('Login.aboutYou')}"></textarea>
+        <input class="HexHoot_Input" name="password" type="password" placeholder="${i18n.getText('Login.password')}" />
         <button class="HexHoot_Button" id="loginButton">${i18n.getText('Login.login')}</button>
         <div>${i18n.getText('Login.or')}</div>
         <button class="HexHoot_Button" id="loginWithJSONButton">${i18n.getText('Login.loginUsingBackup')}</button>

@@ -1,14 +1,14 @@
-<!-- Copyright (c) 2022-2023 Zenin Easa Panthakkalakath -->
+<!-- Copyright (c) 2022-2024 Zenin Easa Panthakkalakath -->
 <div id="title">${i18n.getText('EditProfile.editProfile')}</div>
 <div id="editProfile">
     <div class="HexHoot_Input_label">${i18n.getText('EditProfile.privateKey')} &nbsp; <span>${i18n.getText('EditProfile.warningNotToShare')}</span></div>
     <input class="HexHoot_Input" name="privateKey" type="password" value="${userInfo.privateKey}" readonly/>
 
     <div class="HexHoot_Input_label">${i18n.getText('EditProfile.displayName')}</div>
-    <input class="HexHoot_Input" name="displayName" type="text" value="${userInfo.displayName}" />
+    <input class="HexHoot_Input" name="displayName" type="text" value="${userInfo.displayName}" readonly/>
 
     <div class="HexHoot_Input_label">${i18n.getText('EditProfile.aboutYou')}</div>
-    <textarea class="HexHoot_Input" name="about">${userInfo.about}</textarea>
+    <textarea class="HexHoot_Input" name="about">${(userInfo.about === undefined) ? '' : userInfo.about}</textarea>
 
     <div class="HexHoot_Input_label">${i18n.getText('EditProfile.photo')}</div>
     <input class="HexHoot_Input" name="photo" type="file" accept="image/*"/>

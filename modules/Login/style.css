@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 #login {
     border-radius: 0.2em;
@@ -6,13 +6,6 @@
 }
 #login input, #login textarea {
     font-size: 1.5em;
-}
-#login .privateKey {
-    display: flex;
-    flex-direction: row;
-}
-#login .privateKey input {
-    margin-left: 0.5em;
 }
 #login #generatePrivateKey {
     width: 4em;

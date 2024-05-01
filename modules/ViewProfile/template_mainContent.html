@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2022-2023 Zenin Easa Panthakkalakath -->
+<!-- Copyright (c) 2022-2024 Zenin Easa Panthakkalakath -->
 <div id="title">${i18n.getText('ViewProfile.viewProfile')}</div>
 <div id="viewProfile">
     <div class="HexHoot_Input_label">${i18n.getText('ViewProfile.publicKey')}</div>
@@ -8,7 +8,7 @@
     <input class="HexHoot_Input" name="displayName" value="${userInfo.displayName}" readonly/>
 
     <div class="HexHoot_Input_label">${i18n.getText('ViewProfile.aboutPerson')}</div>
-    <textarea class="HexHoot_Input" name="about" readonly>${userInfo.about}</textarea>
+    <textarea class="HexHoot_Input" name="about" readonly>${(userInfo.about === undefined) ? '' : userInfo.about}</textarea>
 
     <div class="HexHoot_Input_label">${i18n.getText('ViewProfile.photo')}</div>
     <div class="value"><img src="${this.getProfilePic(userInfo.photo)}"></div>
