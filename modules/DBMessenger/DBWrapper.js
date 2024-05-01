@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const IDBExportImport = require('indexeddb-export-import');
 
@@ -144,13 +144,26 @@ class DBWrapper {
     }
 
     /**
-     * Delete everything.
+     * Delete table
+     * @param {string} tableName
      */
-    async deleteDatabaseContent() {
-        indexedDB.deleteDatabase(this.dbName);
-        // TODO: Ensure that the database is deleted before running the
-        // following
-        this.initialize();
+    async deleteTable(tableName) {
+        await new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(tableName, 'readwrite');
+            const objectStore = transaction.objectStore(tableName);
+
+            const clearRequest = objectStore.clear();
+
+            clearRequest.onsuccess = () => {
+                console.log(`All entries removed from ${tableName} table`);
+                resolve();
+            };
+
+            clearRequest.onerror = (event) => {
+                console.error(`Error clearing entries from ${tableName} table:`, event.target.error);
+                reject(event.target.error);
+            };
+        });
     }
 
     /**

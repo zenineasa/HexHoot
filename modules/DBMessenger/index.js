@@ -77,7 +77,9 @@ class DBMessenger {
      * Delete everything.
      */
     async deleteDatabaseContent() {
-        dbWrapper.deleteDatabaseContent();
+        for (const key in this.tableNames) {
+            await dbWrapper.deleteTable(this.tableNames[key]);
+        }
         window.reload();
     }
 

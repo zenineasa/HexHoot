@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const utils = require('./../../../test/utils');
 const Login = require('./../../../modules/Login');
@@ -18,12 +18,12 @@ QUnit.test('Render login and check the forms', function(assert) {
     const logins = document.querySelectorAll('#login');
     assert.strictEqual(logins.length, 1,
         'There should be exactly one DIV with the id "login".');
-    const inputs = document.querySelectorAll('input[type=text],textarea');
-    assert.strictEqual(inputs.length, 3,
-        'There should be exactly three input fields.');
+    const inputs = document.querySelectorAll('input');
+    assert.strictEqual(inputs.length, 2,
+        'There should be exactly two input fields.');
     const buttons = document.querySelectorAll('button');
-    assert.strictEqual(buttons.length, 3,
-        'There should be exactly three buttons.');
+    assert.strictEqual(buttons.length, 2,
+        'There should be exactly two buttons.');
 });
 
 QUnit.test('Check if the logo is rendered', function(assert) {
@@ -48,23 +48,24 @@ QUnit.test('Fill in the form and check', async function(assert) {
     // function defines this.
     window.reload = function() {};
 
+    // Ensure user is logged out
+    await dbMessenger.deleteDatabaseContent();
+
     const login = new Login();
     login.render();
 
     const testUserInfoValues = {
-        'privateKey': '11111111111111111111111111111111',
-        'displayName': 'Display Name',
-        'about': 'About the person!',
+        'displayName': 'ZatMan',
+        'password': 'ThisIsProbablyAGoodPassword',
     };
 
-    const inputs = document.querySelectorAll('input[type=text],textarea');
+    const inputs = document.querySelectorAll(
+        'input[type=text],input[type=password]');
     for (let i = 0; i < inputs.length; i++) {
-        if (inputs[i].name === 'privateKey') {
-            inputs[i].value = testUserInfoValues.privateKey;
+        if (inputs[i].name === 'password') {
+            inputs[i].value = testUserInfoValues.password;
         } else if (inputs[i].name === 'displayName') {
             inputs[i].value = testUserInfoValues.displayName;
-        } else if (inputs[i].name === 'about') {
-            inputs[i].value = testUserInfoValues.about;
         } else {
             assert.notOk(true, 'Form input name not defined');
         }
@@ -72,16 +73,26 @@ QUnit.test('Fill in the form and check', async function(assert) {
     document.getElementById('loginButton').click();
 
     // Verify the data available in dbMessenger with the value provided in the
-    // form
-    const userInfoPrivate = await dbMessenger.getLoggedInUserInfoPrivate();
+    // form; might need to wait for a short while for the information to load
+    let userInfoPrivate;
+    for (let i = 0; i < 10 && !userInfoPrivate; i++) {
+        userInfoPrivate = await dbMessenger.getLoggedInUserInfoPrivate();
+        if (!userInfoPrivate) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+    }
 
-    assert.strictEqual(testUserInfoValues.privateKey,
-        userInfoPrivate.privateKey,
-        'Private keys need to match.');
     assert.strictEqual(testUserInfoValues.displayName,
         userInfoPrivate.displayName,
         'Display names need to match.');
-    assert.strictEqual(testUserInfoValues.about,
-        userInfoPrivate.about,
-        'About text need to match.');
+
+    const hexRegex = /^[0-9a-fA-F]+$/;
+    assert.ok(
+        hexRegex.test(userInfoPrivate.privateKey),
+        'Private key is expected to be hexadecimal.'
+    );
+    assert.ok(
+        userInfoPrivate.privateKey.length == 32,
+        'Private key is expected to be 32 characters long.'
+    );
 });
