@@ -1,4 +1,4 @@
-/* Copyright (c) 2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
 
 const os = require('os');
 const ip = require('ip');

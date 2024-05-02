@@ -21,7 +21,7 @@ lint:
 
 lintfix:
 	npx eslint --config eslint.config.js --fix
-	npx copyright-header --fix --copyrightHolder "Zenin Easa Panthakkalakath"
+	npx copyright-header --fix --copyrightHolder "Zenin Easa Panthakkalakath" --forceModificationYear 2024
 
 build-mac-intel:
 	$(call BUILD_MAC_DMG,darwin,x64)
