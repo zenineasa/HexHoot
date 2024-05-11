@@ -160,7 +160,10 @@ class DBWrapper {
             };
 
             clearRequest.onerror = (event) => {
-                console.error(`Error clearing entries from ${tableName} table:`, event.target.error);
+                console.error(
+                    `Error clearing entries from ${tableName} table:`,
+                    event.target.error
+                );
                 reject(event.target.error);
             };
         });

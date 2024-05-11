@@ -88,7 +88,7 @@ QUnit.test('Tabs and contents visibility', async function(assert) {
                     assert.strictEqual(
                         tabs[i].getAttribute('name'),
                         tabContents[i].id,
-                        'Prefer the tabs and tab content follow the same order.',
+                        'Tabs and tab content should follow the same order.',
                     );
                     assert.notEqual(
                         getComputedStyle(tabContents[j]).display,

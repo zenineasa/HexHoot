@@ -49,12 +49,13 @@ class Login {
             }.bind(this);
 
             // Login with JSON
-            document.getElementById('loginWithJSONButton').onclick = function() {
-                (async function() {
-                    await dbMessenger.uploadDBAsJSON();
-                    window.reload();
-                })();
-            };
+            document.getElementById('loginWithJSONButton').onclick =
+                function() {
+                    (async function() {
+                        await dbMessenger.uploadDBAsJSON();
+                        window.reload();
+                    })();
+                };
         }.bind(this));
     }
 

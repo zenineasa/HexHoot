@@ -77,8 +77,9 @@ QUnit.test('Fill in the form and check', async function(assert) {
         }
         document.getElementById('loginButton').click();
 
-        // Verify the data available in dbMessenger with the value provided in the
-        // form; might need to wait for a short while for the information to load
+        // Verify the data available in dbMessenger with the value provided in
+        // the form; might need to wait for a short while for the information
+        // to load
         let userInfoPrivate;
         for (let i = 0; i < 10 && !userInfoPrivate; i++) {
             userInfoPrivate = await dbMessenger.getLoggedInUserInfoPrivate();

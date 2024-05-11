@@ -83,9 +83,10 @@ class AddFriend {
             }
 
             // Button callback
-            document.getElementById('copyToClipboardButton').onclick = function() {
-                navigator.clipboard.writeText(publicKey);
-            };
+            document.getElementById('copyToClipboardButton').onclick =
+                function() {
+                    navigator.clipboard.writeText(publicKey);
+                };
             document.getElementById('addFriendButton').onclick = function() {
                 const key = document.getElementById('theirPublicKey').value;
                 const otherUserInfo = {key: key};

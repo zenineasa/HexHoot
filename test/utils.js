@@ -97,7 +97,8 @@ utils.waitAndTryAgain = async function(
             // Wait for the interval
             await new Promise(resolve => setTimeout(resolve, interval));
             // Retry the callback
-            await utils.waitAndTryAgain(callback, assert, numTries - 1, interval);
+            await utils.waitAndTryAgain(
+                callback, assert, numTries - 1, interval);
         }
     }
 };

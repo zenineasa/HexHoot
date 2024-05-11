@@ -12,6 +12,7 @@ module.exports = [{
         'sourceType': 'module',
     },
     'rules': {
+        'max-len': ["error", { "code": 80 }],
         'indent': ['error', 4],
         'linebreak-style': 0,
         'no-unused-vars': [

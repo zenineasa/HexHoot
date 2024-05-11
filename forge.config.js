@@ -10,6 +10,7 @@ module.exports = {
             // For windows:
             name: '@electron-forge/maker-squirrel',
             config: {
+                // eslint-disable-next-line max-len
                 iconUrl: 'https://raw.githubusercontent.com/zenineasa/HexHoot/main/modules/ImagePack/images/DesktopIcons/icon_windows.ico',
                 setupIcon: imagePack.getPath('desktop.windows'),
             },

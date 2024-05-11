@@ -28,7 +28,7 @@ QUnit.test('Render the layout', async function(assert) {
 
 });
 
-QUnit.test('Check if the logo is loaded in the sidebar', async function(assert) {
+QUnit.test('Check if the logo is in the sidebar', async function(assert) {
     await utils.setFixtureWithContainerDOMElemenent();
     Layout.render();
 

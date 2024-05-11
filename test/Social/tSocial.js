@@ -19,13 +19,14 @@ QUnit.test('Check the icons and links', async function(assert) {
         assert.ok(images.length > 1,
             'There has to be at least one social button.');
 
-        // Confirm that the image files and the pages to which they are linked to
-        // match
+        // Confirm that the image files and the pages to which they are linked
+        // to match
         images.forEach(function(image) {
             const filename = utils.getFileNameFromPath(image.src)
                 .split('.png')[0].toLowerCase();
             if (filename === 'blogger') { // Blogger is the only exception
-                assert.equal(image.getAttribute('href'), 'https://blog.hexhoot.com');
+                assert.equal(image.getAttribute('href'),
+                    'https://blog.hexhoot.com');
             } else {
                 assert.ok(image.getAttribute('href').includes(filename));
             }
