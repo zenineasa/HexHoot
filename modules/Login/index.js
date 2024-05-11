@@ -29,30 +29,33 @@ class Login {
         link.href = __dirname + '/style.css';
         document.body.appendChild(link);
 
-        // Load the HTML template and insert it to the UI
-        const containerDOM = document.getElementById('container');
-        containerDOM.innerHTML = eval('`' +
-        requireText('./template.html', require) + '`');
+        // Ensure that the CSS is loaded before the HTML is
+        link.addEventListener('load', function() {
+            // Load the HTML template and insert it to the UI
+            const containerDOM = document.getElementById('container');
+            containerDOM.innerHTML = eval('`' +
+            requireText('./template.html', require) + '`');
 
-        // Login button
-        document.getElementById('loginButton').onclick = function() {
-            const info = {};
-            const inputs = containerDOM.querySelectorAll(
-                'input[type=text],input[type=password]');
-            for (let i = 0; i < inputs.length; i++) {
-                info[inputs[i].name] = inputs[i].value;
-            }
-            this.validateLoginForm(info);
-            this.doLogin(info);
-        }.bind(this);
+            // Login button
+            document.getElementById('loginButton').onclick = function() {
+                const info = {};
+                const inputs = containerDOM.querySelectorAll(
+                    'input[type=text],input[type=password]');
+                for (let i = 0; i < inputs.length; i++) {
+                    info[inputs[i].name] = inputs[i].value;
+                }
+                this.validateLoginForm(info);
+                this.doLogin(info);
+            }.bind(this);
 
-        // Login with JSON
-        document.getElementById('loginWithJSONButton').onclick = function() {
-            (async function() {
-                await dbMessenger.uploadDBAsJSON();
-                window.reload();
-            })();
-        };
+            // Login with JSON
+            document.getElementById('loginWithJSONButton').onclick = function() {
+                (async function() {
+                    await dbMessenger.uploadDBAsJSON();
+                    window.reload();
+                })();
+            };
+        }.bind(this));
     }
 
     /**

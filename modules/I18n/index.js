@@ -49,26 +49,29 @@ class I18n {
         link.href = __dirname + '/style.css';
         document.body.appendChild(link);
 
-        const elem = document.createElement('div');
-        elem.innerHTML =
-            eval('`' + requireText('./template.html', require) + '`');
+        // Ensure that the CSS is loaded before the HTML is
+        link.addEventListener('load', function() {
+            const elem = document.createElement('div');
+            elem.innerHTML =
+                eval('`' + requireText('./template.html', require) + '`');
 
-        // If div already exists, remove it.
-        const checkElem = document.getElementById('i18n');
-        if (checkElem) {
-            checkElem.remove();
-        }
+            // If div already exists, remove it.
+            const checkElem = document.getElementById('i18n');
+            if (checkElem) {
+                checkElem.remove();
+            }
 
-        // Append the new element into the body
-        document.body.appendChild(elem);
+            // Append the new element into the body
+            document.body.appendChild(elem);
 
-        // Language selection dropdown
-        const languageSelector = document.getElementById('languages');
-        languageSelector.querySelector('[value=' + this.selectedLang + ']')
-            .setAttribute('selected', '');
-        languageSelector.onchange = function() {
-            this.languageSelectionCallback(languageSelector.value);
-        }.bind(this);
+            // Language selection dropdown
+            const languageSelector = document.getElementById('languages');
+            languageSelector.querySelector('[value=' + this.selectedLang + ']')
+                .setAttribute('selected', '');
+            languageSelector.onchange = function() {
+                this.languageSelectionCallback(languageSelector.value);
+            }.bind(this);
+        }.bind(this));
     }
 
     /**

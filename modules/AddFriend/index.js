@@ -25,6 +25,7 @@ class AddFriend {
      */
     initialize() {
         // If there is something to do...
+        this.numTimesInvoked = 0;
     }
 
     /**
@@ -34,7 +35,10 @@ class AddFriend {
      */
     async render(backCallback) {
         // Render the layout
-        Layout.render();
+        await Layout.render();
+
+        // Get user info from database, which will be used by the template
+        const publicKey = await dbMessenger.getPublicKeyOfLoggedInUser();
 
         // Link css
         const link = document.createElement('link');
@@ -42,49 +46,56 @@ class AddFriend {
         link.href = __dirname + '/style.css';
         document.body.appendChild(link);
 
-        // Get user info from database, which will be used by the template
-        const publicKey = await dbMessenger.getPublicKeyOfLoggedInUser();
+        // Ensure that the CSS is loaded before the HTML is
+        const linkOnLoadCallback = function() {
+            // This should be invoked only once
+            link.removeEventListener('load', linkOnLoadCallback);
 
-        // Sidebar related
-        const sidebarDOMNode = document.getElementById('sidebar');
-        sidebarDOMNode.innerHTML += eval('`' +
-            requireText('./template_sidebar.html', require) + '`');
-        document.getElementById('backButton').onclick = backCallback;
+            this.numTimesInvoked += 1;
+            console.log(this.numTimesInvoked);
 
-        // Main content related
-        const mainContentDOMNode = document.getElementById('mainContent');
-        mainContentDOMNode.innerHTML += eval('`' +
-            requireText('./template_mainContent.html', require) + '`');
+            // Sidebar related
+            const sidebarDOMNode = document.getElementById('sidebar');
+            sidebarDOMNode.innerHTML += eval('`' +
+                requireText('./template_sidebar.html', require) + '`');
+            document.getElementById('backButton').onclick = backCallback;
 
-        const tabDOMNodes = document.getElementById('mainContent')
-            .getElementsByClassName('tab');
-        for (let i = 0; i < tabDOMNodes.length; i++) {
-            tabDOMNodes[i].onclick = function() {
-                const tabName = this.getAttribute('name');
-                const tabContents = document.getElementById('mainContent')
-                    .getElementsByClassName('tabContent');
-                for (let i = 0; i < tabContents.length; i++) {
-                    if (tabContents[i].id == tabName) {
-                        tabContents[i].style.display = 'flex';
-                    } else {
-                        tabContents[i].style.display = 'none';
+            // Main content related
+            const mainContentDOMNode = document.getElementById('mainContent');
+            mainContentDOMNode.innerHTML += eval('`' +
+                requireText('./template_mainContent.html', require) + '`');
+
+            const tabDOMNodes = document.getElementById('mainContent')
+                .getElementsByClassName('tab');
+            for (let i = 0; i < tabDOMNodes.length; i++) {
+                tabDOMNodes[i].onclick = function() {
+                    const tabName = this.getAttribute('name');
+                    const tabContents = document.getElementById('mainContent')
+                        .getElementsByClassName('tabContent');
+                    for (let i = 0; i < tabContents.length; i++) {
+                        if (tabContents[i].id == tabName) {
+                            tabContents[i].style.display = 'flex';
+                        } else {
+                            tabContents[i].style.display = 'none';
+                        }
                     }
-                }
-            };
-        }
+                };
+            }
 
-        // Button callback
-        document.getElementById('copyToClipboardButton').onclick = function() {
-            navigator.clipboard.writeText(publicKey);
-        };
-        document.getElementById('addFriendButton').onclick = function() {
-            const key = document.getElementById('theirPublicKey').value;
-            const otherUserInfo = {key: key};
-            dbMessenger.sendRequestOrResponse(
-                otherUserInfo, dbMessenger.messageType.friendRequest);
-            dbMessenger.updateFriendInformation(otherUserInfo);
-            backCallback();
-        };
+            // Button callback
+            document.getElementById('copyToClipboardButton').onclick = function() {
+                navigator.clipboard.writeText(publicKey);
+            };
+            document.getElementById('addFriendButton').onclick = function() {
+                const key = document.getElementById('theirPublicKey').value;
+                const otherUserInfo = {key: key};
+                dbMessenger.sendRequestOrResponse(
+                    otherUserInfo, dbMessenger.messageType.friendRequest);
+                dbMessenger.updateFriendInformation(otherUserInfo);
+                backCallback();
+            };
+        }.bind(this);
+        link.addEventListener('load', linkOnLoadCallback);
     }
 }
 

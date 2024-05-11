@@ -10,26 +10,29 @@ QUnit.test('Check if Chat module is available', function(assert) {
 });
 
 QUnit.test('Render login and check the children', async function(assert) {
-    utils.setFixtureWithContainerDOMElemenent();
+    await utils.setFixtureWithContainerDOMElemenent();
 
     await chat.render();
 
+    await utils.waitAndTryAgain(async function(assert){
     // Check the elements within
-    const messageSenderInfos = document.querySelectorAll('#messageSenderInfo');
-    assert.strictEqual(messageSenderInfos.length, 1,
-        'There should be exactly one DIV with the id "messageSenderInfo".');
+        const messageSenderInfos = document.querySelectorAll(
+            '#messageSenderInfo');
+        assert.strictEqual(messageSenderInfos.length, 1,
+            'There should be exactly one DIV with id "messageSenderInfo".');
 
-    const messageReaders = document.querySelectorAll('#messageReader');
-    assert.strictEqual(messageReaders.length, 1,
-        'There should be exactly one DIV with the id "messageReader".');
+        const messageReaders = document.querySelectorAll('#messageReader');
+        assert.strictEqual(messageReaders.length, 1,
+            'There should be exactly one DIV with id "messageReader".');
 
-    const messageComposers = document.querySelectorAll('#messageComposer');
-    assert.strictEqual(messageComposers.length, 1,
-        'There should be exactly one DIV with the id "messageComposers".');
-    assert.strictEqual(
-        messageComposers[0].getElementsByTagName('textarea').length, 1,
-        'There should be a textarea to type in the message.');
-    assert.strictEqual(
-        messageComposers[0].getElementsByClassName('send').length, 1,
-        'There should be a send button.');
+        const messageComposers = document.querySelectorAll('#messageComposer');
+        assert.strictEqual(messageComposers.length, 1,
+            'There should be exactly one DIV with id "messageComposers".');
+        assert.strictEqual(
+            messageComposers[0].getElementsByTagName('textarea').length, 1,
+            'There should be a textarea to type in the message.');
+        assert.strictEqual(
+            messageComposers[0].getElementsByClassName('send').length, 1,
+            'There should be a send button.');
+    }, assert);
 });

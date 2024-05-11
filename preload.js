@@ -7,9 +7,6 @@ const Login = require('./modules/Login');
 const Chat = require('./modules/Chat');
 
 window.addEventListener('DOMContentLoaded', function() {
-    Social.render();
-    Copyright.render();
-
     /**
      * The reload function; this was found to be not thread safe. For instance
      * if you run the following function multiple times, the rendering was
@@ -34,4 +31,7 @@ window.addEventListener('DOMContentLoaded', function() {
         queue = result.then(function() {}, function() {});
     };
     window.reload();
+
+    Social.render();
+    Copyright.render();
 });

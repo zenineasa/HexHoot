@@ -18,10 +18,12 @@ class Copyright {
         link.href = __dirname + '/style.css';
         document.body.appendChild(link);
 
-        // Create and append a DIV with the message
-        const elem = document.createElement('div');
-        elem.innerHTML = requireText('./template.html', require);
-        document.body.appendChild(elem);
+        // Ensure that the CSS is loaded before the HTML is
+        link.addEventListener('load', function() {
+            const elem = document.createElement('div');
+            elem.innerHTML = requireText('./template.html', require);
+            document.body.appendChild(elem);
+        });
     }
 }
 

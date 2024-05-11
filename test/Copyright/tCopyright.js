@@ -1,17 +1,20 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
+const utils = require('./../../../test/utils');
 const Copyright = require('./../../../modules/Copyright');
 
 QUnit.test('Check if Copyright module is available', function(assert) {
     assert.ok(typeof(Copyright) !== 'undefined');
 });
 
-QUnit.test('Check the text in the copyright message', function(assert) {
+QUnit.test('Check the text in the copyright message', async function(assert) {
     Copyright.render();
 
-    const copyrights = document.querySelectorAll('#copyright');
-    assert.strictEqual(copyrights.length, 1,
-        'There should be exactly one DIV with the id "copyright".');
+    await utils.waitAndTryAgain(async function(assert){
+        const copyrights = document.querySelectorAll('#copyright');
+        assert.strictEqual(copyrights.length, 1,
+            'There should be exactly one DIV with the id "copyright".');
 
-    assert.ok(copyrights[0].innerText.includes('Copyright'));
+        assert.ok(copyrights[0].innerText.includes('Copyright'));
+    }, assert);
 });

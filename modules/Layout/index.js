@@ -12,16 +12,39 @@ class Layout {
     /**
      * This function renders the template into the UI.
      */
-    static render() {
+    static async render() {
         // Link css
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = __dirname + '/style.css';
-        document.body.appendChild(link);
 
-        // Load the HTML template and insert it to the UI
-        document.getElementById('container').innerHTML =
-            Layout.loadTemplate('./template.html');
+        await new Promise(function(resolve, _reject) {
+            document.body.appendChild(link);
+
+            // Ensure that the CSS is loaded before the HTML is
+            const linkOnLoadCallback = function() {
+                // This should be invoked only once
+                link.removeEventListener('load', linkOnLoadCallback);
+
+                const container = document.getElementById('container');
+
+                // To ensure that innerHTML has changed before resolving
+                const observer = new MutationObserver(
+                    function(_mutationsList, _observer) {
+                        if (container.hasChildNodes()) {
+                            resolve();
+                        }
+                    }
+                );
+                observer.observe(container, {
+                    characterData: false, childList: true, attributes: false
+                });
+
+                // Load the HTML template and insert it to the UI
+                container.innerHTML = Layout.loadTemplate('./template.html');
+            };
+            link.addEventListener('load', linkOnLoadCallback);
+        });
     }
 
     /**

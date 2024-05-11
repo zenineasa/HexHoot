@@ -27,7 +27,7 @@ class ViewProfile {
      */
     async render(backCallback, userInfo) {
         // Render the layout
-        Layout.render();
+        await Layout.render();
 
         // Link css
         const link = document.createElement('link');
@@ -35,16 +35,19 @@ class ViewProfile {
         link.href = __dirname + '/style.css';
         document.body.appendChild(link);
 
-        // Sidebar related
-        const sidebarDOMNode = document.getElementById('sidebar');
-        sidebarDOMNode.innerHTML += eval('`' +
-            requireText('./template_sidebar.html', require) + '`');
-        document.getElementById('backButton').onclick = backCallback;
+        // Ensure that the CSS is loaded before the HTML is
+        link.addEventListener('load', function() {
+            // Sidebar related
+            const sidebarDOMNode = document.getElementById('sidebar');
+            sidebarDOMNode.innerHTML += eval('`' +
+                requireText('./template_sidebar.html', require) + '`');
+            document.getElementById('backButton').onclick = backCallback;
 
-        // Main content related
-        const mainContentDOMNode = document.getElementById('mainContent');
-        mainContentDOMNode.innerHTML += eval('`' +
-            requireText('./template_mainContent.html', require) + '`');
+            // Main content related
+            const mainContentDOMNode = document.getElementById('mainContent');
+            mainContentDOMNode.innerHTML += eval('`' +
+                requireText('./template_mainContent.html', require) + '`');
+        });
     }
 
     /**

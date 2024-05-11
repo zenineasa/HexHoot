@@ -10,8 +10,9 @@
 
 This is an attempt to create an Opensource Peer-to-peer communication platform with Zero-Knowledge-Proof based authentication. The objective is to democratize communication by eliminating any form of central servers.
 
-At the moment, we have a desktop version that can be installed and run on Linux, macOS and Windows, wherein people can chat with each other over the internet and the intranet.
+Currently, HexHoot's standalone desktop installers are available for Linux (Debian and RPM), macOS and Windows; users can chat with each other over the internet and the intranet. Download it from our release page, linked below.
 
+https://github.com/zenineasa/HexHoot/releases/latest
 
 ## Why HexHoot?
 
@@ -24,13 +25,6 @@ Much of the traditional softwares that enabled Peer-to-Peer communication relied
 Internet is supposed to be free; free as in "libre" and not "gratis". There is a tendancy in the world that certain closed source algorithms are actively deciding what content the people must be exposed to. You can't view their source code, while they read each and everything about you.
 
 We would like to reverse that. HexHoot is an Open Source project that is aimed at creating a platform for communication between people, while all data is stored locally on the users' computers.
-
-
-## Download the latest version
-
-You can download and install the packaged (non-development) version from our release page linked below. This contains executables for Linux, macOS and Windows.
-
-https://github.com/zenineasa/HexHoot/releases/latest
 
 
 ## Try the development version
@@ -49,4 +43,4 @@ If you are someone who likes to run the most updated version that is still under
    npm start
    ```
 
-Copyright &copy; 2022-2023 Zenin Easa Panthakkalakath
+Copyright &copy; 2022-2024 Zenin Easa Panthakkalakath

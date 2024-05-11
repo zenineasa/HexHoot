@@ -48,7 +48,7 @@ class Chat {
      * This function renders the template into the UI.
      */
     async render() {
-        Layout.render();
+        await Layout.render();
         EditProfile.renderToIconBar(this.render.bind(this));
 
         // Get the stats for emoji counts
@@ -66,8 +66,11 @@ class Chat {
         link.href = __dirname + '/style.css';
         document.body.appendChild(link);
 
-        this.loadSidebar();
-        this.loadMainContent();
+        // Ensure that the CSS is loaded before the HTML is
+        link.addEventListener('load', function() {
+            this.loadSidebar();
+            this.loadMainContent();
+        }.bind(this));
 
         this.activeChat = '';
     }
