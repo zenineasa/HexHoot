@@ -2,7 +2,7 @@
 
 const {app, BrowserWindow} = require('electron');
 const path = require('path');
-const imagePack = require('./modules/ImagePack');
+const imagePack = require('../ImagePack');
 
 /**
  * Creates CEF window in which the app runs
@@ -20,7 +20,7 @@ function createWindow() {
         },
     });
     win.maximize();
-    win.loadFile('index.html');
+    win.loadFile('Modules/Main/index.html');
 }
 
 app.whenReady().then(() => {

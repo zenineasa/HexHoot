@@ -7,7 +7,7 @@
         "type": "git",
         "url": "git+https://github.com/zenineasa/hexhoot.git"
     },
-    "main": "main.js",
+    "main": "modules/Main/index.js",
     "scripts": {
         "start": "electron-forge start",
         "test": "karma start ./test/karma.conf.js",

@@ -43,4 +43,11 @@ If you are someone who likes to run the most updated version that is still under
    npm start
    ```
 
+## Read our blog
+
+Blog posts detailing the technical aspects and broader vision are published on our blog.
+https://blog.hexhoot.com/
+
+##
+
 Copyright &copy; 2022-2024 Zenin Easa Panthakkalakath

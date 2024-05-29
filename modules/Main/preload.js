@@ -1,10 +1,10 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const i18n = require('./modules/I18n')();
-const Social = require('./modules/Social');
-const Copyright = require('./modules/Copyright');
-const Login = require('./modules/Login');
-const Chat = require('./modules/Chat');
+const i18n = require('../I18n')();
+const Social = require('../Social');
+const Copyright = require('../Copyright');
+const Login = require('../Login');
+const Chat = require('../Chat');
 
 window.addEventListener('DOMContentLoaded', function() {
     /**
