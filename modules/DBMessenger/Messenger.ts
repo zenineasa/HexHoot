@@ -1,14 +1,23 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const Hyperswarm = require('hyperswarm');
-
-const utils = require('./utils');
-const dbWrapper = require('./DBWrapper');
+import Hyperswarm = require('hyperswarm');
+import * as utils from './utils';
+import DBWrapper from './DBWrapper';
+const dbWrapper = new DBWrapper();
 
 /**
  * This class contains methods to send and receive messages from peers
  */
-class Messenger {
+export default class Messenger {
+    private static _instance: Messenger;
+    private subscribedSwarms: any[] = [];
+    private senderSwarms: any[] = [];
+    private listOfChannelsSubscribedTo: string[] = [];
+    private messageReceiveCallbackFunction: (msg: any) => void = () => {};
+    private connMap: {[key: string]: any} = {};
+    private userInfo: any;
+    private userPublicKey: string;
+
     /** This is the constructor (note the singleton implementation) */
     constructor() {
         if (Messenger._instance) {
@@ -20,16 +29,17 @@ class Messenger {
         this.senderSwarms = [];
         this.listOfChannelsSubscribedTo = [];
         this.messageReceiveCallbackFunction = function() {};
-        this.connMap = [];
+        this.connMap = {};
 
-        Messenger._instance.initialize();
+        this.initialize();
     }
 
     /**
      * Initialize messenger
      */
     async initialize() {
-        this.userInfo = (await dbWrapper().getAll('LoggedInUserInfo'))[0];
+        const users = await dbWrapper.getAll('LoggedInUserInfo');
+        this.userInfo = users[0];
         if (this.userInfo) {
             this.userPublicKey =
                 utils.getPublicKeyFromPrivateKey(this.userInfo.privateKey);
@@ -48,8 +58,8 @@ class Messenger {
      * Re-initialize Messenger
      */
     async reInitialize() {
-        await Messenger._instance.cleanup();
-        await Messenger._instance.initialize();
+        await this.cleanup();
+        await this.initialize();
     }
 
     /**
@@ -57,15 +67,16 @@ class Messenger {
      * message arrives.
      * @param {*} message The message that was received in the channel
      */
-    messageReceivedCallback(message) {
+    messageReceivedCallback(message: any) {
         const messageObj = JSON.parse(message);
 
         const sharedKeyString = utils.getSharedKey(
             this.userInfo.privateKey, messageObj.senderPublicKey);
 
         messageObj.iv = Buffer.from(messageObj.iv); // Ensuring the type
-        messageObj.message = JSON.parse(utils.decryptMessage(
-            messageObj.message, sharedKeyString, messageObj.iv));
+        const decrypted = utils.decryptMessage(
+            messageObj.message, sharedKeyString, messageObj.iv);
+        messageObj.message = JSON.parse(decrypted);
 
         console.log('Message received:');
         console.log(messageObj);
@@ -75,17 +86,19 @@ class Messenger {
 
     /**
      * Subscribe for messages from a channel
-     * @param {Buffer} channelName The channel name can be other users
+     * @param {Buffer | string} channelName The channel name can be other users
      * @param {boolean} isServer whether it is joining as a server or not
      * public key or shared key between two (or more) users
      */
-    async subscribeToChannel(channelName, isServer) {
+    async subscribeToChannel(channelName: Buffer | string, isServer: boolean) {
         let channelNameStr = '';
+        let channelNameBuf: Buffer;
         if (typeof(channelName) === 'string') {
             channelNameStr = channelName;
-            channelName = utils.stringToBuffer(channelName);
+            channelNameBuf = utils.stringToBuffer(channelName);
         } else {
             channelNameStr = utils.bufferToString(channelName);
+            channelNameBuf = channelName;
         }
         if (this.listOfChannelsSubscribedTo.includes(channelNameStr)) {
             // Already subscribed to the channel
@@ -96,13 +109,13 @@ class Messenger {
         const idx = this.subscribedSwarms.length;
         this.subscribedSwarms.push(new Hyperswarm());
 
-        this.subscribedSwarms[idx].on('connection', function(conn, peerInfo) {
+        this.subscribedSwarms[idx].on('connection', (conn: any, peerInfo: any) => {
             conn.on('error', this.errorCallback.bind(this));
             conn.on('data', this.messageReceivedCallback.bind(this));
-        }.bind(this));
+        });
 
         const discovery = this.subscribedSwarms[idx].join(
-            channelName, {server: isServer, client: !isServer});
+            channelNameBuf, {server: isServer, client: !isServer});
         await discovery.flushed();
 
         console.log('Subscribed to channel: ' + channelNameStr);
@@ -111,32 +124,37 @@ class Messenger {
 
     /**
      * Send a message to a channel
-     * @param {Buffer} channelName is also the other user's public key
-     * @param {string} message
+     * @param {Buffer | string} channelName is also the other user's public key
+     * @param {any} message
      */
-    async sendMessageToChannel(channelName, message) {
+    async sendMessageToChannel(channelName: Buffer | string, message: any) {
         let channelNameStr = '';
+        let channelNameBuf: Buffer;
         if (typeof(channelName) === 'string') {
             channelNameStr = channelName;
-            channelName = utils.stringToBuffer(channelName);
+            channelNameBuf = utils.stringToBuffer(channelName);
         } else {
             channelNameStr = utils.bufferToString(channelName);
+            channelNameBuf = channelName;
         }
 
         // Encrypt the message using the shared key
         const sharedKeyString =
-            utils.getSharedKey(this.userInfo.privateKey, channelName);
+            utils.getSharedKey(this.userInfo.privateKey, channelNameBuf.toString('hex')); // fix: verify if channelName is pk
 
-        let iv = [];
-        [message, iv] = utils.encryptMessage(
+        let iv: Buffer = Buffer.alloc(0);
+        let ret: [string, Buffer];
+        ret = utils.encryptMessage(
             JSON.stringify(message), sharedKeyString);
+        let encryptedMessage = ret[0];
+        iv = ret[1];
 
         // Add sender and 'iv' informations to the message, which are needed to
         // decrypt the message
-        message = JSON.stringify({
+        const finalMessage = JSON.stringify({
             'senderPublicKey': this.userPublicKey,
             'iv': iv,
-            'message': message,
+            'message': encryptedMessage,
         });
 
         console.log('Sending message to channel: ' + channelNameStr);
@@ -144,22 +162,22 @@ class Messenger {
         if (typeof(this.connMap[channelNameStr]) === 'undefined') {
             const idx = this.senderSwarms.length;
             this.senderSwarms.push(new Hyperswarm());
-            this.senderSwarms[idx].on('connection', function(conn) {
+            this.senderSwarms[idx].on('connection', (conn: any) => {
                 conn.on('error', this.errorCallback.bind(this));
                 conn.on('data', this.messageReceivedCallback.bind(this));
-                conn.write(message);
+                conn.write(finalMessage);
                 this.connMap[channelNameStr] = conn;
-            }.bind(this));
+            });
 
             this.senderSwarms[idx].join(
-                channelName, {server: false, client: true},
+                channelNameBuf, {server: false, client: true},
             );
             await this.senderSwarms[idx].flush();
             // TODO: Perhaps for a more reliable communication, we should not
             // use a temporary connection. We could have a more premanent
             // connection.
         } else {
-            this.connMap[channelNameStr].write(message);
+            this.connMap[channelNameStr].write(finalMessage);
         }
     }
 
@@ -169,7 +187,7 @@ class Messenger {
      * @param {function} func callback function that gets invoked when a new
      * new message is received
      */
-    setMessageReceiveCallbackFunction(func) {
+    setMessageReceiveCallbackFunction(func: (msg: any) => void) {
         this.messageReceiveCallbackFunction = func;
     }
 
@@ -177,11 +195,7 @@ class Messenger {
      * Display error message in the console
      * @param {*} err Error message
      */
-    errorCallback(err) {
+    errorCallback(err: any) {
         console.log(err);
     }
 }
-
-module.exports = function() {
-    return new Messenger();
-};

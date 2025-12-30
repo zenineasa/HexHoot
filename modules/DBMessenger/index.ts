@@ -1,10 +1,14 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const os = require('os');
-const dbWrapper = require('./DBWrapper')();
-const messenger = require('./Messenger')();
-const intranetMessenger = require('./IntranetMessenger')();
-const utils = require('./utils.js');
+import * as os from 'os';
+import * as utils from './utils';
+import DBWrapper from './DBWrapper';
+import Messenger from './Messenger';
+import IntranetMessenger from './IntranetMessenger';
+
+const dbWrapper = new DBWrapper();
+const messenger = new Messenger();
+const intranetMessenger = new IntranetMessenger();
 
 /**
  * This is a singleton class.
@@ -12,7 +16,12 @@ const utils = require('./utils.js');
  * 1. Store information in a local database
  * 2. Communicate information with peers
  */
-class DBMessenger {
+export default class DBMessenger {
+    private static _instance: DBMessenger;
+    private tableNames: {[key: string]: string};
+    private messageType: {[key: string]: string};
+    private listOfMessageReceiveCallbackFunctions: ((msg: any) => void)[];
+
     /** This is the constructor (note the singleton implementation) */
     constructor() {
         if (DBMessenger._instance) {
@@ -20,8 +29,8 @@ class DBMessenger {
         }
         DBMessenger._instance = this;
 
-        DBMessenger._instance.detectNetworkChanges();
-        DBMessenger._instance.initialize();
+        this.detectNetworkChanges();
+        this.initialize();
     }
 
     /**
@@ -58,7 +67,7 @@ class DBMessenger {
     async detectNetworkChanges() {
         let net = os.networkInterfaces();
         /** Recursively check (infinite loop) if the interface has changed */
-        async function checkInterfaces() {
+        const checkInterfaces = async () => {
             if (
                 JSON.stringify(net) !==
                 JSON.stringify(os.networkInterfaces())
@@ -116,7 +125,7 @@ class DBMessenger {
      * Get the information of a particular person
      * @param {string} otherUserPublicKey user key of the other person
      */
-    async getUserInfo(otherUserPublicKey) {
+    async getUserInfo(otherUserPublicKey: string) {
         const loggedInUserInfo = await this.getLoggedInUserInfoPublic();
         if (loggedInUserInfo.key === otherUserPublicKey) {
             return loggedInUserInfo;
@@ -130,7 +139,7 @@ class DBMessenger {
      * for the same is 0.
      * @param {Object} info information about the user
      */
-    async writeLoggedInUserInfo(info) {
+    async writeLoggedInUserInfo(info: any) {
         // Replace password with private key
         const privateKey = utils.generatePrivateKey(info);
         delete info.password
@@ -142,12 +151,12 @@ class DBMessenger {
 
         // Report to every friend regarding this change.
         const allFriends = await this.getAllFriends();
-        allFriends.forEach(function(friendInfo) {
+        allFriends.forEach((friendInfo: any) => {
             this.sendRequestOrResponse(
                 friendInfo,
                 this.messageType.userInfoResponse,
             );
-        }.bind(this));
+        });
 
         // If there is a change in the private key, then the public key also
         // changes, which means that we need to subscribe to the new channel.
@@ -160,7 +169,7 @@ class DBMessenger {
      * @param {string} otherUserPublicKey user key of the other person
      * @param {Object} message the message and information associated with it
      */
-    async sendChatMessage(otherUserPublicKey, message) {
+    async sendChatMessage(otherUserPublicKey: string, message: any) {
         dbWrapper.addOrEditEntry(
             this.tableNames.chat,
             {
@@ -196,7 +205,7 @@ class DBMessenger {
      * Write the received chat message into the database
      * @param {Object} messageObj message object
      */
-    async receivedChatMessage(messageObj) {
+    async receivedChatMessage(messageObj: any) {
         // Store the received message
         const messageToDB = messageObj.message.message;
         dbWrapper.addOrEditEntry(
@@ -223,7 +232,7 @@ class DBMessenger {
      * Update read flag; for notification to stop showing.
      * @param {string} otherUserPublicKey user key of the other person
      */
-    async markChatRead(otherUserPublicKey) {
+    async markChatRead(otherUserPublicKey: string) {
         dbWrapper.addOrEditEntry(
             this.tableNames.friends,
             {
@@ -237,7 +246,7 @@ class DBMessenger {
      * Get all messages in a shared key channel
      * @param {string} otherUserPublicKey user key of the other person
      */
-    async getAllMessages(otherUserPublicKey) {
+    async getAllMessages(otherUserPublicKey: string) {
         const chat = await dbWrapper.getInKeyRange(
             this.tableNames.chat,
             [otherUserPublicKey, 0], // Lowerbound key
@@ -288,7 +297,7 @@ class DBMessenger {
      * @param {Object} otherUserInfo information about the other user
      * @param {string} requestType type of the request
      */
-    async sendRequestOrResponse(otherUserInfo, requestType) {
+    async sendRequestOrResponse(otherUserInfo: any, requestType: string) {
         // Send a message to the other user
         const messageToChannel = {
             type: requestType,
@@ -305,7 +314,7 @@ class DBMessenger {
      * Update friend information
      * @param {Object} otherUserInfo information about the other user
      */
-    async updateFriendInformation(otherUserInfo) {
+    async updateFriendInformation(otherUserInfo: any) {
         dbWrapper.addOrEditEntry(this.tableNames.friends, otherUserInfo);
     }
 
@@ -315,7 +324,7 @@ class DBMessenger {
      * @param {function} func callback function that gets invoked when a new
      * new message is received
      */
-    addMessageReceiveCallbackFunction(func) {
+    addMessageReceiveCallbackFunction(func: (msg: any) => void) {
         this.listOfMessageReceiveCallbackFunctions.push(func);
     }
 
@@ -324,7 +333,7 @@ class DBMessenger {
      * is received.
      * @param {Object} messageObj message object
      */
-    async messageReceivedCallback(messageObj) {
+    async messageReceivedCallback(messageObj: any) {
         // Perform actions that need to be taken from the data before other
         // callback functions get executed here.
 
@@ -355,7 +364,7 @@ class DBMessenger {
      * @param {string} name name of the field
      * @param {*} value value of the field
      */
-    async setPreference(name, value) {
+    async setPreference(name: string, value: any) {
         dbWrapper.addOrEditEntry(
             this.tableNames.preferences,
             {key: name, value: value},
@@ -366,14 +375,10 @@ class DBMessenger {
      * @param {string} name name of the field
      * @return {*} value of the field
      */
-    async getPreference(name) {
+    async getPreference(name: string) {
         return await dbWrapper.get(
             this.tableNames.preferences,
             name,
         );
     }
 }
-
-module.exports = function() {
-    return new DBMessenger();
-};

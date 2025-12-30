@@ -10,6 +10,11 @@ const utils = [];
 * A function that makes sure that a DIV named 'container' is available for
 * the layout to render it's contents into.
 */
+// Mock reload
+window.reload = function() {
+    console.log('Mock reload called');
+};
+
 utils.setFixtureWithContainerDOMElemenent = async function() {
     const fixture = document.getElementById('qunit-fixture');
 

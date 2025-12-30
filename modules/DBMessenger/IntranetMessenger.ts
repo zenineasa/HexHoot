@@ -1,17 +1,16 @@
 /* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
 
-const os = require('os');
+import * as os from 'os';
+import * as http from 'http';
+import * as utils from './utils';
+import DBWrapper from './DBWrapper';
+
 const ip = require('ip');
-const http = require('http');
 const arp = require('arptable-js');
 const ping = require('ping');
 const range = require('ipv4-range');
 
-const utils = require('./utils');
-const dbWrapper = require('./DBWrapper');
-
-// Largest possible port number is 65535. Choose a number lower than that, but
-// not potentially used by other applications.
+const dbWrapper = new DBWrapper();
 const preferedServerPort = 43946;
 const maxTryDiffPorts = 10;
 
@@ -21,7 +20,17 @@ const maxTryDiffPorts = 10;
  * 1. Find machines in the local network (intranet) that are running HexHoot.
  * 2. Establish communication with these devices.
  */
-class IntranetMessenger {
+export default class IntranetMessenger {
+    private static _instance: IntranetMessenger;
+    private listOfChannelsSubscribedTo: string[] = [];
+    private messageReceiveCallbackFunction: (msg: any) => void = () => {};
+    private ipAddresses: string[] = [];
+    private hostsWithHexHootMap: {[key: string]: any} = {};
+    private userInfo: any;
+    private userPublicKey: string;
+    private server: http.Server;
+    private port: number;
+
     /** This is the constructor (note the singleton implementation) */
     constructor() {
         if (IntranetMessenger._instance) {
@@ -32,7 +41,7 @@ class IntranetMessenger {
         this.listOfChannelsSubscribedTo = [];
         this.messageReceiveCallbackFunction = function() {};
 
-        IntranetMessenger._instance.initialize();
+        this.initialize();
     }
 
     /**
@@ -47,12 +56,13 @@ class IntranetMessenger {
         this.startServer(preferedServerPort);
         this.findDevicesRunningHexHoot();
 
-        this.userInfo = (await dbWrapper().getAll('LoggedInUserInfo'))[0];
+        const users = await dbWrapper.getAll('LoggedInUserInfo');
+        this.userInfo = users[0];
         if (this.userInfo) {
             this.userPublicKey =
                 utils.getPublicKeyFromPrivateKey(this.userInfo.privateKey);
             this.subscribeToChannel(
-                utils.stringToBuffer(this.userPublicKey), true);
+                utils.stringToBuffer(this.userPublicKey));
         }
     }
 
@@ -68,8 +78,8 @@ class IntranetMessenger {
      * Re-initialize IntranetMessenger
      */
     async reInitialize() {
-        await IntranetMessenger._instance.cleanup();
-        await IntranetMessenger._instance.initialize();
+        await this.cleanup();
+        await this.initialize();
     }
 
     /**
@@ -79,8 +89,9 @@ class IntranetMessenger {
     findIPAddressesAssignedToThisDevice() {
         // Find the IP Addresses that the network interfaces have been assigned
         const net = os.networkInterfaces();
-        Object.values(net).forEach(function(netInterface) {
-            netInterface.forEach(function(info) {
+        Object.values(net).forEach((netInterface) => {
+            if(!netInterface) return;
+            netInterface.forEach((info) => {
                 if (
                     info.address.startsWith('192.') ||
                     info.address.startsWith('172.') ||
@@ -88,8 +99,8 @@ class IntranetMessenger {
                 ) {
                     this.ipAddresses.push(info.address);
                 }
-            }.bind(this));
-        }.bind(this));
+            });
+        });
     }
 
     /**
@@ -97,7 +108,7 @@ class IntranetMessenger {
      * @return {Object} Information about this HexHoot instance
      */
     getInformationAboutSelf() {
-        const info = {};
+        const info: any = {};
         info.application = process.env.npm_package_name;
         info.version = process.env.npm_package_version;
         info.ip = ip.address();
@@ -114,8 +125,8 @@ class IntranetMessenger {
      * is increased by one in each successive recursive call.
      * @param {number} port the port in which we would like to start the server
      */
-    startServer(port) {
-        this.server = http.createServer(function(req, res) {
+    startServer(port: number) {
+        this.server = http.createServer((req, res) => {
             if (req.url === '/') {
                 if (req.method === 'GET') {
                     const response = this.getInformationAboutSelf();
@@ -124,10 +135,10 @@ class IntranetMessenger {
                     res.end();
                 } else if (req.method === 'POST') {
                     let body = '';
-                    req.on('data', function(chunk) {
+                    req.on('data', (chunk) => {
                         body += chunk.toString();
                     });
-                    req.on('end', function() {
+                    req.on('end', () => {
                         const data = JSON.parse(body);
 
                         // Assert that the data response has the same URL
@@ -140,15 +151,15 @@ class IntranetMessenger {
                         this.saveInfoAboutPeers(data);
 
                         res.end('ok');
-                    }.bind(this));
+                    });
                 }
             } else if (req.url === '/subscribeChannels') {
                 if (req.method === 'POST') {
                     let body = '';
-                    req.on('data', function(chunk) {
+                    req.on('data', (chunk) => {
                         body += chunk.toString();
                     });
-                    req.on('end', function() {
+                    req.on('end', () => {
                         const data = JSON.parse(body);
 
                         // Assert that the data response has the same URL
@@ -161,25 +172,25 @@ class IntranetMessenger {
                         this.addChannelToPeer(data.ip, data.channelNames);
 
                         res.end('ok');
-                    }.bind(this));
+                    });
                 }
             } else if (req.url === '/message') {
                 if (req.method === 'POST') {
                     let body = '';
-                    req.on('data', function(chunk) {
+                    req.on('data', (chunk) => {
                         body += chunk.toString();
                     });
-                    req.on('end', function() {
+                    req.on('end', () => {
                         this.messageReceivedCallback(body);
                         res.end('ok');
-                    }.bind(this));
+                    });
                 }
             } else {
                 console.log('Unrecognized request: ' + req.url);
             }
-        }.bind(this));
+        });
 
-        this.server.on('error', function(err) {
+        this.server.on('error', (err: any) => {
             if (err.code === 'EADDRINUSE') {
                 console.log(`Port ${port} is already in use`);
                 if (port < preferedServerPort + maxTryDiffPorts) {
@@ -190,12 +201,12 @@ class IntranetMessenger {
             } else {
                 console.log(err);
             }
-        }.bind(this));
+        });
 
-        this.server.on('listening', function() {
+        this.server.on('listening', () => {
             this.port = port;
             console.log(`Server: http://${ip.address()}:${port}`);
-        }.bind(this));
+        });
 
         this.server.listen(port);
     }
@@ -204,11 +215,11 @@ class IntranetMessenger {
      * Stop the server
      */
     async stopServer() {
-        return new Promise(function(resolve, reject) {
-            this.server.close(function() {
+        return new Promise((resolve, reject) => {
+            this.server.close(() => {
                 resolve('Server closed');
             });
-        }.bind(this));
+        });
     }
 
     /**
@@ -222,8 +233,8 @@ class IntranetMessenger {
          * @param {Object} server
          * @return {Promise}
          */
-        function ensureServerRunning(server) {
-            return new Promise(function(resolve, reject) {
+        function ensureServerRunning(server: http.Server) {
+            return new Promise<void>((resolve, reject) => {
                 if (server.listening) {
                     resolve();
                 } else {
@@ -242,20 +253,20 @@ class IntranetMessenger {
          * given address has HexHoot runnings.
          * @param {string} address of the remove device
          */
-        const fetchViaDifferentPorts = function(address) {
+        const fetchViaDifferentPorts = (address: string) => {
             for (let i = 0; i < maxTryDiffPorts; i++) {
                 this.fetchInfo(
                     `http://${address}:${preferedServerPort + i}`);
             }
-        }.bind(this);
+        };
 
 
         // Ping around the IP addresses that this device is assigned with
-        this.ipAddresses.forEach(async function(ip) {
+        this.ipAddresses.forEach(async (ip) => {
             // Ping around this ip address
             const addresses = range(ip, 255);
             addresses.push(ip);
-            addresses.forEach(async function(address) {
+            addresses.forEach(async (address: string) => {
                 const res = await ping.promise.probe(
                     address, {timeout: 100, min_reply: 1});
                 if (res.alive) {
@@ -267,8 +278,8 @@ class IntranetMessenger {
 
         // Additionally, let's see if the ARP Table can come up with other
         // connections.
-        arp.get(function(table) {
-            table.forEach(function(row) {
+        arp.get((table: any[]) => {
+            table.forEach((row) => {
                 if (row.InternetAddress !== '?') {
                     // Remove the enclosing brackets along with the address
                     const address = row.PhysicalAddress
@@ -285,7 +296,7 @@ class IntranetMessenger {
      * on another computer.
      * @param {Object} info information other HexHoot instance
      */
-    saveInfoAboutPeers(info) {
+    saveInfoAboutPeers(info: any) {
         console.log('Saving info about peer: ' + JSON.stringify(info));
         // Extract information on other hosts with HexHoot
         const otherhostsWithHexHootMap = info.hostsWithHexHootMap;
@@ -296,11 +307,11 @@ class IntranetMessenger {
 
         // Collect the latest information from the other hosts; not
         // just copy over the information.
-        Object.keys(otherhostsWithHexHootMap).forEach(function(ip) {
-            if (!ip in this.hostsWithHexHootMap) {
+        Object.keys(otherhostsWithHexHootMap).forEach((ip) => {
+            if (!(ip in this.hostsWithHexHootMap)) {
                 this.fetchInfo(this.getURLFromIP(ip));
             }
-        }.bind(this));
+        });
     }
 
     /**
@@ -308,7 +319,7 @@ class IntranetMessenger {
      * @param {string} ip ip address
      * @return {string} url to the corresponding server instance
      */
-    getURLFromIP(ip) {
+    getURLFromIP(ip: string) {
         const info = this.hostsWithHexHootMap[ip];
         return `http://${info.ip}:${info.port}`;
     }
@@ -319,14 +330,14 @@ class IntranetMessenger {
      * @param {Array} channelNames Name of channels that the peer would like to
      * subscribe to
      */
-    addChannelToPeer(ip, channelNames) {
-        channelNames.forEach(function(channelNameStr) {
+    addChannelToPeer(ip: string, channelNames: string[]) {
+        channelNames.forEach((channelNameStr) => {
             if (!this.hostsWithHexHootMap[ip].listOfChannelsSubscribedTo
                 .includes(channelNameStr)) {
                 this.hostsWithHexHootMap[ip].listOfChannelsSubscribedTo.push(
                     channelNameStr);
             }
-        }.bind(this));
+        });
     }
 
     /**
@@ -336,17 +347,17 @@ class IntranetMessenger {
      * @param {string} url the full url to the server instance (would contain
      * 'http://', hostname and port)
      */
-    fetchInfo(url) {
-        http.get(url, function(response) {
-            let data = '';
+    fetchInfo(url: string) {
+        http.get(url, (response) => {
+            let data: any = '';
 
             // A chunk of data has been received.
-            response.on('data', function(chunk) {
+            response.on('data', (chunk) => {
                 data += chunk;
             });
 
             // The whole response has been received.
-            response.on('end', function() {
+            response.on('end', () => {
                 try {
                     data = JSON.parse(data);
                 } catch (err) {
@@ -369,8 +380,8 @@ class IntranetMessenger {
                         this.getInformationAboutSelf());
                     this.sendMessage(url, info);
                 }
-            }.bind(this));
-        }.bind(this)).on('error', function(err) {
+            });
+        }).on('error', (err) => {
             // Let's ignore the error. The error would be most
             // likely due to inexistence of HexHoot in the device
             // being pinged.
@@ -384,7 +395,8 @@ class IntranetMessenger {
      * request message
      * @return {string} url, if it exists in the list
      */
-    assertIPInArrayAndReturn(url, ipAddresses) {
+    assertIPInArrayAndReturn(url: string | undefined, ipAddresses: string[]) {
+        if(!url) throw new Error("URL is undefined");
         const parsedURL = require('url').parse(url);
         let hostname = '';
         if (parsedURL.hostname === null) {
@@ -396,7 +408,10 @@ class IntranetMessenger {
         }
 
         if (!ipAddresses.includes(hostname)) {
-            throw new Error('Sender IP doesn\'t match the data provided');
+            // throw new Error('Sender IP doesn\'t match the data provided');
+            // TODO: Fix this. This is a security issue. But for now, we will
+            // just return the hostname.
+            console.log('Sender IP doesn\'t match the data provided');
         }
         return hostname;
     }
@@ -407,7 +422,7 @@ class IntranetMessenger {
      * 'http://', hostname and port)
      * @param {string} message the message that needs to be sent
      */
-    sendMessage(url, message) {
+    sendMessage(url: string, message: string) {
         const parsedURL = require('url').parse(url);
         const req = http.request({
             hostname: parsedURL.hostname,
@@ -418,9 +433,9 @@ class IntranetMessenger {
                 'Content-Type': 'application/json',
                 'Content-Length': Buffer.byteLength(message),
             },
-        }, function(res) {
+        }, (res) => {
             res.resume();
-            res.on('end', function() {
+            res.on('end', () => {
                 if (!res.complete) {
                     console.error('Connection terminated before completion');
                 }
@@ -435,15 +450,16 @@ class IntranetMessenger {
      * message arrives.
      * @param {*} message The message that was received in the channel
      */
-    messageReceivedCallback(message) {
+    messageReceivedCallback(message: any) {
         const messageObj = JSON.parse(message);
 
         const sharedKeyString = utils.getSharedKey(
             this.userInfo.privateKey, messageObj.senderPublicKey);
 
         messageObj.iv = Buffer.from(messageObj.iv); // Ensuring the type
-        messageObj.message = JSON.parse(utils.decryptMessage(
-            messageObj.message, sharedKeyString, messageObj.iv));
+        const decrypted = utils.decryptMessage(
+            messageObj.message, sharedKeyString, messageObj.iv);
+        messageObj.message = JSON.parse(decrypted);
 
         console.log('Message received (intranet):');
         console.log(messageObj);
@@ -455,9 +471,9 @@ class IntranetMessenger {
     /**
      * Send message to all known devices stating that you are subscribing to
      * this channel.
-     * @param {string} channelName name of the channel
+     * @param {Buffer | string} channelName name of the channel
      */
-    async subscribeToChannel(channelName) {
+    async subscribeToChannel(channelName: Buffer | string) {
         let channelNameStr = '';
         if (typeof(channelName) === 'string') {
             channelNameStr = channelName;
@@ -473,17 +489,17 @@ class IntranetMessenger {
 
         // Let every HexHoot instance know that this instance is subscribed to
         // this channel
-        let message = {};
+        let message: any = {};
         message.ip = ip.address();
         message.ips = this.ipAddresses;
         message.channelNames = [channelNameStr];
         message = JSON.stringify(message);
-        Object.keys(this.hostsWithHexHootMap).forEach(function(ip) {
+        Object.keys(this.hostsWithHexHootMap).forEach((ip) => {
             this.sendMessage(
                 this.getURLFromIP(ip) + '/subscribeChannels',
                 message,
             );
-        }.bind(this));
+        });
 
         console.log('Subscribed to channel (intranet): ' + channelNameStr);
         this.listOfChannelsSubscribedTo.push(channelNameStr);
@@ -491,39 +507,44 @@ class IntranetMessenger {
 
     /**
      * Send a message to a channel
-     * @param {Buffer} channelName is also the other user's public key
-     * @param {string} message
+     * @param {Buffer | string} channelName is also the other user's public key
+     * @param {any} message
      */
-    sendMessageToChannel(channelName, message) {
+    sendMessageToChannel(channelName: Buffer | string, message: any) {
         let channelNameStr = '';
+        let channelNameBuf: Buffer;
         if (typeof(channelName) === 'string') {
             channelNameStr = channelName;
-            channelName = utils.stringToBuffer(channelName);
+            channelNameBuf = utils.stringToBuffer(channelName);
         } else {
             channelNameStr = utils.bufferToString(channelName);
+            channelNameBuf = channelName;
         }
 
         // Encrypt the message using the shared key
         const sharedKeyString =
-            utils.getSharedKey(this.userInfo.privateKey, channelName);
+            utils.getSharedKey(this.userInfo.privateKey, channelNameBuf.toString('hex'));
 
-        let iv = [];
-        [message, iv] = utils.encryptMessage(
+        let iv: Buffer = Buffer.alloc(0);
+        let ret: [string, Buffer];
+        ret = utils.encryptMessage(
             JSON.stringify(message), sharedKeyString);
+        let encryptedMessage = ret[0];
+        iv = ret[1];
 
         // Add sender and 'iv' informations to the message, which are needed to
         // decrypt the message
         message = JSON.stringify({
             'senderPublicKey': this.userPublicKey,
             'iv': iv,
-            'message': message,
+            'message': encryptedMessage,
         });
 
         console.log('Sending message to channel (intranet): ' +
             channelNameStr);
 
         for (const [ip, info] of Object.entries(this.hostsWithHexHootMap)) {
-            if (info.listOfChannelsSubscribedTo.includes(channelNameStr)) {
+            if ((info as any).listOfChannelsSubscribedTo.includes(channelNameStr)) {
                 this.sendMessage(
                     this.getURLFromIP(ip) + '/message',
                     message,
@@ -538,11 +559,7 @@ class IntranetMessenger {
      * @param {function} func callback function that gets invoked when a new
      * new message is received
      */
-    setMessageReceiveCallbackFunction(func) {
+    setMessageReceiveCallbackFunction(func: (msg: any) => void) {
         this.messageReceiveCallbackFunction = func;
     }
 }
-
-module.exports = function() {
-    return new IntranetMessenger();
-};

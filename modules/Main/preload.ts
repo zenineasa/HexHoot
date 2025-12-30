@@ -1,10 +1,18 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const i18n = require('../I18n')();
-const Social = require('../Social');
-const Copyright = require('../Copyright');
-const Login = require('../Login');
-const Chat = require('../Chat');
+import I18n from '../I18n';
+const i18n = new I18n();
+import Social from '../Social';
+import Copyright from '../Copyright';
+import Login from '../Login';
+import Chat from '../Chat';
+
+declare global {
+    interface Window {
+        reload: () => void;
+    }
+}
+
 
 window.addEventListener('DOMContentLoaded', function() {
     /**

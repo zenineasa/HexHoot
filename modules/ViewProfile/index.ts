@@ -1,15 +1,19 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
-const Layout = require('./../Layout');
-const imagePack = require('../ImagePack');
-// eslint-disable-next-line no-unused-vars
-const i18n = require('./../I18n')(); // used in template
+import requireText = require('require-text');
+import Layout from '../Layout';
+import * as imagePack from '../ImagePack';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import I18n from '../I18n';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const i18n = new I18n();
 
 /**
  * This class implements the functionality for viewing profile information.
  */
-class ViewProfile {
+export default class ViewProfile {
+    private static _instance: ViewProfile;
+
     /** This is the constructor (note the singleton implementation) */
     constructor() {
         if (ViewProfile._instance) {
@@ -25,7 +29,7 @@ class ViewProfile {
      * @param {function} userInfo Information about the user that is to be
      * displayed
      */
-    async render(backCallback, userInfo) {
+    async render(backCallback: () => void, userInfo: any) {
         // Render the layout
         await Layout.render();
 
@@ -36,17 +40,22 @@ class ViewProfile {
         document.body.appendChild(link);
 
         // Ensure that the CSS is loaded before the HTML is
-        link.addEventListener('load', function() {
+        link.addEventListener('load', () => {
             // Sidebar related
             const sidebarDOMNode = document.getElementById('sidebar');
-            sidebarDOMNode.innerHTML += eval('`' +
-                requireText('./template_sidebar.html', require) + '`');
-            document.getElementById('backButton').onclick = backCallback;
+            if (sidebarDOMNode) {
+                sidebarDOMNode.innerHTML += eval('`' +
+                    requireText('./template_sidebar.html', require) + '`');
+            }
+            const backBtn = document.getElementById('backButton');
+            if(backBtn) backBtn.onclick = backCallback;
 
             // Main content related
             const mainContentDOMNode = document.getElementById('mainContent');
-            mainContentDOMNode.innerHTML += eval('`' +
-                requireText('./template_mainContent.html', require) + '`');
+            if (mainContentDOMNode) {
+                mainContentDOMNode.innerHTML += eval('`' +
+                    requireText('./template_mainContent.html', require) + '`');
+            }
         });
     }
 
@@ -56,7 +65,7 @@ class ViewProfile {
      * the entire image (base64 encoded image, data URL)
      * @return {string} an image that can be used as CSS background URL
      */
-    getProfilePic(photo) {
+    getProfilePic(photo: string | null | undefined) {
         if (photo) {
             return photo;
         } else {
@@ -64,5 +73,3 @@ class ViewProfile {
         }
     }
 }
-
-module.exports = new ViewProfile();

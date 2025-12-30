@@ -3,30 +3,33 @@
 /**
  * This class implements the different sounds or tones used in the UI.
  */
-class Sounds {
+export default class Sounds {
+    private static _instance: Sounds;
+    private audioContext: AudioContext;
+
     /** This is the constructor (note the singleton implementation) */
     constructor() {
         if (Sounds._instance) {
             return Sounds._instance;
         }
         Sounds._instance = this;
-        Sounds._instance.initialize();
+        this.initialize();
     }
 
     /**
      * Initialize Sounds
      */
     initialize() {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
         this.audioContext = new AudioContext();
     }
 
     /**
      * Play from an array of notes.
      * @param {Array} notes all the notes involed in making this tune
-     * @param {Array} duration total amount of time for which this tune plays
+     * @param {number} duration total amount of time for which this tune plays
      */
-    playFromArray(notes, duration) {
+    playFromArray(notes: string[], duration: number) {
         const dt = duration / notes.length;
         const startTime = this.audioContext.currentTime;
         for (let i = 0; i < notes.length; i++) {
@@ -44,8 +47,8 @@ class Sounds {
     /**
      * Mapping frequency to notes
      */
-    noteToFrequency(note) {
-        const notesMap = {
+    noteToFrequency(note: string) {
+        const notesMap: {[key: string]: number} = {
             'C4': 261.63,
             'D4': 293.66,
             'E4': 329.63,
@@ -64,7 +67,3 @@ class Sounds {
         this.playFromArray(['G4', 'A4', 'G4', 'A4'], 0.5);
     }
 }
-
-module.exports = function() {
-    return new Sounds();
-};

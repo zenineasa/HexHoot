@@ -1,7 +1,7 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const utils = require('./../../../test/utils');
-const Copyright = require('./../../../modules/Copyright');
+const Copyright = require('./../../../dist/modules/Copyright').default;
 
 QUnit.test('Check if Copyright module is available', function(assert) {
     assert.ok(typeof(Copyright) !== 'undefined');

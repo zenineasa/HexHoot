@@ -1,11 +1,16 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const IDBExportImport = require('indexeddb-export-import');
+import IDBExportImport = require('indexeddb-export-import');
 
 /**
  * This class contains a wrapper for IndexedDB in accordance with what we need
  */
-class DBWrapper {
+export default class DBWrapper {
+    private static _instance: DBWrapper;
+    private dbName: string;
+    private dbVersion: number;
+    private db: IDBDatabase | null = null;
+
     /** This is the constructor (note the singleton implementation) */
     constructor() {
         /** This is the constructor (note the singleton implementation) */
@@ -13,7 +18,7 @@ class DBWrapper {
             return DBWrapper._instance;
         }
         DBWrapper._instance = this;
-        DBWrapper._instance.initialize();
+        this.initialize();
     }
 
     /**
@@ -21,7 +26,7 @@ class DBWrapper {
      */
     initialize() {
         this.dbName = 'HexhootDB';
-        this.dbVersion = 1;
+        this.dbVersion = 3;
 
         const request = indexedDB.open(this.dbName, this.dbVersion);
         request.onerror = this.error;
@@ -36,10 +41,10 @@ class DBWrapper {
      * @return {function} callback function that populates the 'db' member
      * variable
      */
-    storeDBAsMemberVariable(request) {
-        return function(event) {
+    storeDBAsMemberVariable(request: IDBOpenDBRequest) {
+        return (event: Event) => {
             this.db = request.result;
-        }.bind(this);
+        };
     }
 
     /**
@@ -48,9 +53,9 @@ class DBWrapper {
      * @return {Promise} promise for whether the database is loaded
      */
     promiseDBLoaded() {
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             let count = 0;
-            const interval = setInterval(function() {
+            const interval = setInterval(() => {
                 if (this.db) {
                     clearInterval(interval);
                     resolve('DB Loaded');
@@ -62,37 +67,39 @@ class DBWrapper {
                         reject(new Error('DB Not loaded after a long time'));
                     }
                 }
-            }.bind(this), 200);
-        }.bind(this));
+            }, 200);
+        });
     }
 
     /**
      * Handle errors
      * @param {Event} event a javascript event
      */
-    error(event) {
-        console.log(new Error('Error: ' + JSON.stringify(event)));
+    error(event: Event) {
+        const error = (event.target as IDBRequest).error;
+        console.error('IndexedDB Error:', error);
+        console.log(new Error('Error: ' + (error ? error.message : JSON.stringify(event))));
     }
 
     /**
-     * When you open the database for the first time or when you open the
-     * database with a higher version number for the first time, the
-     * following callback is invoked.
-     * @param {Event} event a javascript event that is a callback param of
-     * 'onupgradeneeded'
+     * Once the database opening request has been processed, ...
      */
-    upgrade(event) {
+    // ...
+
+    // ...
+
+    /**
+     * When you open the database for the first time ...
+     */
+    upgrade(event: IDBVersionChangeEvent) {
         /**
          * Add table to the database
-         * @param {string} db the database as event callback
-         * @param {string} tableName the name of the table
-         * @param {string} userKey the path of the key in the table; username of
-         * the other person
-         * @param {Object} columns An object with names corresponding to the
-         * column name and the values corresponding to the configuration of the
-         * columns
+         * ...
          */
-        function addTable(db, tableName, userKey, columns) {
+        function addTable(db: IDBDatabase, tableName: string, userKey: string | string[], columns: {[key: string]: IDBIndexParameters}) {
+            if (db.objectStoreNames.contains(tableName)) {
+                return;
+            }
             const store =
                 db.createObjectStore(tableName, {'keyPath': userKey});
 
@@ -101,8 +108,10 @@ class DBWrapper {
                 store.createIndex(column[0], column[0], columns[1]);
             });
         }
+
+        const db = (event.target as IDBOpenDBRequest).result;
         addTable(
-            event.target.result,
+            db,
             'Friends',
             'key',
             {
@@ -115,7 +124,7 @@ class DBWrapper {
             },
         );
         addTable(
-            event.target.result,
+            db,
             'Chat',
             ['key', 'timestamp'],
             {
@@ -123,7 +132,7 @@ class DBWrapper {
             },
         );
         addTable(
-            event.target.result,
+            db,
             'LoggedInUserInfo',
             'key',
             {
@@ -134,7 +143,7 @@ class DBWrapper {
             },
         );
         addTable(
-            event.target.result,
+            db,
             'Preferences',
             'key', // name of the field is the key
             {
@@ -147,8 +156,12 @@ class DBWrapper {
      * Delete table
      * @param {string} tableName
      */
-    async deleteTable(tableName) {
-        await new Promise((resolve, reject) => {
+    async deleteTable(tableName: string) {
+        await new Promise<void>((resolve, reject) => {
+            if(!this.db) {
+                reject(new Error("DB not initialized"));
+                return;
+            }
             const transaction = this.db.transaction(tableName, 'readwrite');
             const objectStore = transaction.objectStore(tableName);
 
@@ -162,9 +175,9 @@ class DBWrapper {
             clearRequest.onerror = (event) => {
                 console.error(
                     `Error clearing entries from ${tableName} table:`,
-                    event.target.error
+                    (event.target as IDBRequest).error
                 );
-                reject(event.target.error);
+                reject((event.target as IDBRequest).error);
             };
         });
     }
@@ -174,16 +187,17 @@ class DBWrapper {
      * @param {string} tableName name of the database table
      * @param {Object} data data to be added/edited
      */
-    async addOrEditEntry(tableName, data) {
+    async addOrEditEntry(tableName: string, data: any) {
         await this.promiseDBLoaded();
+        if(!this.db) throw new Error("DB not initialized");
 
         // Read existing data and update the fields that is available in 'data'
         // object.
-        let dataToDB = await this.get(tableName, data.key);
+        let dataToDB: any = await this.get(tableName, data.key);
         if (dataToDB) {
-            data = Object.entries(data);
-            for (let i = 0; i < data.length; i++) {
-                dataToDB[data[i][0]] = data[i][1];
+            const dataEntries = Object.entries(data);
+            for (let i = 0; i < dataEntries.length; i++) {
+                dataToDB[dataEntries[i][0]] = dataEntries[i][1];
             }
         } else {
             dataToDB = data;
@@ -193,32 +207,33 @@ class DBWrapper {
         const txn = this.db.transaction(tableName, 'readwrite');
         const store = txn.objectStore(tableName);
         const query = store.put(dataToDB);
-        query.onerror = this.error;
+        query.onerror = (e) => this.error(e);
     }
 
     /**
      * Get all entries from a database table
      * @param {string} tableName name of the database table
      */
-    async getAll(tableName) {
+    async getAll(tableName: string) {
         await this.promiseDBLoaded();
+        if(!this.db) throw new Error("DB not initialized");
 
         const txn = this.db.transaction(tableName, 'readwrite');
         const store = txn.objectStore(tableName);
 
-        let ret = [];
+        let ret: any[] = [];
 
-        await new Promise(function(resolve, reject) {
+        await new Promise((resolve, reject) => {
             const getAll = store.getAll();
-            getAll.onsuccess = function(event) {
-                ret = event.target.result;
+            getAll.onsuccess = (event) => {
+                ret = (event.target as IDBRequest).result;
                 resolve('Login data retrieved from DB');
             };
-            getAll.onerror = function(err) {
+            getAll.onerror = (err) => {
                 this.error(err);
                 reject(new Error('Error: retrieving login data from DB'));
-            }.bind(this);
-        }.bind(this));
+            };
+        });
 
         return ret;
     }
@@ -228,25 +243,26 @@ class DBWrapper {
      * @param {string} tableName name of the database table
      * @param {string} key string key value
      */
-    async get(tableName, key) {
+    async get(tableName: string, key: string | any[]) {
         await this.promiseDBLoaded();
+        if(!this.db) throw new Error("DB not initialized");
 
         const txn = this.db.transaction(tableName, 'readwrite');
         const store = txn.objectStore(tableName);
 
-        let ret = [];
+        let ret: any = null;
 
-        await new Promise(function(resolve, reject) {
+        await new Promise((resolve, reject) => {
             const getAll = store.get(key);
-            getAll.onsuccess = function(event) {
-                ret = event.target.result;
+            getAll.onsuccess = (event) => {
+                ret = (event.target as IDBRequest).result;
                 resolve('Data retrieved from DB');
             };
-            getAll.onerror = function(err) {
+            getAll.onerror = (err) => {
                 this.error(err);
                 reject(new Error('Error: retrieving data from DB'));
-            }.bind(this);
-        }.bind(this));
+            };
+        });
 
         return ret;
     }
@@ -257,22 +273,23 @@ class DBWrapper {
      * @param {Array} lowerKeyBound lower bound of the key
      * @param {Array} upperKeyBound upper bound of the key
      */
-    async getInKeyRange(tableName, lowerKeyBound, upperKeyBound) {
+    async getInKeyRange(tableName: string, lowerKeyBound: any, upperKeyBound: any) {
         await this.promiseDBLoaded();
+        if(!this.db) throw new Error("DB not initialized");
 
         const txn = this.db.transaction(tableName, 'readwrite');
         const store = txn.objectStore(tableName);
 
-        let ret = [];
+        let ret: any[] = [];
 
-        await new Promise(function(resolve, reject) {
+        await new Promise((resolve, reject) => {
             const keyRange = IDBKeyRange.bound(lowerKeyBound, upperKeyBound);
             const getAll = store.getAll(keyRange);
-            getAll.onsuccess = function(event) {
-                ret = event.target.result;
+            getAll.onsuccess = (event) => {
+                ret = (event.target as IDBRequest).result;
                 resolve('Data retrieved from DB');
             };
-            getAll.onerror = function(err) {
+            getAll.onerror = (err) => {
                 this.error(err);
                 reject(new Error('Error: retrieving data from DB'));
             };
@@ -285,7 +302,9 @@ class DBWrapper {
      * Download database as JSON.
      */
     async downloadDBAsJSON() {
-        IDBExportImport.exportToJsonString(this.db, function(err, jsonString) {
+        if(!this.db) throw new Error("DB not initialized");
+        const db = this.db;
+        IDBExportImport.exportToJsonString(db, (err: any, jsonString: string) => {
             if (!err) {
                 const element = document.createElement('a');
                 element.setAttribute(
@@ -296,46 +315,52 @@ class DBWrapper {
                 element.setAttribute('download', 'hexhoot_backup.hexhootjson');
 
                 element.style.display = 'none';
+                document.body.appendChild(element); // Added append to body for Firefox support mostly but good practice
                 element.click();
                 element.remove();
             } else {
                 this.error(err);
             }
-        }.bind(this));
+        });
     }
 
     /**
      * Upload database as JSON.
      */
     async uploadDBAsJSON() {
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             const element = document.createElement('input');
             element.type = 'file';
             element.accept = '.hexhootjson';
             element.click();
-            element.onchange = function(event) {
+            element.onchange = (event) => {
+                const target = event.target as HTMLInputElement;
+                if(!target.files || !target.files[0]) {
+                    reject('No file selected');
+                    return;
+                }
                 const reader = new FileReader();
-                reader.readAsText(event.target.files[0], 'UTF-8');
-                reader.onload = function(evt) {
-                    const jsonString = evt.target.result;
+                reader.readAsText(target.files[0], 'UTF-8');
+                reader.onload = (evt) => {
+                    if(!this.db) {
+                        reject('DB not initialized');
+                        return;
+                    }
+                    const jsonString = (evt.target as FileReader).result as string;
                     IDBExportImport.importFromJsonString(this.db, jsonString,
-                        function(err) {
+                        (err: any) => {
                             if (err) {
                                 reject('Loaded JSON file can not be imported');
                             }
                             resolve('JSON file loaded and imported');
                         },
                     );
-                }.bind(this);
-                reader.onerror = function(err) {
+                };
+                reader.onerror = (err) => {
                     reject('JSON file not loaded');
                 };
                 element.remove();
-            }.bind(this);
-        }.bind(this));
+            };
+        });
     }
 }
-
-module.exports = function() {
-    return new DBWrapper();
-};

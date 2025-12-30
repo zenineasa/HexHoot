@@ -1,13 +1,13 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+import requireText = require('require-text');
 
 /**
  * This class adds copyright message to the UI. This is one of the simplest
  * modules that we have, and hence, could be treated as a "Hello World!"
  * module.
  */
-class Copyright {
+export default class Copyright {
     /**
      * This function renders the template into the UI.
      */
@@ -19,12 +19,10 @@ class Copyright {
         document.body.appendChild(link);
 
         // Ensure that the CSS is loaded before the HTML is
-        link.addEventListener('load', function() {
+        link.addEventListener('load', () => {
             const elem = document.createElement('div');
             elem.innerHTML = requireText('./template.html', require);
             document.body.appendChild(elem);
         });
     }
 }
-
-module.exports = Copyright;

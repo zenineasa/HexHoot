@@ -1,6 +1,6 @@
 /* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
 
-const imagePack = require('./modules/ImagePack');
+const imagePack = require('./dist/modules/ImagePack');
 
 module.exports = {
     packagerConfig: {},

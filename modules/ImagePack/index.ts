@@ -4,9 +4,9 @@
  * This file contains maps to all the images that are used in the UI and helper
  * functions that enable accessing them.
  */
-const path = require('path');
+import * as path from 'path';
 
-imagePack = {
+const imagePack: any = {
     'branding': {
         'logoIcon': 'icon.svg',
         'favicon': 'favicon.png',
@@ -37,12 +37,12 @@ imagePack = {
  * @param {String} hierarchy hierarchy to the image
  * @return {string} image path
  */
-imagePack.getPath = function(hierarchy) {
-    hierarchy = hierarchy.split('.'); // to hierarchy array
+imagePack.getPath = function(hierarchy: string) {
+    const parts = hierarchy.split('.'); // to hierarchy array
 
-    let value = imagePack[hierarchy[0]];
-    for (let i = 1; i < hierarchy.length; i++) {
-        value = value[hierarchy[i]];
+    let value = imagePack[parts[0]];
+    for (let i = 1; i < parts.length; i++) {
+        value = value[parts[i]];
     }
 
     if (typeof(value) !== 'string') {
@@ -54,4 +54,4 @@ imagePack.getPath = function(hierarchy) {
     return path.resolve(__dirname + '/images/' + value).replaceAll('\\', '/');
 };
 
-module.exports = imagePack;
+export = imagePack;

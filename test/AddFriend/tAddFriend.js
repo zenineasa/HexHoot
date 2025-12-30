@@ -1,8 +1,10 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const utils = require('./../../../test/utils');
-const addFriend = require('./../../../modules/AddFriend')();
-const dbMessenger = require('./../../../modules/DBMessenger')();
+const AddFriend = require('./../../../dist/modules/AddFriend').default;
+const addFriend = new AddFriend();
+const DBMessenger = require('./../../../dist/modules/DBMessenger').default;
+const dbMessenger = new DBMessenger();
 
 /**
  * Mocking the user login functionality

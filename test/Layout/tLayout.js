@@ -1,7 +1,7 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const utils = require('./../../../test/utils');
-const Layout = require('./../../../modules/Layout');
+const Layout = require('./../../../dist/modules/Layout').default;
 
 QUnit.test('Check if Layout module is available', function(assert) {
     assert.ok(typeof(Layout) !== 'undefined');

@@ -7,12 +7,13 @@
         "type": "git",
         "url": "git+https://github.com/zenineasa/hexhoot.git"
     },
-    "main": "modules/Main/index.js",
+    "main": "dist/modules/Main/index.js",
     "scripts": {
-        "start": "electron-forge start",
+        "build": "tsc && copyfiles \"modules/**/*.{html,css,png,jpg,jpeg,gif,svg,ico,icns,json}\" dist",
+        "start": "npm run build && electron-forge start",
         "test": "karma start ./test/karma.conf.js",
-        "package": "electron-forge package",
-        "make": "electron-forge make"
+        "package": "npm run build && electron-forge package",
+        "make": "npm run build && electron-forge make"
     },
     "author": "Zenin Easa Panthakkalakath (@zenineasa)",
     "license": "AGPLV3",
@@ -23,6 +24,9 @@
         "@electron-forge/maker-rpm": "^7.4.0",
         "@electron-forge/maker-squirrel": "^7.4.0",
         "@electron-forge/maker-zip": "^7.4.0",
+        "@types/electron": "^1.4.38",
+        "@types/node": "^25.0.3",
+        "copyfiles": "^2.4.1",
         "copyright-header": "^0.4.6",
         "electron": "^30.0.1",
         "eslint": "^9.1.1",
@@ -30,7 +34,8 @@
         "glob": "^10.3.12",
         "karma-electron": "^7.3.0",
         "karma-qunit": "^4.2.0",
-        "qunit": "^2.20.1"
+        "qunit": "^2.20.1",
+        "typescript": "^5.9.3"
     },
     "dependencies": {
         "arptable-js": "^0.0.2",

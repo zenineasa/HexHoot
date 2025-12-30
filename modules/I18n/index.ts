@@ -1,19 +1,24 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
-const dbMessenger = require('./../DBMessenger')();
+import requireText = require('require-text');
+import DBMessenger from '../DBMessenger';
+const dbMessenger = new DBMessenger();
 
 /**
  * This class helps in implementing support for multiple languages.
  */
-class I18n {
+export default class I18n {
+    private static _instance: I18n;
+    private texts: any;
+    private selectedLang: string = 'en';
+
     /** This is the constructor (note the singleton implementation) */
     constructor() {
         if (I18n._instance) {
             return I18n._instance;
         }
         I18n._instance = this;
-        I18n._instance.initialize();
+        this.initialize();
     }
 
     /**
@@ -50,7 +55,7 @@ class I18n {
         document.body.appendChild(link);
 
         // Ensure that the CSS is loaded before the HTML is
-        link.addEventListener('load', function() {
+        link.addEventListener('load', () => {
             const elem = document.createElement('div');
             elem.innerHTML =
                 eval('`' + requireText('./template.html', require) + '`');
@@ -65,20 +70,24 @@ class I18n {
             document.body.appendChild(elem);
 
             // Language selection dropdown
-            const languageSelector = document.getElementById('languages');
-            languageSelector.querySelector('[value=' + this.selectedLang + ']')
-                .setAttribute('selected', '');
-            languageSelector.onchange = function() {
-                this.languageSelectionCallback(languageSelector.value);
-            }.bind(this);
-        }.bind(this));
+            const languageSelector = document.getElementById('languages') as HTMLSelectElement;
+            if (languageSelector) {
+                const option = languageSelector.querySelector('[value=' + this.selectedLang + ']');
+                if (option) {
+                    option.setAttribute('selected', '');
+                }
+                languageSelector.onchange = () => {
+                   this.languageSelectionCallback(languageSelector.value);
+                };
+            }
+        });
     }
 
     /**
      * Language selection dropdown callback
      * @param {string} chosenLanguage the language chosen in the UI
      */
-    languageSelectionCallback(chosenLanguage) {
+    languageSelectionCallback(chosenLanguage: string) {
         this.selectedLang = chosenLanguage;
         dbMessenger.setPreference('language', chosenLanguage);
         window.reload();
@@ -90,18 +99,14 @@ class I18n {
      * @param {String} hierarchy path to the message in lang.json
      * @return {string} the requested text in the selected language
      */
-    getText(hierarchy) {
-        hierarchy = hierarchy.split('.'); // to hierarchy array
+    getText(hierarchy: string) {
+        const parts = hierarchy.split('.'); // to hierarchy array
 
         let value = this.texts;
-        for (let i = 0; i < hierarchy.length; i++) {
-            value = value[hierarchy[i]];
+        for (let i = 0; i < parts.length; i++) {
+            value = value[parts[i]];
         }
 
         return value[this.selectedLang];
     }
 }
-
-module.exports = function() {
-    return new I18n();
-};

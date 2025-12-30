@@ -4,6 +4,7 @@ all:
 	make clean
 	make install
 	make lint
+	make build-ts
 	make build-mac-intel
 	make build-mac-m1
 	make build-windows
@@ -13,7 +14,7 @@ install:
 	npm install
 
 clean:
-	rm -rf node_modules bundle.js package-lock.json out
+	rm -rf node_modules bundle.js package-lock.json out dist
 
 lint:
 	npx eslint --config eslint.config.js
@@ -22,6 +23,9 @@ lint:
 lintfix:
 	npx eslint --config eslint.config.js --fix
 	npx copyright-header --fix --copyrightHolder "Zenin Easa Panthakkalakath" --forceModificationYear 2024
+
+build-ts:
+	npm run build
 
 build-mac-intel:
 	$(call BUILD_MAC_DMG,darwin,x64)

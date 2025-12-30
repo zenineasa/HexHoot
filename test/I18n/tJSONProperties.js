@@ -1,6 +1,6 @@
 /* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
 
-const I18n = require('./../../../modules/I18n');
+const I18n = require('./../../../dist/modules/I18n').default;
 
 QUnit.test('Check if I18n module is available', function(assert) {
     assert.ok(typeof(I18n) !== 'undefined');

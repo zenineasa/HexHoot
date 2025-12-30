@@ -1,8 +1,9 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const utils = require('./../../../test/utils');
-const Login = require('./../../../modules/Login');
-const dbMessenger = require('./../../../modules/DBMessenger')();
+const Login = require('./../../../dist/modules/Login').default;
+const DBMessenger = require('./../../../dist/modules/DBMessenger').default;
+const dbMessenger = new DBMessenger();
 
 QUnit.test('Check if Login module is available', function(assert) {
     assert.ok(typeof(Login) !== 'undefined');

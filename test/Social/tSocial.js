@@ -1,7 +1,7 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const utils = require('./../../../test/utils');
-const Social = require('./../../../modules/Social');
+const Social = require('./../../../dist/modules/Social').default;
 
 QUnit.test('Check if Social module is available', function(assert) {
     assert.ok(typeof(Social) !== 'undefined');

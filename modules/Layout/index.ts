@@ -1,24 +1,26 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+import requireText = require('require-text');
 
 // This is invoked from within template.html file
-const Logo = require('./../Logo'); // eslint-disable-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import Logo from '../Logo';
 
 /**
  * This class implements a skeleton UI that is used by most modules
  */
-class Layout {
+export default class Layout {
     /**
      * This function renders the template into the UI.
      */
     static async render() {
+        console.log('Layout.render called');
         // Link css
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = __dirname + '/style.css';
 
-        await new Promise(function(resolve, _reject) {
+        await new Promise<void>((resolve, _reject) => {
             document.body.appendChild(link);
 
             // Ensure that the CSS is loaded before the HTML is
@@ -31,17 +33,22 @@ class Layout {
                 // To ensure that innerHTML has changed before resolving
                 const observer = new MutationObserver(
                     function(_mutationsList, _observer) {
-                        if (container.hasChildNodes()) {
+                        if (container && container.hasChildNodes()) {
                             resolve();
                         }
                     }
                 );
-                observer.observe(container, {
-                    characterData: false, childList: true, attributes: false
-                });
+                if (container) {
+                    observer.observe(container, {
+                        characterData: false, childList: true, attributes: false
+                    });
 
-                // Load the HTML template and insert it to the UI
-                container.innerHTML = Layout.loadTemplate('./template.html');
+                    // Load the HTML template and insert it to the UI
+                    container.innerHTML = Layout.loadTemplate('./template.html');
+                } else {
+                  console.error("Container not found");
+                  resolve(); // Or reject
+                }
             };
             link.addEventListener('load', linkOnLoadCallback);
         });
@@ -53,11 +60,11 @@ class Layout {
      * @param {string} filename name of the HTML file
      * @return {string} template string
      */
-    static loadTemplate(filename) {
+    static loadTemplate(filename: string) {
         // Use Javascript's Template literals (Template strings) for easily
         // evaluating variables in the template.html file
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const Logo = require('../Logo').default;
         return eval('`' + requireText(filename, require) + '`');
     }
 }
-
-module.exports = Layout;

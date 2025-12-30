@@ -1,8 +1,7 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
 const utils = require('./../../../test/utils');
-const Chat = require('./../../../modules/Chat');
-
+const Chat = require('./../../../dist/modules/Chat').default;
 const chat = new Chat();
 
 QUnit.test('Check if Chat module is available', function(assert) {

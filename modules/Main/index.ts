@@ -1,8 +1,8 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const {app, BrowserWindow} = require('electron');
-const path = require('path');
-const imagePack = require('../ImagePack');
+import { app, BrowserWindow } from 'electron';
+import * as path from 'path';
+import * as imagePack from '../ImagePack';
 
 /**
  * Creates CEF window in which the app runs
@@ -20,7 +20,7 @@ function createWindow() {
         },
     });
     win.maximize();
-    win.loadFile('Modules/Main/index.html');
+    win.loadFile('dist/modules/Main/index.html');
 }
 
 app.whenReady().then(() => {
