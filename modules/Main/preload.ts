@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2025 Zenin Easa Panthakkalakath */
 
 import I18n from '../I18n';
 const i18n = new I18n();

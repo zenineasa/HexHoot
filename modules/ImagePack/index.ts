@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2025 Zenin Easa Panthakkalakath */
 
 /**
  * This file contains maps to all the images that are used in the UI and helper

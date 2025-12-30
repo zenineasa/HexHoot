@@ -50,4 +50,4 @@ https://blog.hexhoot.com/
 
 ##
 
-Copyright &copy; 2022-2024 Zenin Easa Panthakkalakath
+Copyright &copy; 2022-2025 Zenin Easa Panthakkalakath

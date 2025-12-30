@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2025 Zenin Easa Panthakkalakath */
 
 const utils = require('./../../../test/utils');
 const Copyright = require('./../../../dist/modules/Copyright').default;
