@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
 module.exports = function(config) {
     config.set({
@@ -13,6 +13,12 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
+            {
+                // Must come first: connects the UI to an in-process Core
+                pattern: './setupCore.js',
+                included: true,
+                type: 'js',
+            },
             {
                 pattern: './**/t*.js',
                 included: true,
@@ -82,6 +88,7 @@ module.exports = function(config) {
         // available preprocessors:
         // https://www.npmjs.com/search?q=keywords:karma-preprocessor
         preprocessors: {
+            './setupCore.js': ['electron'],
             './**/t*.js': ['electron'],
         },
 

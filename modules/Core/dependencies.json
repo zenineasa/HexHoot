@@ -1,0 +1,13 @@
+{
+    "coprightMessage": "Copyright © 2026 Zenin Easa Panthakkalakath",
+    "internal": [
+        "Sanitize"
+    ],
+    "external": [
+        "hyperswarm",
+        "ecdh",
+        "arptable-js",
+        "ping",
+        "ipv4-range"
+    ]
+}

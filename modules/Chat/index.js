@@ -458,12 +458,9 @@ class Chat {
                 return;
             }
 
-            // Add it to the database
-            message.message.message.type = this.messageType.received;
-            await dbMessenger.receivedChatMessage(message);
-
-            // Messages from someone whose friend request is still pending are
-            // stored, and shown once the request is accepted.
+            // Core has stored it already. Messages from someone whose friend
+            // request is still pending are shown once the request is
+            // accepted.
             if (!message.isFromFriend) {
                 return;
             }

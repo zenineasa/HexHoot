@@ -71,6 +71,8 @@ The hooks live in a single `modules/Main/testHooks.js` that is only `require`d w
 
 L1 also includes the **capability guard**: the [Electron crypto probe](/assessment/electron-crypto-capabilities.md) run with `ELECTRON_RUN_AS_NODE=1` against the bundled Electron, so an upgrade that drops ML-KEM-1024, ML-DSA-87, P-521, or SHA-512 fails CI. It also checks that scrypt N=2²⁰ still completes, and that invalid P-521 points are still rejected. Protocol tests cross-check ML-KEM and ML-DSA results against NIST ACVP vectors and `@noble/post-quantum`, which is a dev-only oracle that is never shipped.
 
+L2 exists since 2026-11-26: `test/core/` runs Core with in-memory storage and injected transports. `DhtTransport.announced` resolves once a peer can be found on the DHT. Tests wait for it, because a lookup made earlier finds nobody and Hyperswarm does not retry for minutes. Until Karma is retired, `test/setupCore.js` runs an in-memory Core inside the Karma window, behind the same method allow-list as IPC.
+
 **Core must be importable from plain Node** (the [roadmap's](/plan/roadmap.md) Phase 2) so L2 can run without Electron. **Caveat:** stock Node 24 uses OpenSSL, while Electron uses BoringSSL, and their supported algorithms differ (Node has SHA-3 and Argon2, Electron does not). L1 and L2 must therefore run under Electron's Node (`ELECTRON_RUN_AS_NODE=1 electron --test …`) and not the system `node`. Otherwise a primitive that only works in OpenSSL could slip in.
 
 # First E2E scenarios

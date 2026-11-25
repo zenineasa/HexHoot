@@ -19,7 +19,7 @@ Each phase is a separate PR, or a short series of PRs, and keeps `main` buildabl
 - Wrap all `JSON.parse` calls in the network path with `try`/`catch`.
 - Add a strict Content-Security-Policy `<meta>` to `modules/Main/index.html`.
 
-**Exit (met):** a crafted `displayName` payload renders as text, a spoofed `UserInformation` is ignored, and the existing tests pass. Regression tests are in `test/DBMessenger/tReceivedMessages.js` and `test/unit/sanitize.test.js`.
+**Exit (met):** a crafted `displayName` payload renders as text, a spoofed `UserInformation` is ignored, and the existing tests pass. Regression tests are in `test/core/core.test.js`, `test/Chat/tChatXSS.js`, and `test/unit/sanitize.test.js`.
 
 # Phase 1: Toolchain and dependencies
 
@@ -41,6 +41,7 @@ Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 
 - Turn on `contextIsolation: true` and `nodeIntegration: false`. Add `preload.js` with a narrow `contextBridge` API (`window.hexhoot.*`).
 - Move DBMessenger, the transports, and storage into a **Core** (the main process or an Electron `utilityProcess`). Core must be **importable from plain Node**, with `safeStorage`, paths, and transports injected, so L2 tests can run it without Electron. The renderer becomes UI only. Replace the `eval` template rendering with plain template functions.
+  - **Core split done (2026-11-26).** `modules/Core` holds storage (`node:sqlite`), the v1 protocol, and the DHT and LAN transports, with no Electron imports. The main process forks it as a `utilityProcess` and gives each window its own `MessagePort`. Renderers can call only the methods in `rendererMethods`. `modules/DBMessenger` is now a thin client with the same method names, so the UI is unchanged. L2 tests (`npm run test:core`) run two Cores over an in-memory transport, the LAN carrier on 127.0.0.1, and a hyperdht testnet. This closes T7 and fixes T4 and T5. Old IndexedDB data is not migrated, because there are no users. The renderer lockdown (`contextIsolation`, sandbox, no `eval`) is the next commit.
 - **Multi-instance harness** (moved from Phase 1): the orchestrator, `testHooks.js` with `--use-mock-keychain`, per-peer `userData`, the hyperdht testnet, artifacts, and retry-once. The first L3 scenario: alice and bob exchange a friend request and chat.
 - **Capability guard test** (L1), done 2026-11-26: `test/capability/capability.test.js`, run with `npm run test:capability` through `scripts/electron-node.js` so it runs on Electron's BoringSSL. It checks ML-KEM-1024, ML-DSA-87, P-521 (including invalid-point rejection), AES-256-GCM, SHA-512, HMAC and HKDF against published vectors, scrypt (N=2²⁰ in CI or with `HEXHOOT_SLOW_TESTS=1`), and `node:sqlite`. It passes on macOS arm64. CI covers Linux and Windows.
 

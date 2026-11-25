@@ -40,10 +40,10 @@ All findings are against commit `67ca2c0`. The **Fix** column refers to the phas
 | T1 | The Hyperswarm topic is the raw public key, so anyone with a user's address can find their IP address. |
 | T2 | The LAN server answers unauthenticated `GET /` with every subscribed channel (that is, the user's public key) and its whole peer map. |
 | T3 | LAN JSON bodies go to `JSON.parse` without `try`, and `assertIPInArrayAndReturn` throws inside request handlers. A malformed request can break the messenger. **Fixed 2026-11-26** (Phase 0): parsing is wrapped, bodies are capped at 4 MiB, and peer info is validated. |
-| T4 | `!ip in this.hostsWithHexHootMap` is an operator-precedence bug that is always `false`, so gossip-based discovery never fires. |
-| T5 | Hyperswarm `data` events are treated as whole messages. Stream chunks can split or merge, which breaks `JSON.parse` under load. |
+| T4 | `!ip in this.hostsWithHexHootMap` is an operator-precedence bug that is always `false`, so gossip-based discovery never fires. **Fixed 2026-11-26** (Phase 2): the LAN carrier keys peers by `ip:port` and contacts gossiped peers directly, after validating them. |
+| T5 | Hyperswarm `data` events are treated as whole messages. Stream chunks can split or merge, which breaks `JSON.parse` under load. **Fixed 2026-11-26** (Phase 2): each envelope is one line of JSON, and frames over 4 MiB close the connection. Protocol v2 replaces this with length-prefixed frames. |
 | T6 | Hyperswarm's own Noise transport is classical-only (X25519/Ed25519). That is acceptable only if the inner end-to-end layer is post-quantum. |
-| T7 | Hyperswarm runs in the renderer, which Holepunch does not support. `hyperdht` ≥ 6.37 calls `.unref()` on `setTimeout` results, which are numbers in a browser, so every incoming connection crashes the receiving renderer (found 2026-11-26 in a two-instance test). A remote peer can crash the app. Fixed by moving networking into Core (Phase 2). |
+| T7 | Hyperswarm runs in the renderer, which Holepunch does not support. `hyperdht` ≥ 6.37 calls `.unref()` on `setTimeout` results, which are numbers in a browser, so every incoming connection crashes the receiving renderer (found 2026-11-26 in a two-instance test). A remote peer can crash the app. **Fixed 2026-11-26** (Phase 2): networking runs in the Core `utilityProcess`. Two instances now befriend and chat through the UI without errors, and `test/core/network.test.js` covers the DHT testnet and the LAN carrier. |
 
 # What is fine to keep
 

@@ -40,6 +40,7 @@ jobs:
       - run: npm ci
       - run: npm run test:unit
       - run: npm run test:capability
+      - run: npm run test:core
       - name: UI tests (Electron)
         shell: bash
         run: |

@@ -18,7 +18,7 @@ The latest versions were taken from the npm registry on 2026-11-25. "Phase" refe
 |---|---|---|---|---|
 | `hyperswarm` | ^4.7.14 | ^4.17.2 | 1 | Minor-version upgrade. Re-test `join`/`flush` behaviour. |
 | `electron-squirrel-startup` | ^1.0.0 | ^1.0.1 | 1 | |
-| `indexeddb-export-import` | ^2.1.5 | ^2.2.0, then **removed** | 1 → 3 | Replaced by the `.hexhoot2` encrypted backup |
+| `indexeddb-export-import` | ^2.1.5 | ^2.2.0, then **removed** | 1 → 2 | Removed 2026-11-26: Core exports the same JSON from `node:sqlite`. Phase 3 replaces it with the `.hexhoot2` encrypted backup |
 | `ping` | ^0.4.4 | ^1.0.0 | 1 | Major version. Needs Node ≥ 22. Check `promise.probe` options. |
 | `ip` | ^2.0.1 | **remove** | 1 | No fixed release. Use `os.networkInterfaces()`. |
 | `ecdh` | ^0.2.0 | **remove** | 3 | Replaced by Electron's built-in `crypto` ([ADR-002](/decisions/adr-002-builtin-crypto-only.md)) |
@@ -39,7 +39,7 @@ The latest versions were taken from the npm registry on 2026-11-25. "Phase" refe
 | `glob` | ^10.3.12 | ^14.0.6 | 1 | Fixes the `minimatch` advisory |
 | `karma`, `karma-electron`, `karma-qunit`, `qunit` | — | **remove** | 1 → 4 | Replaced by `node:test` and the multi-instance harness ([testing infrastructure](/design/testing-infrastructure.md)) |
 | `@noble/post-quantum` (dev) | — | ^0.7.1 | 3 | **Test oracle only, never shipped.** Cross-checks ML-KEM and ML-DSA. |
-| `hyperdht` (dev) | — | latest | 1 | `createTestnet` gives tests a local DHT bootstrap |
+| `hyperdht` (dev) | — | ^6.37.0 (added 2026-11-26) | 2 | `createTestnet` gives tests a local DHT bootstrap |
 | `copyright-header` | ^0.4.6 | keep | — | Dev-only and stale |
 
 No third-party crypto library is shipped at runtime. Every primitive comes from Electron's `crypto` and `safeStorage` ([capability probe](/assessment/electron-crypto-capabilities.md)).
