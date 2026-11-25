@@ -21,12 +21,9 @@ The latest versions were taken from the npm registry on 2026-11-25. "Phase" refe
 | `indexeddb-export-import` | ^2.1.5 | ^2.2.0, then **removed** | 1 → 3 | Replaced by the `.hexhoot2` encrypted backup |
 | `ping` | ^0.4.4 | ^1.0.0 | 1 | Major version. Needs Node ≥ 22. Check `promise.probe` options. |
 | `ip` | ^2.0.1 | **remove** | 1 | No fixed release. Use `os.networkInterfaces()`. |
-| `ecdh` | ^0.2.0 | **remove** | 3 | Replaced by libsignal and noble |
+| `ecdh` | ^0.2.0 | **remove** | 3 | Replaced by Electron's built-in `crypto` ([ADR-002](/decisions/adr-002-builtin-crypto-only.md)) |
 | `require-text` | ^0.0.1 | **remove** | 1–2 | `fs.readFileSync(path.join(__dirname, f), 'utf8')` |
 | `arptable-js`, `ipv4-range` | 0.0.x | keep / inline | 4 | Unmaintained and tiny. Inline during the LAN rewrite. |
-| `@signalapp/libsignal-client` | — | **0.108.7 exact pin** | 2–3 | AGPL-3.0-only. Native module. |
-| `@noble/post-quantum` | — | ^0.7.1 | 3 | ML-DSA-65 (and the X-Wing fallback) |
-| `@noble/curves`, `@noble/hashes`, `@noble/ciphers` | — | ^2.4.0 | 3 | HKDF, BLAKE2b, Argon2id, XChaCha20-Poly1305 |
 | `copyright-regex` | ^1.1.6 | move to devDependencies | 1 | Only the tests use it |
 
 # Dev and build dependencies
@@ -40,10 +37,12 @@ The latest versions were taken from the npm registry on 2026-11-25. "Phase" refe
 | `eslint` | ^9.1.1 | ^10.15.0 | 1 | |
 | `eslint-config-google` | ^0.14.0 | replace if incompatible | 1 | Unmaintained. Copy its rule values into `eslint.config.js`. |
 | `glob` | ^10.3.12 | ^14.0.6 | 1 | Fixes the `minimatch` advisory |
-| `qunit` | ^2.20.1 | ^3.0.0 | 1 | Major version. Check `karma-qunit` 4.2.3 compatibility. |
 | `karma`, `karma-electron`, `karma-qunit`, `qunit` | — | **remove** | 1 → 4 | Replaced by `node:test` and the multi-instance harness ([testing infrastructure](/design/testing-infrastructure.md)) |
+| `@noble/post-quantum` (dev) | — | ^0.7.1 | 3 | **Test oracle only, never shipped.** Cross-checks ML-KEM and ML-DSA. |
 | `hyperdht` (dev) | — | latest | 1 | `createTestnet` gives tests a local DHT bootstrap |
 | `copyright-header` | ^0.4.6 | keep | — | Dev-only and stale |
+
+No third-party crypto library is shipped at runtime. Every primitive comes from Electron's `crypto` and `safeStorage` ([capability probe](/assessment/electron-crypto-capabilities.md)).
 
 # Platform
 

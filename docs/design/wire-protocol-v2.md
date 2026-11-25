@@ -16,14 +16,18 @@ Hyperswarm streams carry a byte stream, not messages (T5). Both transports use `
 | Field | Type | Notes |
 |---|---|---|
 | `v` | u8 | Always `2`. Any other value is dropped. |
-| `kind` | u8 | `1 HELLO`, `2 BUNDLE`, `3 PREKEY_MSG`, `4 MSG`, `5 ACK` |
+| `kind` | u8 | `1 HS1`, `2 HS2`, `3 HS3` (the SIGMA-I handshake), `4 MSG`, `5 ACK` |
 | `from` | 32 B | Sender fingerprint |
 | `to` | 32 B | Recipient fingerprint |
-| `body` | bytes | Depends on `kind` (a libsignal ciphertext for `PREKEY_MSG` and `MSG`) |
+| `body` | bytes | Depends on `kind`: handshake messages per the [spec](/design/session-and-ratchet.md), or for `MSG` a ratchet header plus AES-256-GCM ciphertext |
+
+During the handshake, `from` and `to` are **topic hashes**, not fingerprints. That keeps SIGMA-I's identity protection.
+
+The `MSG` ratchet header is `dh` (32 B) ‖ `pn` (u32) ‖ `n` (u32), plus `kem_pub` (1568 B) and `kem_ct` (1568 B) on a turn's first message. The header is authenticated as AEAD associated data.
 
 The outer fields are parsed with strict length checks. Unknown `kind` values and oversized frames are dropped without a crash (T3).
 
-# Inner plaintext (inside libsignal encryption)
+# Inner plaintext (inside the ratchet's AES-256-GCM)
 
 ```json
 {

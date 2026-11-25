@@ -64,12 +64,14 @@ The hooks live in a single `modules/Main/testHooks.js` that is only `require`d w
 | Layer | Tool | Runs | What it covers |
 |---|---|---|---|
 | L1 Unit | `node --test` | Every push, all OS, seconds | Keyring with a fake `safeStorage`, identity derivation vectors, address and checksum, wire codec (fuzzed), ML-DSA bundle checks, record encryption |
-| L2 Core integration | `node --test`. Core is imported **without Electron** (dependency-injected `safeStorage`, paths, and transports). | Every push | 2–3 Cores in one process over in-memory or testnet transports: PQXDH, ratchet healing, simultaneous start, out-of-order delivery, restart and persistence, backup restore without ratchet state |
+| L2 Core integration | `node --test`. Core is imported **without Electron** (dependency-injected `safeStorage`, paths, and transports). | Every push | 2–3 Cores in one process over in-memory or testnet transports: the SIGMA-I handshake, ratchet healing, simultaneous start, out-of-order delivery, restart and persistence, backup restore without ratchet state |
 | L3 Multi-instance E2E | Orchestrator + N Electron apps (above) | Every push on Linux (xvfb), nightly on macOS and Windows | Real UI flows across peers |
 | L4 Adversarial peer | Headless `tests/peers/evilPeer.mjs` that speaks protocol v2 using Core with no UI | With L3 | Regression tests for findings S1–S3 and T2–T5: XSS display names, spoofed `UserInformation`, a tampered bundle or fingerprint mismatch, replay, oversized or malformed frames, an unknown `v` |
-| L5 Packaged smoke | L3 scenarios against `out/` builds (Konjugate: `runPackagedInteractionTests.mjs`) | On release tags | Native libsignal loads in the packaged app, fuses are set, and test hooks are inert |
+| L5 Packaged smoke | L3 scenarios against `out/` builds (Konjugate: `runPackagedInteractionTests.mjs`) | On release tags | The capability guard passes inside the packaged app, fuses are set, and test hooks are inert |
 
-L2 has one design constraint for the [roadmap's](/plan/roadmap.md) Phase 2: **Core must be importable from plain Node.** `@signalapp/libsignal-client` is a Node-API module, so the same binary should load in Node and in Electron. Confirm this in the Phase 2 spike.
+L1 also includes the **capability guard**: the [Electron crypto probe](/assessment/electron-crypto-capabilities.md) run with `ELECTRON_RUN_AS_NODE=1` against the bundled Electron, so an upgrade that drops ML-KEM or ML-DSA fails CI. Protocol tests cross-check ML-KEM and ML-DSA results against NIST ACVP vectors and `@noble/post-quantum`, which is a dev-only oracle that is never shipped.
+
+**Core must be importable from plain Node** (the [roadmap's](/plan/roadmap.md) Phase 2) so L2 can run without Electron. **Caveat:** stock Node 24 uses OpenSSL, while Electron uses BoringSSL, and their supported algorithms differ (Node has SHA-3 and Argon2, Electron does not). L1 and L2 must therefore run under Electron's Node (`ELECTRON_RUN_AS_NODE=1 electron --test …`) and not the system `node`. Otherwise a primitive that only works in OpenSSL could slip in.
 
 # First E2E scenarios
 

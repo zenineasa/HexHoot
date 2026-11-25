@@ -1,31 +1,37 @@
 ---
 type: Architecture Decision Record
 title: "ADR-003: Hybrid post-quantum algorithm choice"
-description: Why HexHoot 2.0 uses X25519 + ML-KEM-1024 (PQXDH), an SPQR ratchet, and ML-DSA-65 signatures instead of a single X25519MLKEM768 exchange.
+description: X25519 + ML-KEM-1024 for the handshake and every ratchet turn, and Ed25519 + ML-DSA-65 for identity, all from Electron's built-in crypto.
 tags: [adr, post-quantum, ml-kem, ml-dsa]
 status: draft
 decision_status: Proposed
-generated: { by: claude-code/claude-opus-5-5, at: 2026-11-25T12:00:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-11-25T13:00:00Z }
+sources:
+  - { id: probe, resource: /assessment/electron-crypto-capabilities.md, title: Electron 45 crypto capability probe }
 ---
 
 # Context
 
-The maintainer asked for "hybrid methods such as X25519MLKEM768 or something better" and for ratcheting.
+The maintainer asked for "hybrid methods such as X25519MLKEM768 or something better" and for ratcheting. [ADR-002](/decisions/adr-002-builtin-crypto-only.md) limits us to what Electron provides.
 
-X25519MLKEM768 is the **TLS 1.3 named group** (codepoint `0x11EC`). It is the right choice for TLS. For a messenger at the application layer, the equivalent building block is a hybrid KEM such as **X-Wing** (X25519 + ML-KEM-768 with a proper combiner). On its own, that still gives one static secret per conversation.
+X25519MLKEM768 is the TLS 1.3 named group. The application-layer equivalent is a hybrid KEM. On its own, though, that still gives one static secret per conversation.
 
 # Decision (proposed)
 
-| Concern | Choice | Why this is "better" than a single X25519MLKEM768 exchange |
+| Concern | Choice | Why this is better than a single X25519MLKEM768 exchange |
 |---|---|---|
-| Handshake KEM | X25519 + **ML-KEM-1024** (PQXDH) | NIST category 5 rather than 3, plus multiple DH legs for authentication and deniability |
-| Ongoing secrecy | **SPQR** post-quantum ratchet together with the X25519 Double Ratchet | Forward secrecy and healing against a quantum attacker, which no one-off KEM can give |
-| Authentication | Hybrid **XEdDSA + ML-DSA-65** on identity and prekeys | Post-quantum authentication of prekeys, which Signal does not have today |
-| Fallback KEM | X-Wing (`ml_kem768_x25519` in `@noble/post-quantum`) | Used only if libsignal is rejected ([ADR-002](/decisions/adr-002-libsignal-for-session-crypto.md)) |
+| Hybrid KEM | **X25519 + ML-KEM-1024**, combined with HKDF-SHA-256 over both shared secrets, both ciphertexts, and both public keys (a "KitchenSink"-style combiner) | NIST category 5 rather than 3. The combiner stays secure if either component holds. |
+| Ongoing secrecy | Double Ratchet with an **ML-KEM-1024 encapsulation in every ratchet turn** | Forward secrecy and post-compromise healing against a quantum attacker |
+| Authentication | **Ed25519 + ML-DSA-65**, and both must verify | Post-quantum authentication |
+| AEAD | AES-256-GCM | The only built-in AEAD |
+| KDF | HKDF-SHA-256, with HMAC-SHA-256 chains | |
+
+**Why not exact X-Wing:** X-Wing's combiner uses SHA3-256, which BoringSSL in Electron does not expose. The HKDF-SHA-256 combiner that hashes in the full transcript is the generic construction in `draft-irtf-cfrg-hybrid-kems`. It is also what Signal's PQXDH does: HKDF over the DH outputs together with the KEM secret.
+
+**Bandwidth:** an ML-KEM-1024 public key plus ciphertext adds about 3.1 KB per ratchet turn. A turn happens only when the direction of the conversation changes, which is acceptable for desktop P2P. See Q13 in [open questions](/plan/open-questions.md) if this becomes a problem.
 
 # Not chosen
 
-- **ML-KEM alone.** Not hybrid. It is only as safe as a scheme that is still young.
-- **SLH-DSA.** Signatures are 7–50 KB, too large to send at every reconnect. Reconsider it as a backup if ML-DSA weakens.
-- **Falcon / FN-DSA.** FIPS 206 is not final, and correct floating-point implementations are hard.
-- **Native Node `crypto` ML-KEM / ML-DSA.** Node 24 with OpenSSL 3.5 supports them, but Electron is built on BoringSSL, so support inside Electron is not guaranteed. Re-check this in the Phase 2 spike. It would allow dropping `@noble/post-quantum`.
+- **ML-KEM alone.** Not hybrid.
+- **SLH-DSA, Falcon, X448.** Not available in Electron, or too large.
+- **ML-KEM-768.** Available and smaller. It is kept as a fallback if bandwidth becomes an issue.

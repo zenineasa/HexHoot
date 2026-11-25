@@ -39,26 +39,28 @@ Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 
 - Turn on `contextIsolation: true` and `nodeIntegration: false`. Add `preload.js` with a narrow `contextBridge` API (`window.hexhoot.*`).
 - Move DBMessenger, the transports, and storage into a **Core** (the main process or an Electron `utilityProcess`). Core must be **importable from plain Node**, with `safeStorage`, paths, and transports injected, so L2 tests can run it without Electron. The renderer becomes UI only. Replace the `eval` template rendering with plain template functions.
-- **Spike:** load `@signalapp/libsignal-client` in Core on macOS arm64 and x64, Windows x64, and Linux x64. Run PQXDH + SPQR between two in-process stores. Confirm the ML-KEM parameter set. Check whether Electron's native `crypto` supports ML-DSA and ML-KEM.
+- Add the **capability guard test** (L1), which runs the [capability probe](/assessment/electron-crypto-capabilities.md) under the bundled Electron on all three OS. It has already passed on macOS arm64. Windows and Linux are still to be confirmed.
 
-**Exit:** the UI works unchanged on top of IPC, and the spike results are recorded in `log.md`. [ADR-002](/decisions/adr-002-libsignal-for-session-crypto.md) is moved to Accepted or Rejected.
+**Exit:** the UI works unchanged on top of IPC, and the capability guard is green on all OS.
 
 # Phase 3: Crypto core v2
 
 A new `modules/Crypto` (in Core), with unit tests in Node (`node:test`).
 
 1. **Keyring** ([design](/design/keyring.md)): the vault key, the safeStorage and passphrase unlockers, and the encrypted record store.
-2. **Identity** ([design](/design/identity-and-addresses.md)): the recovery phrase, deterministic `ik_c` and `ik_pq`, the bundle and its signatures, the `hh2:` address, and the safety number.
-3. **Signal stores:** the identity, prekey, signed-prekey, Kyber-prekey, and session stores on top of the encrypted store, plus prekey rotation.
-4. **SessionEngine** ([design](/design/session-and-ratchet.md)): a thin wrapper over libsignal with the extra ML-DSA check.
-5. **Encrypted backup** `.hexhoot2` with Argon2id + XChaCha20-Poly1305.
+2. **Identity** ([design](/design/identity-and-addresses.md)): the recovery phrase, deterministic `ik_ed` and `ik_pq`, the bundle and its signatures, the `hh2:` address, and the safety number.
+3. **Hybrid KEM** (`HK`) and the **SIGMA-I handshake** ([spec](/design/session-and-ratchet.md)).
+4. **Double Ratchet + ML-KEM** turns, skipped-key handling, and session persistence through the encrypted store.
+5. **Encrypted backup** `.hexhoot2` with scrypt + AES-256-GCM.
 
-**Exit:** test vectors and property tests pass, covering round trips, out-of-order delivery, simultaneous starts, healing after state compromise, a tampered bundle rejected, and backup restore without ratchet state.
+Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DSA results against `@noble/post-quantum` (dev-only) and the NIST ACVP vectors.
+
+**Exit:** test vectors and property tests pass, covering round trips, out-of-order delivery, simultaneous starts, healing after state compromise (classical *and* post-quantum), a tampered bundle or transcript rejected, replay rejected, and backup restore without ratchet state. The spec is frozen for external review.
 
 # Phase 4: Transport and protocol v2
 
 - [Wire protocol v2](/design/wire-protocol-v2.md): framing, envelopes, the inner schema, and padding.
-- Hyperswarm: one long-lived swarm, `topic = BLAKE2b("hexhoot/v2/topic" ‖ fp)`, and connection reuse keyed by fingerprint. Fix T5.
+- Hyperswarm: one long-lived swarm, `topic = SHA-256("hexhoot/v2/topic" ‖ fp)`, and connection reuse keyed by fingerprint. Fix T5.
 - LAN: carrier only, no channel disclosure. Fix T2–T4.
 - UI: the new Login (create / restore), Add friend by `hh2:` address or QR, pending requests, and safety-number verification.
 
@@ -71,4 +73,4 @@ A new `modules/Crypto` (in Core), with unit tests in Node (`node:test`).
 - Migration screen: export v1 chat history as plaintext JSON, then wipe the v1 data ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)).
 - Update the README (the account model and the reworded "zero-knowledge" claim) and add a `SECURITY.md`.
 - L5: run the packaged-build smoke tests on every OS.
-- Get an external review of the composition (keyring, ML-DSA layer, and wire protocol), even if libsignal itself is trusted.
+- **External cryptographic review** of the handshake, ratchet, keyring, and wire protocol, against the frozen spec. This is required: HexHoot owns its protocol ([ADR-002](/decisions/adr-002-builtin-crypto-only.md)), so a 2.0.0 release waits on the review.

@@ -16,7 +16,7 @@ v1 derives the identity from `SHA-256(username, password)` with a global salt. T
 
 | Option | Same identity on any device | Resistant to offline guessing | UX |
 |---|---|---|---|
-| A. Keep username and password, but use Argon2id (slow) | Yes | **No.** Slower, but still guessable per user, since the public key is still public. | Unchanged |
+| A. Keep username and password, but use a slow KDF (scrypt) | Yes | **No.** Slower, but still guessable per user, since the public key is still public. | Unchanged |
 | B. **Random 256-bit identity + 24-word recovery phrase** (recommended) | Yes, with the phrase | **Yes** (2²⁵⁶) | Users must save the phrase |
 | C. Random identity, encrypted backup file only | Only with the backup file | Yes | Users must keep the file |
 
