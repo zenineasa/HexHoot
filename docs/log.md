@@ -2,6 +2,7 @@
 
 ## 2026-11-26
 
+* **Creation**: Added the capability guard (`npm run test:capability`). [Q6](/plan/open-questions.md) is resolved as `node:sqlite`. scrypt at 2²⁰ took 59–153 s on an 8 GiB Mac under memory pressure ([probe](/assessment/electron-crypto-capabilities.md), [Q14](/plan/open-questions.md)).
 * **Update**: The maintainer confirmed that v1 has no users to protect, so no 1.0.6 patch release ships. The Phase 0 hardening and the Phase 1 toolchain upgrade are done on the same branch ([roadmap](/plan/roadmap.md), [Q3](/plan/open-questions.md)).
 * **Finding**: With no committed lockfile, a fresh install resolves `hyperdht` 6.37.0, which calls `.unref()` on a browser timer and crashes the receiving renderer on every incoming Hyperswarm connection. Running Hyperswarm in the renderer is unsupported, and the real fix is the Core split ([roadmap](/plan/roadmap.md) Phase 2). Recorded as T7 in [findings](/assessment/crypto-findings.md).
 

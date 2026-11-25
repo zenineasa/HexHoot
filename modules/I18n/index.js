@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
 const readText = require('./../ReadText');
 const dbMessenger = require('./../DBMessenger')();

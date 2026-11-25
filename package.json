@@ -10,8 +10,9 @@
     "main": "modules/Main/index.js",
     "scripts": {
         "start": "electron-forge start",
-        "test": "npm run test:unit && npm run test:ui",
+        "test": "npm run test:unit && npm run test:capability && npm run test:ui",
         "test:unit": "node --test \"test/unit/**/*.test.js\"",
+        "test:capability": "node scripts/electron-node.js --test \"test/capability/**/*.test.js\"",
         "test:ui": "karma start ./test/karma.conf.js",
         "lint": "eslint . && copyright-header --copyrightHolder \"Zenin Easa Panthakkalakath\"",
         "package": "electron-forge package",

@@ -42,7 +42,7 @@ Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 - Turn on `contextIsolation: true` and `nodeIntegration: false`. Add `preload.js` with a narrow `contextBridge` API (`window.hexhoot.*`).
 - Move DBMessenger, the transports, and storage into a **Core** (the main process or an Electron `utilityProcess`). Core must be **importable from plain Node**, with `safeStorage`, paths, and transports injected, so L2 tests can run it without Electron. The renderer becomes UI only. Replace the `eval` template rendering with plain template functions.
 - **Multi-instance harness** (moved from Phase 1): the orchestrator, `testHooks.js` with `--use-mock-keychain`, per-peer `userData`, the hyperdht testnet, artifacts, and retry-once. The first L3 scenario: alice and bob exchange a friend request and chat.
-- Add the **capability guard test** (L1), which runs the [capability probe](/assessment/electron-crypto-capabilities.md) under the bundled Electron on all three OS. It has already passed on macOS arm64. Windows and Linux are still to be confirmed.
+- **Capability guard test** (L1), done 2026-11-26: `test/capability/capability.test.js`, run with `npm run test:capability` through `scripts/electron-node.js` so it runs on Electron's BoringSSL. It checks ML-KEM-1024, ML-DSA-87, P-521 (including invalid-point rejection), AES-256-GCM, SHA-512, HMAC and HKDF against published vectors, scrypt (N=2²⁰ in CI or with `HEXHOOT_SLOW_TESTS=1`), and `node:sqlite`. It passes on macOS arm64. CI covers Linux and Windows.
 
 **Exit:** the UI works unchanged on top of IPC, two instances chat over the DHT testnet in the L3 harness (closing T7), and the capability guard is green on all OS.
 

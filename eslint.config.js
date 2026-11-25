@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
 // The google style config used to be registered here as a plugin, which did
 // not enable any of its rules; these are the rules that were in effect.

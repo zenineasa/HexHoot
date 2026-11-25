@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Zenin Easa Panthakkalakath
+# Copyright (c) 2022-2026 Zenin Easa Panthakkalakath
 
 name: CI
 
@@ -39,6 +39,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:unit
+      - run: npm run test:capability
       - name: UI tests (Electron)
         shell: bash
         run: |

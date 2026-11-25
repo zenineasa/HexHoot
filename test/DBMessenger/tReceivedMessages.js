@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
 // Regression tests for findings S1-S3 (docs/assessment/crypto-findings.md):
 // peer-controlled profile data must never be rendered as HTML, profiles may

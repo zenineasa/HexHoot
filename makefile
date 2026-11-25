@@ -20,7 +20,7 @@ lint:
 
 lintfix:
 	npx eslint --config eslint.config.js --fix
-	npx copyright-header --fix --copyrightHolder "Zenin Easa Panthakkalakath" --forceModificationYear 2024
+	npx copyright-header --fix --copyrightHolder "Zenin Easa Panthakkalakath"
 
 build-mac-intel:
 	npx electron-forge make --platform=darwin --arch=x64

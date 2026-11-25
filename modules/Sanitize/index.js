@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
 /**
  * Helpers for handling data that comes from peers (or from an imported

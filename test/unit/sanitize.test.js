@@ -1,4 +1,4 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
 // Plain Node unit tests (node --test). Run with: npm run test:unit
 

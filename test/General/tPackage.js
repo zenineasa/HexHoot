@@ -1,4 +1,4 @@
-/* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2023-2026 Zenin Easa Panthakkalakath */
 
 const fs = require('fs');
 const path = require('path');

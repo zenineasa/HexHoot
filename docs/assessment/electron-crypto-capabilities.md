@@ -25,7 +25,7 @@ Electron builds Node's `crypto` on **BoringSSL**, not OpenSSL (`process.versions
 | **AES-256-GCM** | `createCipheriv` | AES-CBC and AES-CTR are also present |
 | **HKDF** | `hkdfSync('sha256' \| 'sha512', …)` | |
 | **HMAC / SHA-256 / SHA-384 / SHA-512 / SHA-512-256** | `createHmac`, `createHash` | |
-| **scrypt** | `scryptSync` / `scrypt` | r=8, p=1 on Apple Silicon: N=2¹⁷ 0.6 s · 2¹⁸ 1.2 s · 2¹⁹ 2.9 s · **2²⁰ 7–8 s (1 GiB, the ceiling)**. **N=2²¹ crashes Electron with SIGTRAP**, not a catchable error, so the code must hard-cap N at 2²⁰. Electron's scrypt is about 2.5× slower than stock Node 24's (3.1 s at 2²⁰). |
+| **scrypt** | `scryptSync` / `scrypt` | r=8, p=1 on Apple Silicon: N=2¹⁷ 0.6 s · 2¹⁸ 1.2 s · 2¹⁹ 2.9 s · **2²⁰ 7–8 s (1 GiB, the ceiling)**. **N=2²¹ crashes Electron with SIGTRAP**, not a catchable error, so the code must hard-cap N at 2²⁰. Electron's scrypt is about 2.5× slower than stock Node 24's (3.1 s at 2²⁰). **Under memory pressure it is far slower:** on an 8 GiB Mac with 7.6 GiB of swap in use, 2²⁰ took 59 s async and 153 s sync (2026-11-26), because the 1 GiB buffer pages to swap. |
 | CSPRNG | `randomBytes` | |
 | OS keyring | `safeStorage` | Main process only. Round trip confirmed with `--use-mock-keychain`. |
 

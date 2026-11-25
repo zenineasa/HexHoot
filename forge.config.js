@@ -1,4 +1,4 @@
-/* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2023-2026 Zenin Easa Panthakkalakath */
 
 const {FusesPlugin} = require('@electron-forge/plugin-fuses');
 const {FuseV1Options, FuseVersion} = require('@electron/fuses');
