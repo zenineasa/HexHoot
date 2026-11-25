@@ -15,7 +15,7 @@ sources:
 
 The first draft proposed `@signalapp/libsignal-client`. On 2026-11-25 the maintainer said: *"I don't want to be dependent on signalapp. Can we use whatever electron/chrome already provides (crypto library) and perhaps a few other things?"*
 
-The [capability probe](/assessment/electron-crypto-capabilities.md) shows that Electron 45 already has every primitive a hybrid post-quantum messenger needs: ML-KEM-1024, ML-DSA-65, X25519, Ed25519, AES-256-GCM, HKDF, and scrypt.
+The [capability probe](/assessment/electron-crypto-capabilities.md) shows that Electron 45 already has every primitive a hybrid post-quantum messenger needs: ML-KEM-1024, ML-DSA-87, ECDH and ECDSA on P-521, AES-256-GCM, SHA-512, HKDF, and scrypt.
 
 # Decision
 

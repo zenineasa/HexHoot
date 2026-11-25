@@ -23,7 +23,7 @@ Hyperswarm streams carry a byte stream, not messages (T5). Both transports use `
 
 During the handshake, `from` and `to` are **topic hashes**, not fingerprints. That keeps SIGMA-I's identity protection.
 
-The `MSG` ratchet header is `dh` (32 B) ‖ `pn` (u32) ‖ `n` (u32), plus `kem_pub` (1568 B) and `kem_ct` (1568 B) on a turn's first message. The header is authenticated as AEAD associated data.
+The `MSG` ratchet header is `dh` (P-521, 133 B) ‖ `pn` (u32) ‖ `n` (u32), plus `kem_pub` (1568 B) and `kem_ct` (1568 B) on a turn's first message. The header is authenticated as AEAD associated data.
 
 The outer fields are parsed with strict length checks. Unknown `kind` values and oversized frames are dropped without a crash (T3).
 
@@ -35,13 +35,13 @@ The outer fields are parsed with strict length checks. Unknown `kind` values and
   "ts": 1764072000000,
   "type": "chat | friend_request | friend_accept | profile | receipt",
   "body": { },
-  "pad": "<random bytes to the next 256-byte bucket>"
+  "pad": "<random bytes up to the Padmé bucket size, minimum 1 KiB>"
 }
 ```
 
 - The chat DB key becomes `[contactFp, id]`, **not** the timestamp (F6). `ts` is display-only.
 - The sender identity is taken from the *session* the message decrypted under, never from the body (S2).
-- Padding to 256-byte buckets hides exact message length.
+- Padding uses **Padmé** (the PURBs paper) with a 1 KiB minimum. Lengths leak at most O(log log n) bits, at most 12% overhead, and every short message looks the same.
 - Profile photos larger than about 256 KiB are sent in chunks.
 
 # LAN transport changes

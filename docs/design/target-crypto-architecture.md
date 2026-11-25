@@ -21,18 +21,23 @@ Every row below is `require('crypto')` or `safeStorage` in Electron 45, as verif
 
 | Purpose | Algorithm |
 |---|---|
-| Identity signatures | **Ed25519 + ML-DSA-65** (FIPS 204), and both must verify |
-| Hybrid KEM | **X25519 + ML-KEM-1024** (FIPS 203), combined with HKDF-SHA-256 over secrets, ciphertexts, and public keys |
-| Handshake | SIGMA-I over the hybrid KEM, with encrypted identities |
-| Ongoing ratchet | Double Ratchet (X25519) **with an ML-KEM-1024 encapsulation in every turn** |
-| Message AEAD | AES-256-GCM, with the header and handshake hash as associated data |
-| Local record encryption | AES-256-GCM under per-record HKDF-derived keys |
-| Key derivation | HKDF-SHA-256 and HMAC-SHA-256, with `hexhoot/v2/…` labels |
-| Passphrase KDF | scrypt (N=2¹⁷, r=8, p=1). Argon2id is not available in BoringSSL. |
-| Root secret at rest | OS keyring through `safeStorage` (Keychain, DPAPI, libsecret or kwallet) |
-| Address, fingerprint, topic | SHA-256 with labels |
+Each choice is the **strongest option Electron offers** ([ADR-003](/decisions/adr-003-hybrid-pq-algorithm-choice.md)).
 
-The user asked for X25519MLKEM768 "or something better". This suite uses ML-KEM-1024 rather than 768 and adds a post-quantum *ratchet*, which a one-off hybrid KEM cannot provide. The reasoning is in [ADR-003](/decisions/adr-003-hybrid-pq-algorithm-choice.md).
+| Purpose | Algorithm |
+|---|---|
+| Identity signatures | **ECDSA P-521/SHA-512 + ML-DSA-87** (FIPS 204, category 5), and both must verify |
+| Hybrid KEM | **ECDH P-521 + ML-KEM-1024** (FIPS 203, category 5), combined with HKDF-SHA-512 over secrets, ciphertexts, and public keys |
+| Handshake | SIGMA-I over the hybrid KEM, with encrypted identities and a separate key per direction |
+| Ongoing ratchet | Double Ratchet (P-521) **with an ML-KEM-1024 encapsulation in every turn** |
+| Message AEAD | AES-256-GCM with a fresh key per message, and the header and handshake hash as associated data |
+| Local record encryption | AES-256-GCM under per-record HKDF-SHA-512-derived keys |
+| Hash, KDF, MAC | SHA-512, HKDF-SHA-512, and HMAC-SHA-512, with `hexhoot/v2/…` labels |
+| Passphrase KDF | scrypt N=2²⁰, r=8, p=1 (1 GiB). This is Electron's ceiling, since 2²¹ crashes. Argon2id is not available. |
+| Recovery entropy | 256 bits (24 words) |
+| Root secret at rest | OS keyring through `safeStorage` (Keychain, DPAPI, libsecret or kwallet) |
+| Address, fingerprint, topic | SHA-512 with labels, truncated to 256 bits |
+
+This meets or exceeds NSA CNSA 2.0. The user asked for X25519MLKEM768 "or something better". This suite has a stronger KEM, a stronger classical half, post-quantum signatures, and a post-quantum *ratchet*.
 
 # Layers
 
@@ -42,8 +47,8 @@ The user asked for X25519MLKEM768 "or something better". This suite uses ML-KEM-
 └───────────────────────────────────────────────┬──────────────────────────────────────────────┘
                                                 │ IPC (plaintext UI data only, no keys)
 ┌──────────────────────── Main or utilityProcess: "Core" ───────────────────────────────────────┐
-│ Keyring (safeStorage → vault key) ── Identity (Ed25519 + ML-DSA-65) ── Encrypted store       │
-│ Session engine (SIGMA-I + hybrid KEM, Double Ratchet + ML-KEM) ── Contact/trust manager     │
+│ Keyring (safeStorage → vault key) ── Identity (P-521 + ML-DSA-87) ── Encrypted store         │
+│ Session engine (SIGMA-I + hybrid KEM, Double Ratchet + ML-KEM-1024) ── Contact/trust manager│
 │ Transports: Hyperswarm (internet) + LAN  ── Wire protocol v2 framing                         │
 │ Encrypted store (IndexedDB is replaced by a file/SQLite store in Core; see open questions)    │
 └───────────────────────────────────────────────────────────────────────────────────────────────┘
