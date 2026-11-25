@@ -10,41 +10,50 @@
     "main": "modules/Main/index.js",
     "scripts": {
         "start": "electron-forge start",
-        "test": "karma start ./test/karma.conf.js",
+        "test": "npm run test:unit && npm run test:ui",
+        "test:unit": "node --test \"test/unit/**/*.test.js\"",
+        "test:ui": "karma start ./test/karma.conf.js",
+        "lint": "eslint . && copyright-header --copyrightHolder \"Zenin Easa Panthakkalakath\"",
         "package": "electron-forge package",
         "make": "electron-forge make"
     },
     "author": "Zenin Easa Panthakkalakath (@zenineasa)",
     "license": "AGPLV3",
     "devDependencies": {
-        "@electron-forge/cli": "^7.4.0",
-        "@electron-forge/maker-deb": "^7.4.0",
-        "@electron-forge/maker-dmg": "^7.4.0",
-        "@electron-forge/maker-rpm": "^7.4.0",
-        "@electron-forge/maker-squirrel": "^7.4.0",
-        "@electron-forge/maker-zip": "^7.4.0",
+        "@electron-forge/cli": "^8.0.1",
+        "@electron-forge/maker-deb": "^8.0.1",
+        "@electron-forge/maker-dmg": "^8.0.1",
+        "@electron-forge/maker-rpm": "^8.0.1",
+        "@electron-forge/maker-squirrel": "^8.0.1",
+        "@electron-forge/maker-zip": "^8.0.1",
+        "@electron-forge/plugin-fuses": "^8.0.1",
+        "@electron/fuses": "^2.1.3",
         "copyright-header": "^0.4.6",
-        "electron": "^30.0.1",
-        "eslint": "^9.1.1",
-        "eslint-config-google": "^0.14.0",
-        "glob": "^10.3.12",
+        "copyright-regex": "^1.1.6",
+        "electron": "^45.5.0",
+        "eslint": "^10.15.0",
+        "glob": "^14.0.6",
+        "karma": "^6.4.4",
         "karma-electron": "^7.3.0",
         "karma-qunit": "^4.2.0",
         "qunit": "^2.20.1"
     },
     "dependencies": {
         "arptable-js": "^0.0.2",
-        "copyright-regex": "^1.1.6",
         "ecdh": "^0.2.0",
-        "electron-squirrel-startup": "^1.0.0",
-        "hyperswarm": "^4.7.14",
-        "indexeddb-export-import": "^2.1.5",
-        "ip": "^2.0.1",
+        "electron-squirrel-startup": "^1.0.1",
+        "hyperswarm": "^4.17.2",
+        "indexeddb-export-import": "^2.2.0",
         "ipv4-range": "^0.0.0",
-        "ping": "^0.4.4",
-        "require-text": "^0.0.1"
+        "ping": "^1.0.0"
     },
-    "optionalDependencies": {
-        "appdmg": "^0.6.6"
+    "engines": {
+        "node": ">=22.13.0"
+    },
+    "allowScripts": {
+        "electron-winstaller@5.4.4": true,
+        "fs-xattr@0.3.1": true,
+        "macos-alias@0.2.12": true,
+        "fsevents": false
     }
 }

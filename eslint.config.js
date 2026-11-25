@@ -1,26 +1,28 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const google = require('eslint-config-google');
-
-module.exports = [{
-    'files': ['**/*.js'],
-    'plugins': {
-        'google': google
+// The google style config used to be registered here as a plugin, which did
+// not enable any of its rules; these are the rules that were in effect.
+module.exports = [
+    {
+        'ignores': ['out/**', 'node_modules/**'],
     },
-    'languageOptions': {
-        'ecmaVersion': 2022,
-        'sourceType': 'module',
+    {
+        'files': ['**/*.js'],
+        'languageOptions': {
+            'ecmaVersion': 2022,
+            'sourceType': 'module',
+        },
+        'rules': {
+            'max-len': ['error', {'code': 80}],
+            'indent': ['error', 4],
+            'linebreak-style': 0,
+            'no-unused-vars': [
+                'error',
+                {
+                    'args': 'none',
+                    'caughtErrors': 'none',
+                },
+            ],
+        },
     },
-    'rules': {
-        'max-len': ["error", { "code": 80 }],
-        'indent': ['error', 4],
-        'linebreak-style': 0,
-        'no-unused-vars': [
-            "error",
-            {
-                'args': 'none',
-                'caughtErrors': 'none'
-            }
-        ]
-    }
-}];
+];

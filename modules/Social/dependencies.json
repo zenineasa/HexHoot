@@ -1,9 +1,8 @@
 {
     "coprightMessage": "Copyright © 2022-2023 Zenin Easa Panthakkalakath",
     "internal": [
-        "ImagePack"
+        "ImagePack",
+        "ReadText"
     ],
-    "external": [
-        "require-text"
-    ]
+    "external": []
 }

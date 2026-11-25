@@ -1,8 +1,10 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 const Layout = require('./../Layout');
 const imagePack = require('../ImagePack');
+// eslint-disable-next-line no-unused-vars
+const {escapeHTML, safePhoto} = require('./../Sanitize'); // used in template
 // eslint-disable-next-line no-unused-vars
 const i18n = require('./../I18n')(); // used in template
 
@@ -40,13 +42,13 @@ class ViewProfile {
             // Sidebar related
             const sidebarDOMNode = document.getElementById('sidebar');
             sidebarDOMNode.innerHTML += eval('`' +
-                requireText('./template_sidebar.html', require) + '`');
+                readText(__dirname, './template_sidebar.html') + '`');
             document.getElementById('backButton').onclick = backCallback;
 
             // Main content related
             const mainContentDOMNode = document.getElementById('mainContent');
             mainContentDOMNode.innerHTML += eval('`' +
-                requireText('./template_mainContent.html', require) + '`');
+                readText(__dirname, './template_mainContent.html') + '`');
         });
     }
 
@@ -57,7 +59,7 @@ class ViewProfile {
      * @return {string} an image that can be used as CSS background URL
      */
     getProfilePic(photo) {
-        if (photo) {
+        if (safePhoto(photo)) {
             return photo;
         } else {
             return imagePack.getPath('interface.defaultProfilePic');

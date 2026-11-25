@@ -12,9 +12,9 @@ imagePack = {
         'favicon': 'favicon.png',
     },
     'desktop': {
-        'windows': 'DesktopIcons/icon_windows.ico',
-        'mac': 'DesktopIcons/icon_mac.icns',
-        'linux': 'DesktopIcons/icon_linux.png',
+        'windows': 'DesktopIcons/icon.ico',
+        'mac': 'DesktopIcons/icon.icns',
+        'linux': 'DesktopIcons/icon.png',
     },
     'interface': {
         'sendButton': 'send.svg',

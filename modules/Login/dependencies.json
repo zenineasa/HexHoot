@@ -3,9 +3,8 @@
     "internal": [
         "Logo",
         "DBMessenger",
-        "I18n"
+        "I18n",
+        "ReadText"
     ],
-    "external": [
-        "require-text"
-    ]
+    "external": []
 }

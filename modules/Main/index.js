@@ -19,8 +19,20 @@ function createWindow() {
             contextIsolation: false,
         },
     });
+    // The app is a single page; never navigate away from it or open new
+    // windows. External links go through shell.openExternal instead.
+    win.webContents.setWindowOpenHandler(function() {
+        return {action: 'deny'};
+    });
+    win.webContents.on('will-navigate', function(event) {
+        event.preventDefault();
+    });
+    win.webContents.on('will-attach-webview', function(event) {
+        event.preventDefault();
+    });
+
     win.maximize();
-    win.loadFile('Modules/Main/index.html');
+    win.loadFile(path.join(__dirname, 'index.html'));
 }
 
 app.whenReady().then(() => {

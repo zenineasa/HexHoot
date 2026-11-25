@@ -1,5 +1,10 @@
 # Log
 
+## 2026-11-26
+
+* **Update**: The maintainer confirmed that v1 has no users to protect, so no 1.0.6 patch release ships. The Phase 0 hardening and the Phase 1 toolchain upgrade are done on the same branch ([roadmap](/plan/roadmap.md), [Q3](/plan/open-questions.md)).
+* **Finding**: With no committed lockfile, a fresh install resolves `hyperdht` 6.37.0, which calls `.unref()` on a browser timer and crashes the receiving renderer on every incoming Hyperswarm connection. Running Hyperswarm in the renderer is unsupported, and the real fix is the Core split ([roadmap](/plan/roadmap.md) Phase 2). Recorded as T7 in [findings](/assessment/crypto-findings.md).
+
 ## 2026-11-25
 
 * **Update**: The maintainer asked for the strongest option for every method. [ADR-003](/decisions/adr-003-hybrid-pq-algorithm-choice.md) is now the maximum-strength suite (ML-KEM-1024 + ECDH P-521, ML-DSA-87 + ECDSA P-521, AES-256-GCM, SHA-512 / HKDF-SHA-512 / HMAC-SHA-512, scrypt N=2²⁰, Padmé padding), and it is accepted. The probe found that scrypt N=2²¹ crashes Electron, so 2²⁰ is the hard cap ([probe](/assessment/electron-crypto-capabilities.md)).

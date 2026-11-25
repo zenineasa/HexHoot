@@ -1,6 +1,6 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 
 /**
  * This class adds copyright message to the UI. This is one of the simplest
@@ -21,7 +21,7 @@ class Copyright {
         // Ensure that the CSS is loaded before the HTML is
         link.addEventListener('load', function() {
             const elem = document.createElement('div');
-            elem.innerHTML = requireText('./template.html', require);
+            elem.innerHTML = readText(__dirname, './template.html');
             document.body.appendChild(elem);
         });
     }

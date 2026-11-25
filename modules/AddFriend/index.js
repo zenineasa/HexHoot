@@ -1,11 +1,11 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 const Layout = require('./../Layout');
 const dbMessenger = require('./../DBMessenger')();
+const sanitize = require('./../Sanitize');
 
-// eslint-disable-next-line no-unused-vars
-const i18n = require('./../I18n')(); // used in template
+const i18n = require('./../I18n')();
 
 /**
  * This class implements the functionality for adding a friend
@@ -57,13 +57,13 @@ class AddFriend {
             // Sidebar related
             const sidebarDOMNode = document.getElementById('sidebar');
             sidebarDOMNode.innerHTML += eval('`' +
-                requireText('./template_sidebar.html', require) + '`');
+                readText(__dirname, './template_sidebar.html') + '`');
             document.getElementById('backButton').onclick = backCallback;
 
             // Main content related
             const mainContentDOMNode = document.getElementById('mainContent');
             mainContentDOMNode.innerHTML += eval('`' +
-                requireText('./template_mainContent.html', require) + '`');
+                readText(__dirname, './template_mainContent.html') + '`');
 
             const tabDOMNodes = document.getElementById('mainContent')
                 .getElementsByClassName('tab');
@@ -87,14 +87,28 @@ class AddFriend {
                 function() {
                     navigator.clipboard.writeText(publicKey);
                 };
-            document.getElementById('addFriendButton').onclick = function() {
-                const key = document.getElementById('theirPublicKey').value;
-                const otherUserInfo = {key: key};
-                dbMessenger.sendRequestOrResponse(
-                    otherUserInfo, dbMessenger.messageType.friendRequest);
-                dbMessenger.updateFriendInformation(otherUserInfo);
-                backCallback();
-            };
+            document.getElementById('addFriendButton').onclick =
+                async function() {
+                    const key = document.getElementById('theirPublicKey')
+                        .value.trim();
+                    if (!sanitize.isValidKey(key) || key === publicKey) {
+                        alert(i18n.getText('AddFriend.invalidKey'));
+                        return;
+                    }
+                    const otherUserInfo = {key: key};
+                    const pending =
+                        await dbMessenger.getPendingFriendRequests();
+                    if (pending[key]) {
+                        // They had already sent us a request; accept it
+                        await dbMessenger.acceptFriendRequest(key);
+                    } else {
+                        await dbMessenger.updateFriendInformation(
+                            otherUserInfo);
+                    }
+                    dbMessenger.sendRequestOrResponse(
+                        otherUserInfo, dbMessenger.messageType.friendRequest);
+                    backCallback();
+                };
         }.bind(this);
         link.addEventListener('load', linkOnLoadCallback);
     }

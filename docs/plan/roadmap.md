@@ -9,9 +9,9 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-11-25T12:00:00Z }
 
 Each phase is a separate PR, or a short series of PRs, and keeps `main` buildable. The phases are ordered so that the most urgent risk is fixed first and the crypto work lands on a current toolchain.
 
-# Phase 0: Emergency hardening (ship as 1.0.6)
+# Phase 0: Emergency hardening
 
-The current users are exposed to S1–S3 (see [findings](/assessment/crypto-findings.md)), so this phase is patched into v1 before the rewrite.
+**Status: done (2026-11-26), not released.** v1 has no users to protect ([Q3](/plan/open-questions.md)), so there is no 1.0.6 release. The fixes stay in the codebase and carry into 2.0. They close S1–S3 (see [findings](/assessment/crypto-findings.md)).
 
 - Render all peer-controlled text with `textContent` or an `escapeHTML()` helper, including names, about text, and photo URLs (allow only `data:image/(png|jpeg|webp);base64`).
 - In `messageReceivedCallback`, require `senderInfo.key === messageObj.senderPublicKey` before `updateFriendInformation`. Ignore `UserInformation` from unknown contacts.
@@ -19,9 +19,11 @@ The current users are exposed to S1–S3 (see [findings](/assessment/crypto-find
 - Wrap all `JSON.parse` calls in the network path with `try`/`catch`.
 - Add a strict Content-Security-Policy `<meta>` to `modules/Main/index.html`.
 
-**Exit:** a crafted `displayName` payload renders as text, a spoofed `UserInformation` is ignored, and the existing tests pass.
+**Exit (met):** a crafted `displayName` payload renders as text, a spoofed `UserInformation` is ignored, and the existing tests pass. Regression tests are in `test/DBMessenger/tReceivedMessages.js` and `test/unit/sanitize.test.js`.
 
 # Phase 1: Toolchain and dependencies
+
+**Status: done (2026-11-26) except the multi-instance harness, which moved to Phase 2.** Electron 45.5, Forge 8.0.1 with fuses, ESLint 10, Node ≥ 22.13, the lockfile committed, `ip`/`require-text`/`appdmg`/`eslint-config-google` removed, and one CI workflow on all three OS. `npm audit --omit=dev` reports 0 vulnerabilities. The dev tree still has one high advisory with no fix (`image-size` ICNS parsing, through `maker-dmg`). Karma passes on Electron 45, and the packaged macOS app runs with fuses on.
 
 Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 
@@ -31,7 +33,7 @@ Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 - Add `@electron-forge/plugin-fuses`: enable ASAR integrity and `OnlyLoadAppFromAsar`, and disable `RunAsNode` and `EnableNodeCliInspectArguments`.
 - **Commit `package-lock.json`** (remove it from `.gitignore`) and add `npm audit --omit=dev --audit-level=high` to CI.
 - ESLint 10. Replace `eslint-config-google` if it is incompatible, keeping the same rule values.
-- **Testing skeleton** ([testing infrastructure](/design/testing-infrastructure.md)): `node --test` for L1, the orchestrator plus `testHooks.js` with `--use-mock-keychain`, per-peer `userData`, artifacts, and retry-once. The first L3 scenario runs two v1 peers chatting over the LAN carrier, as a baseline before the rewrite.
+- **Testing skeleton** ([testing infrastructure](/design/testing-infrastructure.md)): `node --test` for L1 (done). The orchestrator, `testHooks.js`, and the first L3 scenario **moved to Phase 2**. Two v1 peers cannot run on one machine today: the DHT crashes the receiving renderer (T7), and the LAN carrier keys peers by IP.
 
 **Exit:** `npm audit --omit=dev` reports zero high or critical vulnerabilities, the app runs and packages on all three operating systems, and CI is green.
 
@@ -39,9 +41,10 @@ Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 
 - Turn on `contextIsolation: true` and `nodeIntegration: false`. Add `preload.js` with a narrow `contextBridge` API (`window.hexhoot.*`).
 - Move DBMessenger, the transports, and storage into a **Core** (the main process or an Electron `utilityProcess`). Core must be **importable from plain Node**, with `safeStorage`, paths, and transports injected, so L2 tests can run it without Electron. The renderer becomes UI only. Replace the `eval` template rendering with plain template functions.
+- **Multi-instance harness** (moved from Phase 1): the orchestrator, `testHooks.js` with `--use-mock-keychain`, per-peer `userData`, the hyperdht testnet, artifacts, and retry-once. The first L3 scenario: alice and bob exchange a friend request and chat.
 - Add the **capability guard test** (L1), which runs the [capability probe](/assessment/electron-crypto-capabilities.md) under the bundled Electron on all three OS. It has already passed on macOS arm64. Windows and Linux are still to be confirmed.
 
-**Exit:** the UI works unchanged on top of IPC, and the capability guard is green on all OS.
+**Exit:** the UI works unchanged on top of IPC, two instances chat over the DHT testnet in the L3 harness (closing T7), and the capability guard is green on all OS.
 
 # Phase 3: Crypto core v2
 

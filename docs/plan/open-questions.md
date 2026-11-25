@@ -11,7 +11,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-11-25T12:00:00Z }
 |---|---|---|
 | Q1 | Replace username and password login with a random identity plus a recovery phrase? ([ADR-004](/decisions/adr-004-account-model.md)) | **Yes.** The current model cannot resist offline guessing, whatever the KDF. |
 | Q2 | ~~Use libsignal or build our own?~~ | **Resolved 2026-11-25:** built-in Electron crypto only ([ADR-002](/decisions/adr-002-builtin-crypto-only.md)) |
-| Q3 | Ship Phase 0 as a 1.0.6 patch to current users before the 2.0 work? | **Yes.** S1 is remote code execution from any peer. |
+| Q3 | ~~Ship Phase 0 as a 1.0.6 patch to current users before the 2.0 work?~~ | **Resolved 2026-11-26:** no. v1 has no users to protect. The fixes carry into 2.0. |
 | Q4 | Core in the main process or in an Electron `utilityProcess`? | `utilityProcess`. It isolates crashes and keeps the main process small. `safeStorage` calls stay in main and pass the vault key once at unlock. |
 | Q5 | Replace Karma (deprecated) now or later? | During 2.0. New tests go in `node:test`, and UI checks move to the multi-instance harness ([testing infrastructure](/design/testing-infrastructure.md)). Remove Karma once nothing depends on it. |
 | Q11 | Run L3 multi-instance E2E on every push for all OS, or Linux per push and macOS/Windows nightly? | Linux per push, macOS and Windows nightly and on release tags, to keep CI minutes down |

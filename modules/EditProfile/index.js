@@ -1,10 +1,12 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 const Layout = require('./../Layout');
 const dbMessenger = require('./../DBMessenger')();
 // eslint-disable-next-line no-unused-vars
 const imagePack = require('../ImagePack'); // used in template
+// eslint-disable-next-line no-unused-vars
+const {escapeHTML, safePhoto} = require('./../Sanitize'); // used in template
 const i18n = require('./../I18n')();
 
 /**
@@ -43,13 +45,13 @@ class EditProfile {
             // Sidebar related
             const sidebarDOMNode = document.getElementById('sidebar');
             sidebarDOMNode.innerHTML += eval('`' +
-                requireText('./template_sidebar.html', require) + '`');
+                readText(__dirname, './template_sidebar.html') + '`');
             document.getElementById('backButton').onclick = backCallback;
 
             // Main content related
             const mainContentDOMNode = document.getElementById('mainContent');
             mainContentDOMNode.innerHTML += eval('`' +
-                requireText('./template_mainContent.html', require) + '`');
+                readText(__dirname, './template_mainContent.html') + '`');
 
             // Button callbacks
             document.getElementById('editButton').onclick = async function() {
@@ -117,7 +119,7 @@ class EditProfile {
 
         const holderDOM = document.createElement('div');
         holderDOM.innerHTML = eval('`' +
-            requireText('./template_iconbar.html', require) + '`');
+            readText(__dirname, './template_iconbar.html') + '`');
 
         const iconDOMNode = holderDOM.querySelector('#ownProfilePic');
         iconDOMNode.onclick = function() {

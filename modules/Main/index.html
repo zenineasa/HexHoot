@@ -1,6 +1,12 @@
 <!-- Copyright (c) 2022-2024 Zenin Easa Panthakkalakath -->
 <html>
     <head>
+        <!--
+            'unsafe-eval' is needed until the eval()-based templates are
+            replaced (roadmap Phase 2). Inline style attributes are used by
+            the templates, hence 'unsafe-inline' for styles only.
+        -->
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file: 'unsafe-eval'; style-src 'self' file: 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' file: data:; media-src 'self' file: data:; connect-src 'self' file:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
         <title>HexHoot</title>
         <link rel="icon" type="image/png" href="../ImagePack/images/favicon.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">

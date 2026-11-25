@@ -1,6 +1,6 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 const dbMessenger = require('./../DBMessenger')();
 
 /**
@@ -20,7 +20,7 @@ class I18n {
      * Initialize I18n
      */
     initialize() {
-        this.texts = JSON.parse(requireText('./lang.json', require));
+        this.texts = JSON.parse(readText(__dirname, './lang.json'));
 
         this.selectedLang = 'en'; // default language
         this.selectLanguageFromPreferences();
@@ -53,7 +53,7 @@ class I18n {
         link.addEventListener('load', function() {
             const elem = document.createElement('div');
             elem.innerHTML =
-                eval('`' + requireText('./template.html', require) + '`');
+                eval('`' + readText(__dirname, './template.html') + '`');
 
             // If div already exists, remove it.
             const checkElem = document.getElementById('i18n');

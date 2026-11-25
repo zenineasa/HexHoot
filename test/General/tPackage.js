@@ -1,7 +1,7 @@
 /* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
 
+const fs = require('fs');
 const path = require('path');
-const requireText = require('require-text');
 
 
 /**
@@ -30,7 +30,7 @@ function fetchJSONWithRetry(url, retries = 10) {
 QUnit.test('Check package name', function(assert) {
     // Read package.json
     const packageJson = JSON.parse(
-        requireText(path.resolve() + '/package.json', require),
+        fs.readFileSync(path.resolve('package.json'), 'utf8'),
     );
 
     // Ensure that the package name in package.json is always 'hexhoot'
@@ -43,7 +43,7 @@ QUnit.test('Check package name', function(assert) {
 QUnit.test('Version greater than in GitHub release', async function(assert) {
     // Read package.json
     const packageJson = JSON.parse(
-        requireText(path.resolve() + '/package.json', require),
+        fs.readFileSync(path.resolve('package.json'), 'utf8'),
     );
 
     // Get the GitHub API URL using information from package.json

@@ -1,7 +1,6 @@
 /* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
 
 const os = require('os');
-const ip = require('ip');
 const http = require('http');
 const arp = require('arptable-js');
 const ping = require('ping');
@@ -14,6 +13,10 @@ const dbWrapper = require('./DBWrapper');
 // not potentially used by other applications.
 const preferedServerPort = 43946;
 const maxTryDiffPorts = 10;
+
+// Largest request body accepted by the HTTP server. Profile photos are sent
+// inside encrypted messages, so this has to be larger than the photo limit.
+const maxRequestBodyBytes = 4 * 1024 * 1024;
 
 /**
  * This is a singleton class.
@@ -93,6 +96,22 @@ class IntranetMessenger {
     }
 
     /**
+     * The first external IPv4 address of this device (replaces the 'ip'
+     * package's ip.address()).
+     * @return {string} the address, or '127.0.0.1' if there is none
+     */
+    getPrimaryIPv4Address() {
+        for (const addresses of Object.values(os.networkInterfaces())) {
+            for (const address of addresses) {
+                if (address.family === 'IPv4' && !address.internal) {
+                    return address.address;
+                }
+            }
+        }
+        return '127.0.0.1';
+    }
+
+    /**
      * Information about this HexHoot instance
      * @return {Object} Information about this HexHoot instance
      */
@@ -100,7 +119,7 @@ class IntranetMessenger {
         const info = {};
         info.application = process.env.npm_package_name;
         info.version = process.env.npm_package_version;
-        info.ip = ip.address();
+        info.ip = this.getPrimaryIPv4Address();
         info.ips = this.ipAddresses;
         info.port = this.port;
         info.hostsWithHexHootMap = this.hostsWithHexHootMap;
@@ -116,67 +135,76 @@ class IntranetMessenger {
      */
     startServer(port) {
         this.server = http.createServer(function(req, res) {
-            if (req.url === '/') {
-                if (req.method === 'GET') {
-                    const response = this.getInformationAboutSelf();
-                    res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify(response));
-                    res.end();
-                } else if (req.method === 'POST') {
-                    let body = '';
-                    req.on('data', function(chunk) {
-                        body += chunk.toString();
-                    });
-                    req.on('end', function() {
-                        const data = JSON.parse(body);
-
-                        // Assert that the data response has the same URL
-                        // information as the URL we sent to
-                        data.ip = this.assertIPInArrayAndReturn(
-                            req.connection.remoteAddress, data.ips,
-                        );
-
-                        // Extract information about this
-                        this.saveInfoAboutPeers(data);
-
-                        res.end('ok');
-                    }.bind(this));
-                }
-            } else if (req.url === '/subscribeChannels') {
-                if (req.method === 'POST') {
-                    let body = '';
-                    req.on('data', function(chunk) {
-                        body += chunk.toString();
-                    });
-                    req.on('end', function() {
-                        const data = JSON.parse(body);
-
-                        // Assert that the data response has the same URL
-                        // information as the URL we sent to
-                        data.ip = this.assertIPInArrayAndReturn(
-                            req.connection.remoteAddress, data.ips,
-                        );
-
-                        // Add the channel to the peer
-                        this.addChannelToPeer(data.ip, data.channelNames);
-
-                        res.end('ok');
-                    }.bind(this));
-                }
-            } else if (req.url === '/message') {
-                if (req.method === 'POST') {
-                    let body = '';
-                    req.on('data', function(chunk) {
-                        body += chunk.toString();
-                    });
-                    req.on('end', function() {
-                        this.messageReceivedCallback(body);
-                        res.end('ok');
-                    }.bind(this));
-                }
-            } else {
-                console.log('Unrecognized request: ' + req.url);
+            if (req.url === '/' && req.method === 'GET') {
+                const response = this.getInformationAboutSelf();
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify(response));
+                res.end();
+                return;
             }
+
+            const postHandlers = {
+                '/': function(body) {
+                    const data = JSON.parse(body);
+
+                    // Assert that the data response has the same URL
+                    // information as the URL we sent to
+                    data.ip = this.assertIPInArrayAndReturn(
+                        req.socket.remoteAddress, data.ips,
+                    );
+
+                    // Extract information about this
+                    this.saveInfoAboutPeers(data);
+                },
+                '/subscribeChannels': function(body) {
+                    const data = JSON.parse(body);
+
+                    // Assert that the data response has the same URL
+                    // information as the URL we sent to
+                    data.ip = this.assertIPInArrayAndReturn(
+                        req.socket.remoteAddress, data.ips,
+                    );
+
+                    // Add the channel to the peer
+                    this.addChannelToPeer(data.ip, data.channelNames);
+                },
+                '/message': function(body) {
+                    this.messageReceivedCallback(body);
+                },
+            };
+            const handler = postHandlers[req.url];
+            if (req.method !== 'POST' ||
+                !Object.hasOwn(postHandlers, req.url)) {
+                console.log('Unrecognized request: ' + req.url);
+                res.writeHead(404);
+                res.end();
+                return;
+            }
+
+            const chunks = [];
+            let size = 0;
+            req.on('data', function(chunk) {
+                size += chunk.length;
+                if (size > maxRequestBodyBytes) {
+                    res.writeHead(413);
+                    res.end();
+                    req.destroy();
+                    return;
+                }
+                chunks.push(chunk);
+            });
+            req.on('end', function() {
+                try {
+                    handler.call(this, Buffer.concat(chunks).toString());
+                    res.end('ok');
+                } catch (err) {
+                    console.log('Rejected request to ' + req.url + ': ' +
+                        err.message);
+                    res.writeHead(400);
+                    res.end();
+                }
+            }.bind(this));
+            req.on('error', function() {});
         }.bind(this));
 
         this.server.on('error', function(err) {
@@ -194,7 +222,8 @@ class IntranetMessenger {
 
         this.server.on('listening', function() {
             this.port = port;
-            console.log(`Server: http://${ip.address()}:${port}`);
+            console.log('Server: http://' + this.getPrimaryIPv4Address() +
+                ':' + port);
         }.bind(this));
 
         this.server.listen(port);
@@ -286,13 +315,30 @@ class IntranetMessenger {
      * @param {Object} info information other HexHoot instance
      */
     saveInfoAboutPeers(info) {
-        console.log('Saving info about peer: ' + JSON.stringify(info));
+        console.log('Saving info about peer: ' + info.ip);
         // Extract information on other hosts with HexHoot
-        const otherhostsWithHexHootMap = info.hostsWithHexHootMap;
+        const otherhostsWithHexHootMap =
+            (info.hostsWithHexHootMap &&
+                typeof info.hostsWithHexHootMap === 'object') ?
+                info.hostsWithHexHootMap : {};
 
-        // Remove the other hosts information and store the rest
-        delete info.hostsWithHexHootMap;
-        this.hostsWithHexHootMap[info.ip] = info;
+        // Keep only the fields this class uses, after validating them; the
+        // rest of the object is controlled by the peer.
+        const port = Number(info.port);
+        if (!Number.isInteger(port) || port < 1 || port > 65535) {
+            throw new Error('Invalid port');
+        }
+        const channels = Array.isArray(info.listOfChannelsSubscribedTo) ?
+            info.listOfChannelsSubscribedTo.filter(function(name) {
+                return typeof name === 'string' && name.length <= 256;
+            }) : [];
+        this.hostsWithHexHootMap[info.ip] = {
+            application: 'hexhoot',
+            version: String(info.version).slice(0, 32),
+            ip: info.ip,
+            port: port,
+            listOfChannelsSubscribedTo: channels,
+        };
 
         // Collect the latest information from the other hosts; not
         // just copy over the information.
@@ -320,7 +366,15 @@ class IntranetMessenger {
      * subscribe to
      */
     addChannelToPeer(ip, channelNames) {
+        if (!Object.hasOwn(this.hostsWithHexHootMap, ip) ||
+            !Array.isArray(channelNames)) {
+            throw new Error('Unknown peer or invalid channel list');
+        }
         channelNames.forEach(function(channelNameStr) {
+            if (typeof channelNameStr !== 'string' ||
+                channelNameStr.length > 256) {
+                return;
+            }
             if (!this.hostsWithHexHootMap[ip].listOfChannelsSubscribedTo
                 .includes(channelNameStr)) {
                 this.hostsWithHexHootMap[ip].listOfChannelsSubscribedTo.push(
@@ -354,15 +408,21 @@ class IntranetMessenger {
                     console.log(data);
                     return;
                 }
-                if (data.application === 'hexhoot') {
-                    // Assert that the data response has the same URL
-                    // information as the URL we sent to
-                    data.ip = this.assertIPInArrayAndReturn(
-                        url, data.ips,
-                    );
+                if (data && data.application === 'hexhoot') {
+                    try {
+                        // Assert that the data response has the same URL
+                        // information as the URL we sent to
+                        data.ip = this.assertIPInArrayAndReturn(
+                            url, data.ips,
+                        );
 
-                    // Extract information about this
-                    this.saveInfoAboutPeers(data);
+                        // Extract information about this
+                        this.saveInfoAboutPeers(data);
+                    } catch (err) {
+                        console.log('Invalid peer information from ' + url +
+                            ': ' + err.message);
+                        return;
+                    }
 
                     // Send back information about this instance
                     const info = JSON.stringify(
@@ -395,7 +455,7 @@ class IntranetMessenger {
             hostname = parsedURL.hostname;
         }
 
-        if (!ipAddresses.includes(hostname)) {
+        if (!Array.isArray(ipAddresses) || !ipAddresses.includes(hostname)) {
             throw new Error('Sender IP doesn\'t match the data provided');
         }
         return hostname;
@@ -436,14 +496,28 @@ class IntranetMessenger {
      * @param {*} message The message that was received in the channel
      */
     messageReceivedCallback(message) {
-        const messageObj = JSON.parse(message);
+        let messageObj;
+        try {
+            messageObj = JSON.parse(message);
+            if (!messageObj || typeof messageObj.senderPublicKey !== 'string' ||
+                typeof messageObj.message !== 'string' ||
+                !messageObj.iv || messageObj.iv.type !== 'Buffer' ||
+                !Array.isArray(messageObj.iv.data) ||
+                messageObj.iv.data.length !== 16) {
+                throw new Error('Unexpected message format');
+            }
 
-        const sharedKeyString = utils.getSharedKey(
-            this.userInfo.privateKey, messageObj.senderPublicKey);
+            const sharedKeyString = utils.getSharedKey(
+                this.userInfo.privateKey, messageObj.senderPublicKey);
 
-        messageObj.iv = Buffer.from(messageObj.iv); // Ensuring the type
-        messageObj.message = JSON.parse(utils.decryptMessage(
-            messageObj.message, sharedKeyString, messageObj.iv));
+            messageObj.iv = Buffer.from(messageObj.iv); // Ensuring the type
+            messageObj.message = JSON.parse(utils.decryptMessage(
+                messageObj.message, sharedKeyString, messageObj.iv));
+        } catch (err) {
+            console.log('Dropping a message that could not be read:',
+                err.message);
+            return;
+        }
 
         console.log('Message received (intranet):');
         console.log(messageObj);
@@ -474,7 +548,7 @@ class IntranetMessenger {
         // Let every HexHoot instance know that this instance is subscribed to
         // this channel
         let message = {};
-        message.ip = ip.address();
+        message.ip = this.getPrimaryIPv4Address();
         message.ips = this.ipAddresses;
         message.channelNames = [channelNameStr];
         message = JSON.stringify(message);

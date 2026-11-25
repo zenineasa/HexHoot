@@ -1,6 +1,6 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 
 // This is invoked from within template.html file
 const Logo = require('./../Logo'); // eslint-disable-line no-unused-vars
@@ -56,7 +56,7 @@ class Layout {
     static loadTemplate(filename) {
         // Use Javascript's Template literals (Template strings) for easily
         // evaluating variables in the template.html file
-        return eval('`' + requireText(filename, require) + '`');
+        return eval('`' + readText(__dirname, filename) + '`');
     }
 }
 

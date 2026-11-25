@@ -1,6 +1,6 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 const imagePack = require('../ImagePack');
 // eslint-disable-next-line no-unused-vars
 const i18n = require('./../I18n')(); // used in template
@@ -24,9 +24,9 @@ class Logo {
 
         const elem = document.createElement('div');
         elem.innerHTML = eval('`' +
-            requireText('./template.html', require) + '`');
+            readText(__dirname, './template.html') + '`');
         elem.getElementsByClassName('logo')[0].innerHTML =
-            requireText(imagePack.getPath('branding.logoIcon'), require);
+            readText(__dirname, imagePack.getPath('branding.logoIcon'));
 
         elem.children[0].style.zoom = zoomVal.toString();
         return elem;

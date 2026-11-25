@@ -58,18 +58,33 @@ class Messenger {
      * @param {*} message The message that was received in the channel
      */
     messageReceivedCallback(message) {
-        const messageObj = JSON.parse(message);
+        let messageObj;
+        try {
+            messageObj = JSON.parse(message);
+            if (!messageObj || typeof messageObj.senderPublicKey !== 'string' ||
+                typeof messageObj.message !== 'string' ||
+                !messageObj.iv || messageObj.iv.type !== 'Buffer' ||
+                !Array.isArray(messageObj.iv.data) ||
+                messageObj.iv.data.length !== 16) {
+                throw new Error('Unexpected message format');
+            }
 
-        const sharedKeyString = utils.getSharedKey(
-            this.userInfo.privateKey, messageObj.senderPublicKey);
+            const sharedKeyString = utils.getSharedKey(
+                this.userInfo.privateKey, messageObj.senderPublicKey);
 
-        messageObj.iv = Buffer.from(messageObj.iv); // Ensuring the type
-        messageObj.message = JSON.parse(utils.decryptMessage(
-            messageObj.message, sharedKeyString, messageObj.iv));
+            messageObj.iv = Buffer.from(messageObj.iv); // Ensuring the type
+            messageObj.message = JSON.parse(utils.decryptMessage(
+                messageObj.message, sharedKeyString, messageObj.iv));
+        } catch (err) {
+            console.log('Dropping a message that could not be read:',
+                err.message);
+            return;
+        }
 
         console.log('Message received:');
         console.log(messageObj);
 
+        // Send this information to DBMessenger
         this.messageReceiveCallbackFunction(messageObj);
     }
 

@@ -1,9 +1,17 @@
 /* Copyright (c) 2023-2024 Zenin Easa Panthakkalakath */
 
+const {FusesPlugin} = require('@electron-forge/plugin-fuses');
+const {FuseV1Options, FuseVersion} = require('@electron/fuses');
 const imagePack = require('./modules/ImagePack');
 
 module.exports = {
-    packagerConfig: {},
+    packagerConfig: {
+        name: 'HexHoot',
+        executableName: 'hexhoot',
+        asar: true,
+        // No extension: the packager picks .icns / .ico per target platform
+        icon: imagePack.getPath('desktop.mac').replace(/\.icns$/, ''),
+    },
     rebuildConfig: {},
     makers: [
         {
@@ -11,15 +19,19 @@ module.exports = {
             name: '@electron-forge/maker-squirrel',
             config: {
                 // eslint-disable-next-line max-len
-                iconUrl: 'https://raw.githubusercontent.com/zenineasa/HexHoot/main/modules/ImagePack/images/DesktopIcons/icon_windows.ico',
+                iconUrl: 'https://raw.githubusercontent.com/zenineasa/HexHoot/main/modules/ImagePack/images/DesktopIcons/icon.ico',
                 setupIcon: imagePack.getPath('desktop.windows'),
             },
         },
         {
-            // For mac:
+            // For mac (replaces the former appdmg steps in the makefile):
             name: '@electron-forge/maker-dmg',
             config: {
+                title: 'HexHoot',
                 icon: imagePack.getPath('desktop.mac'),
+                additionalDMGOptions: {
+                    'background-color': '#2b2e2f',
+                },
             },
         },
         {
@@ -40,5 +52,17 @@ module.exports = {
                 },
             },
         },
+    ],
+    plugins: [
+        // Fuses are flipped at package time and cannot be changed at runtime.
+        new FusesPlugin({
+            version: FuseVersion.V1,
+            [FuseV1Options.RunAsNode]: false,
+            [FuseV1Options.EnableCookieEncryption]: true,
+            [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
+            [FuseV1Options.EnableNodeCliInspectArguments]: false,
+            [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
+            [FuseV1Options.OnlyLoadAppFromAsar]: true,
+        }),
     ],
 };

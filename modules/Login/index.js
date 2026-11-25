@@ -1,6 +1,6 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 const dbMessenger = require('./../DBMessenger')();
 const i18n = require('./../I18n')();
 
@@ -34,7 +34,7 @@ class Login {
             // Load the HTML template and insert it to the UI
             const containerDOM = document.getElementById('container');
             containerDOM.innerHTML = eval('`' +
-            requireText('./template.html', require) + '`');
+            readText(__dirname, './template.html') + '`');
 
             // Login button
             document.getElementById('loginButton').onclick = function() {

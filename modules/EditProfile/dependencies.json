@@ -4,9 +4,9 @@
         "Layout",
         "DBMessenger",
         "ImagePack",
-        "I18n"
+        "I18n",
+        "ReadText",
+        "Sanitize"
     ],
-    "external": [
-        "require-text"
-    ]
+    "external": []
 }

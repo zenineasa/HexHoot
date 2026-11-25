@@ -1,2 +1,2 @@
 <!-- Copyright (c) 2022-2024 Zenin Easa Panthakkalakath -->
-<div id="ownProfilePic" class="icon" style="background-image: url('${info && info.photo ? info.photo : imagePack.getPath('interface.defaultProfilePic')}')"></div>
+<div id="ownProfilePic" class="icon" style="background-image: url(&quot;${escapeHTML(info && safePhoto(info.photo) ? info.photo : imagePack.getPath('interface.defaultProfilePic'))}&quot;)"></div>

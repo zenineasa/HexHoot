@@ -1,6 +1,6 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 const Layout = require('./../Layout');
 const dbMessenger = require('./../DBMessenger')();
 const addFriend = require('./../AddFriend');
@@ -9,6 +9,7 @@ const ViewProfile = require('./../ViewProfile');
 const imagePack = require('../ImagePack');
 const sounds = require('../Sounds');
 const i18n = require('./../I18n')();
+const sanitize = require('./../Sanitize');
 
 /**
  * This class implements the functionality for chatting
@@ -90,7 +91,7 @@ class Chat {
     loadSidebar() {
         const sidebarDOMNode = document.getElementById('sidebar');
         sidebarDOMNode.innerHTML += eval('`' +
-            requireText('./template_sidebar.html', require) + '`');
+            readText(__dirname, './template_sidebar.html') + '`');
 
         sidebarDOMNode.querySelector('#addFriendButton').onclick =
             this.addFriendCallback.bind(this);
@@ -114,15 +115,19 @@ class Chat {
             return b.lastMessageTimestamp - a.lastMessageTimestamp;
         });
 
+        // Friend requests waiting for a decision are listed first
+        const pending = await dbMessenger.getPendingFriendRequests();
+        for (const key of Object.keys(pending)) {
+            if (!sanitize.isValidKey(key)) {
+                continue;
+            }
+            ul.appendChild(this.createPendingRequestListItem(pending[key]));
+        }
+
         for (let i = 0; i < this.allFriends.length; i++) {
-            const li = document.createElement('li');
+            const li = this.createProfileListItem(this.allFriends[i]);
             li.id = this.sidebarLiIdPrefix + this.allFriends[i].key;
-            li.innerHTML = `
-                <div class="photo" style="background-image: url(
-                    ${this.getProfilePic(this.allFriends[i].photo)}
-                );"></div>
-                <div class="name">${this.allFriends[i].displayName}</div>
-            `;
+            li.dataset.testid = 'friend';
             li.onclick = this.loadChat(this.allFriends[i]);
             ul.appendChild(li);
 
@@ -133,12 +138,94 @@ class Chat {
     }
 
     /**
+     * Create a list item showing a profile photo and name. Peer-controlled
+     * values are only ever assigned through textContent and style properties.
+     * @param {Object} profile profile with 'photo' and 'displayName'
+     * @return {HTMLLIElement} the list item
+     */
+    createProfileListItem(profile) {
+        const li = document.createElement('li');
+        li.appendChild(this.createPhotoElement(profile.photo));
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = this.getDisplayName(profile);
+        li.appendChild(name);
+        return li;
+    }
+
+    /**
+     * Create a sidebar entry for a pending friend request.
+     * @param {Object} request sanitized profile of the requester
+     * @return {HTMLLIElement} the list item
+     */
+    createPendingRequestListItem(request) {
+        const li = this.createProfileListItem(request);
+        li.classList.add('pendingRequest');
+        li.dataset.testid = 'pending-request';
+        li.dataset.key = request.key;
+        li.title = request.key;
+
+        const label = document.createElement('div');
+        label.className = 'requestLabel';
+        label.textContent = i18n.getText('Chat.friendRequest');
+        li.appendChild(label);
+
+        const accept = document.createElement('button');
+        accept.className = 'HexHoot_Button acceptRequest';
+        accept.textContent = i18n.getText('Chat.acceptRequest');
+        accept.onclick = async function(event) {
+            event.stopPropagation();
+            await dbMessenger.acceptFriendRequest(request.key);
+            await this.loadFriendsInSidebar();
+        }.bind(this);
+        li.appendChild(accept);
+
+        const decline = document.createElement('button');
+        decline.className = 'HexHoot_Button declineRequest';
+        decline.textContent = i18n.getText('Chat.declineRequest');
+        decline.onclick = async function(event) {
+            event.stopPropagation();
+            await dbMessenger.declineFriendRequest(request.key);
+            await this.loadFriendsInSidebar();
+        }.bind(this);
+        li.appendChild(decline);
+
+        return li;
+    }
+
+    /**
+     * Create the round profile photo element.
+     * @param {string} photo photo stored for the profile
+     * @return {HTMLDivElement} the photo element
+     */
+    createPhotoElement(photo) {
+        const div = document.createElement('div');
+        div.className = 'photo';
+        div.style.backgroundImage =
+            'url(' + JSON.stringify(this.getProfilePic(photo)) + ')';
+        return div;
+    }
+
+    /**
+     * Name to show for a profile; falls back to the start of the key.
+     * @param {Object} profile profile with 'displayName' and 'key'
+     * @return {string} the name to display
+     */
+    getDisplayName(profile) {
+        if (typeof profile.displayName === 'string' &&
+            profile.displayName.trim() !== '') {
+            return profile.displayName;
+        }
+        return String(profile.key).slice(0, 16) + '…';
+    }
+
+    /**
      * Load the main content
      */
     loadMainContent() {
         const mainContentDOMNode = document.getElementById('mainContent');
         mainContentDOMNode.innerHTML += eval('`' +
-            requireText('./template_mainContent.html', require) + '`');
+            readText(__dirname, './template_mainContent.html') + '`');
     }
 
     /**
@@ -152,14 +239,13 @@ class Chat {
             const messages = await dbMessenger.getAllMessages(friend.key);
             const messageSenderInfo =
                 document.getElementById('messageSenderInfo');
-            messageSenderInfo.innerHTML = `
-                <div class="photo" style="background-image: url(
-                    ${this.getProfilePic(friend.photo)}
-                );"></div>
-                <div class="name">${friend.displayName}</div>
-                <!-- div class="about">${friend.about}</div -->
-                <!-- div class="key">${friend.key}</div -->
-            `;
+            messageSenderInfo.replaceChildren();
+            messageSenderInfo.appendChild(
+                this.createPhotoElement(friend.photo));
+            const name = document.createElement('div');
+            name.className = 'name';
+            name.textContent = this.getDisplayName(friend);
+            messageSenderInfo.appendChild(name);
             messageSenderInfo.onclick = function() {
                 ViewProfile.render(this.render.bind(this), friend);
             }.bind(this);
@@ -246,8 +332,11 @@ class Chat {
         // Show the time at which the message arrived
         const span = document.createElement('span');
         const date = new Date(message.timestamp);
-        span.innerHTML = date.toDateString() + '<br>' +
-            i18n.getText('Chat.at') + ' ' + date.toLocaleTimeString();
+        span.append(
+            date.toDateString(),
+            document.createElement('br'),
+            i18n.getText('Chat.at') + ' ' + date.toLocaleTimeString(),
+        );
         div.appendChild(span);
 
         messageReader.prepend(div);
@@ -260,7 +349,7 @@ class Chat {
      * @return {string} an image that can be used as CSS background URL
      */
     getProfilePic(photo) {
-        if (photo) {
+        if (sanitize.safePhoto(photo)) {
             return photo;
         } else {
             return imagePack.getPath('interface.defaultProfilePic');
@@ -319,16 +408,20 @@ class Chat {
      * @param {string} userKey
      */
     doNotify(userKey) {
-        const id = this.sidebarLiIdPrefix + userKey;
-        document.getElementById(id).classList.add('notification');
+        const li = document.getElementById(this.sidebarLiIdPrefix + userKey);
+        if (li) {
+            li.classList.add('notification');
+        }
     }
     /**
      * De-activate notification
      * @param {string} userKey
      */
     unDoNotify(userKey) {
-        const id = this.sidebarLiIdPrefix + userKey;
-        document.getElementById(id).classList.remove('notification');
+        const li = document.getElementById(this.sidebarLiIdPrefix + userKey);
+        if (li) {
+            li.classList.remove('notification');
+        }
         dbMessenger.markChatRead(userKey);
     }
 
@@ -367,7 +460,13 @@ class Chat {
 
             // Add it to the database
             message.message.message.type = this.messageType.received;
-            dbMessenger.receivedChatMessage(message);
+            await dbMessenger.receivedChatMessage(message);
+
+            // Messages from someone whose friend request is still pending are
+            // stored, and shown once the request is accepted.
+            if (!message.isFromFriend) {
+                return;
+            }
 
             // Before rendering, confirm if the chat module is active in the
             // view. If so, check if the chat that is active is the same as
@@ -385,14 +484,14 @@ class Chat {
 
             // Play sound for alert
             sounds().messageReceivedSound();
-            console.log(Notification);
-            const friend = this.allFriends.find(function(friend) {
+            const friend = (this.allFriends || []).find(function(friend) {
                 return friend.key == message.senderPublicKey;
             });
-            if (Notification.permission !== 'denied') {
+            if (friend && Notification.permission !== 'denied') {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
-                    const title = friend.displayName + ' sent you a message.';
+                    const title = this.getDisplayName(friend) +
+                        ' sent you a message.';
                     const body = message.message.message.message;
                     const icon = this.getProfilePic(friend.photo);
                     new Notification(title, {
@@ -402,9 +501,12 @@ class Chat {
                 }
             }
         } else if (message.message.type ===
-            dbMessenger.messageType.userInfoResponse) {
+            dbMessenger.messageType.userInfoResponse ||
+            message.message.type === dbMessenger.messageType.friendRequest) {
             // Reload the sidebar
-            await this.loadFriendsInSidebar();
+            if (this.isActiveInView()) {
+                await this.loadFriendsInSidebar();
+            }
         }
     }
 
@@ -435,7 +537,7 @@ class Chat {
             .slice(0, 5);
 
         frequentlyUsed.forEach(function(emoji) {
-            ret += '<span>' + emoji + '</span>';
+            ret += '<span>' + sanitize.escapeHTML(emoji) + '</span>';
         });
 
         // Add a separator

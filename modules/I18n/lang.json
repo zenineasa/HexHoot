@@ -34,6 +34,13 @@
         }
     },
     "AddFriend": {
+        "invalidKey": {
+            "en": "That does not look like a valid public key.",
+            "ml": "ഇത് സാധുവായ ഒരു പബ്ലിക് കീ അല്ല.",
+            "de": "Das ist kein gültiger öffentlicher Schlüssel.",
+            "fr": "Ceci n'est pas une clé publique valide.",
+            "it": "Questa non è una chiave pubblica valida."
+        },
         "addFriend": {
             "en": "Add friend",
             "ml": "സുഹൃത്തിനെ ചേർക്കുക",
@@ -85,6 +92,27 @@
         }
     },
     "Chat": {
+        "friendRequest": {
+            "en": "Friend request",
+            "ml": "സൗഹൃദ അഭ്യർത്ഥന",
+            "de": "Freundschaftsanfrage",
+            "fr": "Demande d'ami",
+            "it": "Richiesta di amicizia"
+        },
+        "acceptRequest": {
+            "en": "Accept",
+            "ml": "സ്വീകരിക്കുക",
+            "de": "Annehmen",
+            "fr": "Accepter",
+            "it": "Accetta"
+        },
+        "declineRequest": {
+            "en": "Decline",
+            "ml": "നിരസിക്കുക",
+            "de": "Ablehnen",
+            "fr": "Refuser",
+            "it": "Rifiuta"
+        },
         "at": {
             "en": "at",
             "ml": "സമയം",

@@ -1,6 +1,6 @@
 /* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
 
-const requireText = require('require-text');
+const readText = require('./../ReadText');
 const shell = require('electron').shell;
 
 // The following is used by the template
@@ -25,7 +25,7 @@ class Social {
         link.addEventListener('load', function() {
             const elem = document.createElement('div');
             elem.innerHTML =
-                eval('`' + requireText('./template.html', require) + '`');
+                eval('`' + readText(__dirname, './template.html') + '`');
             document.body.appendChild(elem);
 
             const icons = elem.getElementsByTagName('img');

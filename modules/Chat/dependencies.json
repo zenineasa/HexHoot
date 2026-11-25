@@ -8,9 +8,9 @@
         "ViewProfile",
         "ImagePack",
         "Sounds",
-        "I18n"
+        "I18n",
+        "ReadText",
+        "Sanitize"
     ],
-    "external": [
-        "require-text"
-    ]
+    "external": []
 }

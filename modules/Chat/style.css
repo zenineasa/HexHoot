@@ -95,3 +95,18 @@
     background-color: #E6E7ED;
 }
 /* TODO: Update messageComposer; change it to div with content editable tag /*
+
+#sidebar li.pendingRequest {
+    flex-wrap: wrap;
+    align-items: center;
+    background: rgba(0, 180, 255, 0.2);
+}
+#sidebar li.pendingRequest .requestLabel {
+    font-size: 0.8em;
+    opacity: 0.8;
+    padding: 0 0.5em;
+}
+#sidebar li.pendingRequest .HexHoot_Button {
+    margin: 0.25em;
+    padding: 0.25em 0.75em;
+}

@@ -2,14 +2,14 @@
 <div id="title">${i18n.getText('ViewProfile.viewProfile')}</div>
 <div id="viewProfile">
     <div class="HexHoot_Input_label">${i18n.getText('ViewProfile.publicKey')}</div>
-    <input class="HexHoot_Input" name="publicKey" value="${userInfo.key}" readonly/>
+    <input class="HexHoot_Input" name="publicKey" value="${escapeHTML(userInfo.key)}" readonly/>
 
     <div class="HexHoot_Input_label">${i18n.getText('ViewProfile.displayName')}</div>
-    <input class="HexHoot_Input" name="displayName" value="${userInfo.displayName}" readonly/>
+    <input class="HexHoot_Input" name="displayName" value="${escapeHTML(userInfo.displayName)}" readonly/>
 
     <div class="HexHoot_Input_label">${i18n.getText('ViewProfile.aboutPerson')}</div>
-    <textarea class="HexHoot_Input" name="about" readonly>${(userInfo.about === undefined) ? '' : userInfo.about}</textarea>
+    <textarea class="HexHoot_Input" name="about" readonly>${escapeHTML(userInfo.about)}</textarea>
 
     <div class="HexHoot_Input_label">${i18n.getText('ViewProfile.photo')}</div>
-    <div class="value"><img src="${this.getProfilePic(userInfo.photo)}"></div>
+    <div class="value"><img src="${escapeHTML(this.getProfilePic(userInfo.photo))}"></div>
 </div>

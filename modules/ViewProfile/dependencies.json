@@ -3,9 +3,9 @@
     "internal": [
         "Layout",
         "ImagePack",
-        "I18n"
+        "I18n",
+        "ReadText",
+        "Sanitize"
     ],
-    "external": [
-        "require-text"
-    ]
+    "external": []
 }
