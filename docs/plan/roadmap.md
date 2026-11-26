@@ -54,7 +54,7 @@ Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 A new `modules/Crypto` (in Core), with unit tests in Node (`node:test`).
 
 1. **Keyring** ([design](/design/keyring.md)): the vault key, the safeStorage and passphrase unlockers, and the encrypted record store. **Done 2026-11-26** as a library with L1 tests and a real-`safeStorage` test; Core starts using it with the new login in Phase 4.
-2. **Identity** ([design](/design/identity-and-addresses.md)): the recovery phrase, deterministic `ik_ec` (P-521, with rejection sampling) and `ik_pq` (ML-DSA-87), the bundle and its signatures, the `hh2:` address, and the safety number.
+2. **Identity** ([design](/design/identity-and-addresses.md)): the recovery phrase, deterministic `ik_ec` (P-521, with rejection sampling) and `ik_pq` (ML-DSA-87), the bundle and its signatures, the `hh2:` address, and the safety number. **Done 2026-11-26** as a library with L1 tests. The address became Bech32m (`hh21…`).
 3. **Hybrid KEM** (`HK`) and the **SIGMA-I handshake** ([spec](/design/session-and-ratchet.md)).
 4. **Double Ratchet + ML-KEM** turns, skipped-key handling, and session persistence through the encrypted store.
 5. **Encrypted backup** `.hexhoot2` with scrypt (N=2²⁰) + AES-256-GCM.
@@ -68,7 +68,7 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 - [Wire protocol v2](/design/wire-protocol-v2.md): framing, envelopes, the inner schema, and padding.
 - Hyperswarm: one long-lived swarm, `topic = SHA-512("hexhoot/v2/topic" ‖ fp)[0..32]`, and connection reuse keyed by fingerprint. Fix T5.
 - LAN: carrier only, no channel disclosure. Fix T2–T4.
-- UI: the new Login (create / restore), Add friend by `hh2:` address or QR, pending requests, and safety-number verification.
+- UI: the new Login (create / restore), Add friend by `hh21…` address or QR, pending requests, and safety-number verification.
 
 - Build the L4 evil peer, and run the full L3 scenario table across alice, bob, and carol on the hyperdht testnet. (Karma was removed in Phase 2.)
 

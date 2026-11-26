@@ -97,7 +97,8 @@ function addActions(app, otherPeers) {
             await app.waitFor(`document.getElementById('theirPublicKey')`);
             await app.type('#theirPublicKey', key);
             await app.click('#mainContent #addFriendButton');
-            await app.waitFor(`document.getElementById('friendsList')`);
+            // The sidebar stays visible; wait for the form to close
+            await app.waitFor(`!document.getElementById('theirPublicKey')`);
         },
 
         /**
@@ -131,8 +132,10 @@ function addActions(app, otherPeers) {
          */
         async openChat(key) {
             await app.click(sidebarItem(key));
-            await app.waitFor(`document.querySelector(
-                '#messageComposer textarea')`);
+            // The composer is always in the page; data-chat is set once the
+            // chat has loaded and the send button is wired to this friend
+            await app.waitFor(`document.getElementById('messageComposer')
+                ?.dataset.chat === ${JSON.stringify(key)}`);
         },
 
         /**
@@ -264,6 +267,7 @@ export function useNetwork(options) {
         try {
             await func(handle.peers, t);
         } catch (err) {
+            handle.step('failed: ' + err.message);
             if (handle.saveArtifacts) {
                 const dir = await handle.saveArtifacts(name);
                 err.message += `\nArtifacts: ${path.relative(root, dir)}`;

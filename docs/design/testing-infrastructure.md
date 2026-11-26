@@ -95,7 +95,7 @@ L2 exists since 2026-11-26: `test/core/` runs Core with in-memory storage and in
 | Group | Scenario | Peers |
 |---|---|---|
 | onboarding | Create an account, then the recovery phrase restores the same address in a fresh `userData` | alice, alice′ |
-| friends | alice adds bob by `hh2:` address. bob sees a pending request (no auto-reply). Accept. Profiles appear on both sides. | alice, bob |
+| friends | alice adds bob by `hh21…` address. bob sees a pending request (no auto-reply). Accept. Profiles appear on both sides. | alice, bob |
 | chat | 50 messages each way, interleaved, then exact order and no duplicates on both sides | alice, bob |
 | chat | The same, with `HEXHOOT_TEST_FAULTS` on | alice, bob |
 | resilience | Kill bob mid-conversation, alice queues, bob restarts, the queue is delivered, and the session epoch has advanced | alice, bob |

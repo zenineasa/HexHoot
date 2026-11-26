@@ -312,8 +312,9 @@ class Chat {
                 }
             }.bind(this);
 
-            // Update the active chat
+            // Update the active chat; tests wait for data-chat
             this.activeChat = friend.key;
+            messageComposer.dataset.chat = friend.key;
 
             // Switch the notification
             if (!friend.isRead) {
