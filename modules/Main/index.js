@@ -2,12 +2,13 @@
 
 const {
     app, BrowserWindow, ipcMain, MessageChannelMain, protocol, session, shell,
-    utilityProcess,
+    utilityProcess, safeStorage,
 } = require('electron');
 const fs = require('fs/promises');
 const path = require('path');
 const imagePack = require('../ImagePack');
 const testHooks = require('./testHooks');
+const createSealer = require('./sealer');
 const {links: socialLinks} = require('../Social/links.json');
 
 // The renderer is served from app://hexhoot/modules/..., which gives it a
@@ -31,6 +32,7 @@ protocol.registerSchemesAsPrivileged([{
 }]);
 
 let core = null;
+const sealer = createSealer(safeStorage);
 let quitting = false;
 
 /**
@@ -68,6 +70,29 @@ function startCore() {
         userData: app.getPath('userData'),
         version: app.getVersion(),
     }, testHooks(app))});
+    // safeStorage only works here; Core asks for it (Core/main.js)
+    core.on('message', async function(message) {
+        if (!message || message.type !== 'sealer') {
+            return;
+        }
+        const reply = {type: 'sealer-result', id: message.id};
+        try {
+            if (message.op === 'status') {
+                reply.result = await sealer.status();
+            } else if (message.op === 'seal') {
+                reply.result = new Uint8Array(
+                    await sealer.seal(String(message.data)));
+            } else if (message.op === 'unseal') {
+                reply.result = await sealer.unseal(
+                    Buffer.from(message.data));
+            } else {
+                throw new Error('Unknown operation');
+            }
+        } catch (err) {
+            reply.error = err.message;
+        }
+        core.postMessage(reply);
+    });
     core.on('exit', function(code) {
         if (quitting) {
             return;

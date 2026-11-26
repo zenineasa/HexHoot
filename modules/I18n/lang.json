@@ -17,6 +17,7 @@
             "it": "Seleziona la lingua"
         }
     },
+
     "Logo": {
         "hexhoot": {
             "en": "HexHoot",
@@ -33,13 +34,14 @@
             "it": "ALPHA"
         }
     },
+
     "AddFriend": {
         "invalidKey": {
-            "en": "That does not look like a valid public key.",
-            "ml": "ഇത് സാധുവായ ഒരു പബ്ലിക് കീ അല്ല.",
-            "de": "Das ist kein gültiger öffentlicher Schlüssel.",
-            "fr": "Ceci n'est pas une clé publique valide.",
-            "it": "Questa non è una chiave pubblica valida."
+            "en": "That does not look like a valid HexHoot address.",
+            "ml": "അത് സാധുവായ ഒരു HexHoot വിലാസമായി തോന്നുന്നില്ല.",
+            "de": "Das sieht nicht nach einer gültigen HexHoot-Adresse aus.",
+            "fr": "Cela ne ressemble pas à une adresse HexHoot valide.",
+            "it": "Non sembra un indirizzo HexHoot valido."
         },
         "addFriend": {
             "en": "Add friend",
@@ -56,11 +58,11 @@
             "it": "Copia negli appunti"
         },
         "publicKey": {
-            "en": "Public key (32 characters)",
-            "ml": "പബ്ലിക് കീ (32 പ്രതീകങ്ങൾ)",
-            "de": "Öffentlicher Schlüssel (32 Zeichen)",
-            "fr": "Clé publique (32 caractères)",
-            "it": "Chiave pubblica (32 caratteri)"
+            "en": "Their address (starts with hh21)",
+            "ml": "അവരുടെ വിലാസം (hh21 എന്നതിൽ ആരംഭിക്കുന്നു)",
+            "de": "Adresse der Person (beginnt mit hh21)",
+            "fr": "Son adresse (commence par hh21)",
+            "it": "Il suo indirizzo (inizia con hh21)"
         },
         "add": {
             "en": "Add",
@@ -91,6 +93,7 @@
             "it": "Indietro"
         }
     },
+
     "Chat": {
         "friendRequest": {
             "en": "Friend request",
@@ -140,8 +143,16 @@
             "de": "Deine Nachricht hier eintippen...",
             "fr": "Tapez votre message ici...",
             "it": "Digita qui il tuo messaggio..."
+        },
+        "notFriendYet": {
+            "en": "They have not accepted your friend request yet.",
+            "ml": "അവർ ഇതുവരെ നിങ്ങളുടെ സൗഹൃദ അഭ്യർത്ഥന സ്വീകരിച്ചിട്ടില്ല.",
+            "de": "Die Person hat Ihre Freundschaftsanfrage noch nicht angenommen.",
+            "fr": "Cette personne n'a pas encore accepté votre demande d'ami.",
+            "it": "Questa persona non ha ancora accettato la tua richiesta di amicizia."
         }
     },
+
     "EditProfile": {
         "editProfile": {
             "en": "Edit profile",
@@ -156,20 +167,6 @@
             "de": "Durch das Abmelden werden alle Daten in Ihrem System gelöscht. Wir empfehlen, einen backup zu kreieren.",
             "fr": "La déconnexion supprimera toutes les données de votre système. Nous vous recommandons de sauvegarder le même.",
             "it": "La disconnessione eliminerà tutti i dati nel sistema. Ti consigliamo di eseguire il backup dello stesso."
-        },
-        "privateKey": {
-            "en": "Private key (32 characters)",
-            "ml": "പ്രൈവറ്റ് കീ (32 പ്രതീകങ്ങൾ)",
-            "de": "Privater Schlüssel (32 Zeichen)",
-            "fr": "Clé privée (32 caractères)",
-            "it": "Chiave privata (32 caratteri)"
-        },
-        "warningNotToShare": {
-            "en": "Do not share it with anyone",
-            "ml": "യാതൊരു കാരണവശയാലും ഇത് മറ്റൊരാൾക്ക് പറഞ്ഞുകൊടുക്കരുത്",
-            "de": "Mit niemanden teilen",
-            "fr": "Ne partagez avec personne",
-            "it": "Non condividerla con nessuno"
         },
         "displayName": {
             "en": "Display name",
@@ -221,34 +218,35 @@
             "it": "Indietro"
         }
     },
+
     "Login": {
         "minimumCharacters": {
-            "en": "Display name should have atleast 5 characters.",
-            "ml": "പ്രദർശന നാമത്തിൽ കുറഞ്ഞത് 5 പ്രതീകമെങ്കിലുമുണ്ടായിരിക്കണം.",
-            "de": "Anzeigename muss mindestens 5 Zeichen enthalten",
-            "fr": "Le nom à afficher doit comporter au moins 5 caractères.",
-            "it": "Il nome visualizzato deve contenere almeno 5 caratteri."
+            "en": "Your name needs at least 5 characters.",
+            "ml": "നിങ്ങളുടെ പേരിന് കുറഞ്ഞത് 5 അക്ഷരങ്ങൾ വേണം.",
+            "de": "Ihr Name braucht mindestens 5 Zeichen.",
+            "fr": "Votre nom doit comporter au moins 5 caractères.",
+            "it": "Il tuo nome deve avere almeno 5 caratteri."
         },
         "password": {
-            "en": "Password (minimum 8 characters)",
-            "ml": "പാസ്സ്‌വേർഡ് (ചുരുങ്ങിയത് 8 പ്രതീകങ്ങൾ)",
-            "de": "Passwort (mindestens 8 Zeichen)",
-            "fr": "Mot de passe (minimum 8 caractères)",
-            "it": "Password (minimo 8 caratteri)"
+            "en": "Password (at least 16 characters)",
+            "ml": "പാസ്‌വേഡ് (കുറഞ്ഞത് 16 അക്ഷരങ്ങൾ)",
+            "de": "Passwort (mindestens 16 Zeichen)",
+            "fr": "Mot de passe (au moins 16 caractères)",
+            "it": "Password (almeno 16 caratteri)"
         },
         "passwordLength": {
-            "en": "Password must be at least 8 characters long.",
-            "ml": "പാസ്സ്‌വേർഡിൽ ചുരുങ്ങിയത് 8 പ്രതീകങ്ങളെങ്കിലും ഉണ്ടായിരിക്കണം.",
-            "de": "Das Passwort muss mindestens 8 Zeichen lang sein.",
-            "fr": "Le mot de passe doit comporter au moins 8 caractères.",
-            "it": "La password deve contenere almeno 8 caratteri."
+            "en": "The password needs at least 16 characters.",
+            "ml": "പാസ്‌വേഡിന് കുറഞ്ഞത് 16 അക്ഷരങ്ങൾ വേണം.",
+            "de": "Das Passwort braucht mindestens 16 Zeichen.",
+            "fr": "Le mot de passe doit comporter au moins 16 caractères.",
+            "it": "La password deve avere almeno 16 caratteri."
         },
         "displayName": {
-            "en": "Display name (minimum 4 characters)",
-            "ml": "പ്രദർശന നാമം (ചുരുങ്ങിയത് 4 പ്രതീകങ്ങൾ)",
-            "de": "Anzeigename (mindestens 4 Zeichen)",
-            "fr": "Afficher un nom (minimum 4 caractères)",
-            "it": "Nome pubblico (minimo 4 caratteri)"
+            "en": "Your name (at least 5 characters)",
+            "ml": "നിങ്ങളുടെ പേര് (കുറഞ്ഞത് 5 അക്ഷരങ്ങൾ)",
+            "de": "Ihr Name (mindestens 5 Zeichen)",
+            "fr": "Votre nom (au moins 5 caractères)",
+            "it": "Il tuo nome (almeno 5 caratteri)"
         },
         "aboutYou": {
             "en": "About you",
@@ -277,8 +275,65 @@
             "de": "Anmeldung mit Profilsicherung",
             "fr": "Connectez-vous en utilisant la sauvegarde du profil",
             "it": "Accedi utilizzando il file di backup del profilo"
+        },
+        "passwordContainsName": {
+            "en": "The password must not contain your name.",
+            "ml": "പാസ്‌വേഡിൽ നിങ്ങളുടെ പേര് ഉണ്ടാകരുത്.",
+            "de": "Das Passwort darf Ihren Namen nicht enthalten.",
+            "fr": "Le mot de passe ne doit pas contenir votre nom.",
+            "it": "La password non deve contenere il tuo nome."
+        },
+        "passwordRepetitive": {
+            "en": "Use at least 5 different characters in the password.",
+            "ml": "പാസ്‌വേഡിൽ കുറഞ്ഞത് 5 വ്യത്യസ്ത അക്ഷരങ്ങൾ ഉപയോഗിക്കുക.",
+            "de": "Verwenden Sie im Passwort mindestens 5 verschiedene Zeichen.",
+            "fr": "Utilisez au moins 5 caractères différents dans le mot de passe.",
+            "it": "Usa almeno 5 caratteri diversi nella password."
+        },
+        "nameTooLong": {
+            "en": "Your name can have at most 64 characters.",
+            "ml": "പേരിന് പരമാവധി 64 അക്ഷരങ്ങൾ മാത്രം.",
+            "de": "Ihr Name darf höchstens 64 Zeichen haben.",
+            "fr": "Votre nom peut comporter au plus 64 caractères.",
+            "it": "Il tuo nome può avere al massimo 64 caratteri."
+        },
+        "working": {
+            "en": "Creating your keys. This takes a few seconds…",
+            "ml": "നിങ്ങളുടെ കീകൾ സൃഷ്ടിക്കുന്നു. ഇതിന് കുറച്ച് സെക്കൻഡുകൾ എടുക്കും…",
+            "de": "Ihre Schlüssel werden erstellt. Das dauert ein paar Sekunden …",
+            "fr": "Création de vos clés. Cela prend quelques secondes…",
+            "it": "Creazione delle tue chiavi. Ci vorranno alcuni secondi…"
+        },
+        "slow": {
+            "en": "This computer is short of free memory, so this may take a few minutes.",
+            "ml": "ഈ കമ്പ്യൂട്ടറിൽ സ്വതന്ത്ര മെമ്മറി കുറവാണ്, അതിനാൽ ഇതിന് കുറച്ച് മിനിറ്റുകൾ എടുത്തേക്കാം.",
+            "de": "Dieser Computer hat wenig freien Arbeitsspeicher, daher kann es einige Minuten dauern.",
+            "fr": "Cet ordinateur manque de mémoire libre, cela peut donc prendre quelques minutes.",
+            "it": "Questo computer ha poca memoria libera, quindi potrebbero volerci alcuni minuti."
+        },
+        "unlockTitle": {
+            "en": "Enter your password to unlock HexHoot.",
+            "ml": "HexHoot തുറക്കാൻ നിങ്ങളുടെ പാസ്‌വേഡ് നൽകുക.",
+            "de": "Geben Sie Ihr Passwort ein, um HexHoot zu entsperren.",
+            "fr": "Saisissez votre mot de passe pour déverrouiller HexHoot.",
+            "it": "Inserisci la tua password per sbloccare HexHoot."
+        },
+        "unlock": {
+            "en": "Unlock",
+            "ml": "തുറക്കുക",
+            "de": "Entsperren",
+            "fr": "Déverrouiller",
+            "it": "Sblocca"
+        },
+        "wrongPassword": {
+            "en": "That password is not right.",
+            "ml": "ആ പാസ്‌വേഡ് ശരിയല്ല.",
+            "de": "Dieses Passwort ist nicht richtig.",
+            "fr": "Ce mot de passe n'est pas correct.",
+            "it": "Quella password non è corretta."
         }
     },
+
     "ViewProfile": {
         "viewProfile": {
             "en": "View profile",
@@ -288,11 +343,11 @@
             "it": "Vedi profilo"
         },
         "publicKey": {
-            "en": "Public key",
-            "ml": "പബ്ലിക് കീ",
-            "de": "Öffentlicher Schlüssel (32 Zeichen)",
-            "fr": "Clé publique",
-            "it": "Chiave pubblica"
+            "en": "Address",
+            "ml": "വിലാസം",
+            "de": "Adresse",
+            "fr": "Adresse",
+            "it": "Indirizzo"
         },
         "displayName": {
             "en": "Display name",
@@ -321,6 +376,51 @@
             "de": "Zurück",
             "fr": "Retour",
             "it": "Indietro"
+        },
+        "safetyNumber": {
+            "en": "Safety number (compare it with them in person or on a call)",
+            "ml": "സുരക്ഷാ നമ്പർ (നേരിട്ടോ ഫോൺ വിളിയിലോ അവരുമായി ഒത്തുനോക്കുക)",
+            "de": "Sicherheitsnummer (vergleichen Sie sie persönlich oder in einem Anruf)",
+            "fr": "Numéro de sécurité (comparez-le en personne ou lors d’un appel)",
+            "it": "Numero di sicurezza (confrontalo di persona o durante una chiamata)"
+        }
+    },
+
+    "Backup": {
+        "passphrase": {
+            "en": "Backup passphrase (at least 16 characters)",
+            "ml": "ബാക്കപ്പ് പാസ്‌ഫ്രേസ് (കുറഞ്ഞത് 16 അക്ഷരങ്ങൾ)",
+            "de": "Backup-Passphrase (mindestens 16 Zeichen)",
+            "fr": "Phrase secrète de la sauvegarde (au moins 16 caractères)",
+            "it": "Passphrase del backup (almeno 16 caratteri)"
+        },
+        "ok": {
+            "en": "OK",
+            "ml": "ശരി",
+            "de": "OK",
+            "fr": "OK",
+            "it": "OK"
+        },
+        "cancel": {
+            "en": "Cancel",
+            "ml": "റദ്ദാക്കുക",
+            "de": "Abbrechen",
+            "fr": "Annuler",
+            "it": "Annulla"
+        },
+        "wrongPassphrase": {
+            "en": "Wrong passphrase, or the file is damaged.",
+            "ml": "പാസ്‌ഫ്രേസ് തെറ്റാണ്, അല്ലെങ്കിൽ ഫയൽ കേടായിരിക്കുന്നു.",
+            "de": "Falsche Passphrase, oder die Datei ist beschädigt.",
+            "fr": "Phrase secrète incorrecte, ou fichier endommagé.",
+            "it": "Passphrase errata, oppure il file è danneggiato."
+        },
+        "notABackup": {
+            "en": "That is not a HexHoot backup file.",
+            "ml": "അത് ഒരു HexHoot ബാക്കപ്പ് ഫയൽ അല്ല.",
+            "de": "Das ist keine HexHoot-Sicherungsdatei.",
+            "fr": "Ce n'est pas un fichier de sauvegarde HexHoot.",
+            "it": "Questo non è un file di backup di HexHoot."
         }
     }
 }

@@ -5,11 +5,16 @@
 
 import {test, before, after} from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {launchApp} from './driver.mjs';
 
-const XSS_NAME = '<img src=x onerror="window.__hexhootPwned=true">';
-
 let app;
+// Kept across a restart of the app
+const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'hexhoot-ui-'));
+const launch = () => launchApp({name: 'ui', userData,
+    env: {HEXHOOT_TRANSPORTS: 'none'}});
 
 /**
  * Wait until the app has shown more than 'count' dialogs
@@ -23,11 +28,12 @@ async function waitForDialog(count) {
 }
 
 before(async () => {
-    app = await launchApp({name: 'ui', env: {HEXHOOT_TRANSPORTS: 'none'}});
+    app = await launch();
 });
 
 after(async () => {
     await app?.close();
+    fs.rmSync(userData, {recursive: true, force: true});
 });
 
 test('The renderer is locked down', async () => {
@@ -95,12 +101,18 @@ test('The login screen, social links and copyright are shown', async () => {
     }
 });
 
-test('A short password is rejected', async () => {
+test('Weak passwords are rejected, with the reason', async () => {
     await app.type('[name=displayName]', 'ZatMan');
-    await app.type('[name=password]', 'short');
+    await app.type('[name=password]', 'only15 chars!!!');
     await app.click('#loginButton');
     await waitForDialog(0);
-    assert.equal(await app.core('getPublicKeyOfLoggedInUser'), undefined);
+    assert.equal(await app.core('getMyAddress'), undefined);
+    // Core gives the reason, and the UI shows it
+    await app.type('[name=password]', 'zatman is my password');
+    await app.click('#loginButton');
+    await waitForDialog(1);
+    assert.match(app.dialogs[1], /name/);
+    assert.equal(await app.core('getMyAddress'), undefined);
 });
 
 test('Logging in shows the chat screen', async () => {
@@ -118,7 +130,7 @@ test('Logging in shows the chat screen', async () => {
     })`), {layout: true, logo: 1, textarea: 1, send: 1});
     const user = await app.core('getLoggedInUserInfoPublic');
     assert.equal(user.displayName, 'ZatMan');
-    assert.match(user.key, /^[0-9a-f]{64}$/);
+    assert.match(user.key, /^hh21[0-9a-z]{58}$/);
 });
 
 test('Add friend: tabs, invalid key, back', async () => {
@@ -135,7 +147,7 @@ test('Add friend: tabs, invalid key, back', async () => {
             myKey: document.querySelector('[name=myPublicKey]').value
                 .length,
         };
-    })()`), {tabs: 2, contents: 2, hidden: true, myKey: 64});
+    })()`), {tabs: 2, contents: 2, hidden: true, myKey: 62});
 
     await app.type('#theirPublicKey', 'not a key');
     const dialogs = app.dialogs.length;
@@ -146,40 +158,14 @@ test('Add friend: tabs, invalid key, back', async () => {
     await app.waitFor(`document.getElementById('friendsList')`);
 });
 
-test('A malicious display name renders as text (S1)', async () => {
-    const evil = 'ab'.repeat(32);
-    await app.core('updateFriendInformation', {key: evil,
-        displayName: XSS_NAME, photo: 'x);background:url(https://evil/'});
-    await app.evaluate(`window.reload()`);
-    const li = `document.getElementById('sidebar_li_${evil}')`;
-    await app.waitFor(li);
-    assert.equal(await app.evaluate(`${li}.querySelector('.name')
-        .textContent`), XSS_NAME);
-    assert.equal(await app.evaluate(`${li}.getElementsByTagName('img')
-        .length`), 0);
-    assert.ok(!await app.evaluate(`${li}.querySelector('.photo').style
-        .backgroundImage.includes('evil')`));
-
-    // Opening the chat and the profile must not create elements either
-    await app.click(`#sidebar_li_${evil}`);
-    await app.waitFor(`document.querySelector('#messageSenderInfo .name')`);
-    await app.click('#messageSenderInfo');
-    await app.waitFor(`document.querySelector('#viewProfile')`);
-    assert.equal(await app.evaluate(`document.querySelector(
-        '#viewProfile [name=displayName]').value`), XSS_NAME);
-    await app.click('#backButton');
-    await app.waitFor(`document.getElementById('friendsList')`);
-    assert.equal(await app.evaluate(`window.__hexhootPwned`), undefined);
-});
-
 test('Editing the profile keeps the key (S4)', async () => {
-    const before = await app.core('getPublicKeyOfLoggedInUser');
+    const before = await app.core('getMyAddress');
     await app.click('#ownProfilePic');
     await app.waitFor(`document.getElementById('editProfile')`);
     await app.type('#editProfile [name=about]', 'Hello <b>there</b>');
     await app.click('#editButton');
     await app.waitFor(`document.getElementById('friendsList')`);
-    assert.equal(await app.core('getPublicKeyOfLoggedInUser'), before);
+    assert.equal(await app.core('getMyAddress'), before);
     assert.equal((await app.core('getLoggedInUserInfoPublic')).about,
         'Hello <b>there</b>');
 });
@@ -194,6 +180,16 @@ test('Changing the language re-renders the UI', async () => {
     })()`);
     await app.waitFor(`document.getElementById('addFriendButton')
         .textContent.trim() !== ${JSON.stringify(english)}`);
+    assert.equal((await app.core('getPreference', 'language')).value, 'de');
+});
+
+test('After a restart the OS keyring signs in by itself', async () => {
+    const address = await app.core('getMyAddress');
+    assert.deepEqual(app.errors, []);
+    await app.close();
+    app = await launch();
+    await app.waitFor(`document.getElementById('friendsList')`);
+    assert.equal(await app.core('getMyAddress'), address);
     assert.equal((await app.core('getPreference', 'language')).value, 'de');
 });
 

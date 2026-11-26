@@ -41,7 +41,6 @@
     },
     "dependencies": {
         "arptable-js": "^0.0.2",
-        "ecdh": "^0.2.0",
         "electron-squirrel-startup": "^1.0.1",
         "hyperswarm": "^4.17.2",
         "ipv4-range": "^0.0.0",

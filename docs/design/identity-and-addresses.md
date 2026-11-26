@@ -64,7 +64,7 @@ This is domain-separated from the address, so the DHT topic is not the public ke
 
 # Implementation (2026-11-26)
 
-Built and tested as a library in `modules/Crypto`: `Identity.js` (`Identity`, `PublicIdentity`), `credentials.js` and `address.js`. Core starts using it in Phase 4, together with the new login screen and the [keyring](/design/keyring.md), which stores `Identity#secret()` under its `secrets` key.
+Built and tested as a library in `modules/Crypto`: `Identity.js` (`Identity`, `PublicIdentity`), `credentials.js` and `address.js`. Core uses it since Phase 4: logging in runs `Identity.fromCredentials`, and the [keyring](/design/keyring.md) stores `Identity#secret()` under its `secrets` key. A UI login at the real cost took 4.6 s on the 8 GiB Mac and gave exactly the known-answer address.
 
 ## Exact formats
 

@@ -19,7 +19,7 @@ class EditProfile {
     async render(backCallback) {
         await Layout.render();
         await loadStyle(new URL('./style.css', import.meta.url));
-        const userInfo = await dbMessenger.getLoggedInUserInfoPrivate();
+        const userInfo = await dbMessenger.getLoggedInUserInfoPublic();
 
         // Sidebar related
         document.getElementById('sidebar').insertAdjacentHTML('beforeend',
@@ -33,16 +33,9 @@ class EditProfile {
             <div id="title">${i18n.getText('EditProfile.editProfile')}</div>
             <div id="editProfile">
                 <div class="HexHoot_Input_label">
-                    ${i18n.getText('EditProfile.privateKey')} &nbsp;
-                    <span>${i18n.getText('EditProfile.warningNotToShare')}
-                    </span></div>
-                <input class="HexHoot_Input" name="privateKey"
-                    type="password" value="${userInfo.privateKey}" readonly/>
-
-                <div class="HexHoot_Input_label">
                     ${i18n.getText('EditProfile.displayName')}</div>
                 <input class="HexHoot_Input" name="displayName" type="text"
-                    value="${userInfo.displayName}" readonly/>
+                    value="${userInfo.displayName}"/>
 
                 <div class="HexHoot_Input_label">
                     ${i18n.getText('EditProfile.aboutYou')}</div>
@@ -68,9 +61,7 @@ class EditProfile {
             const inputs =
                 mainContentDOMNode.getElementsByClassName('HexHoot_Input');
             for (const input of inputs) {
-                if (input.name === 'privateKey') {
-                    continue; // Core keeps the existing key
-                } else if (input.name === 'photo') {
+                if (input.name === 'photo') {
                     // If there is a photo being uploaded
                     if (input.files.length !== 0) {
                         info.photo = await readAsDataURL(input.files[0]);
@@ -83,21 +74,12 @@ class EditProfile {
             backCallback(); // Just to give the users a sense of feedback
         };
         document.getElementById('downloadProfile').onclick = () => {
-            dbMessenger.downloadDBAsJSON();
+            dbMessenger.downloadBackup();
         };
         document.getElementById('logout').onclick = () => {
             if (confirm(i18n.getText('EditProfile.logoutConfirmation'))) {
                 dbMessenger.deleteDatabaseContent();
             }
-        };
-
-        // Private key toggle callbacks
-        const privateKeyDOM = document.querySelector('[name=privateKey]');
-        privateKeyDOM.onfocus = () => {
-            privateKeyDOM.type = 'text';
-        };
-        privateKeyDOM.onblur = () => {
-            privateKeyDOM.type = 'password';
         };
     }
 

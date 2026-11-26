@@ -1,6 +1,7 @@
 /* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
 import Layout from '../Layout/index.mjs';
+import dbMessenger from '../DBMessenger/index.mjs';
 import {getPath} from '../ImagePack/index.mjs';
 import {safePhoto} from '../Sanitize/index.mjs';
 import i18n from '../I18n/index.mjs';
@@ -20,6 +21,7 @@ class ViewProfile {
     async render(backCallback, userInfo) {
         await Layout.render();
         await loadStyle(new URL('./style.css', import.meta.url));
+        const safetyNumber = await dbMessenger.getSafetyNumber(userInfo.key);
 
         // Sidebar related
         document.getElementById('sidebar').insertAdjacentHTML('beforeend',
@@ -35,6 +37,11 @@ class ViewProfile {
                     ${i18n.getText('ViewProfile.publicKey')}</div>
                 <input class="HexHoot_Input" name="publicKey"
                     value="${userInfo.key}" readonly/>
+
+                <div class="HexHoot_Input_label">
+                    ${i18n.getText('ViewProfile.safetyNumber')}</div>
+                <input class="HexHoot_Input" name="safetyNumber"
+                    value="${safetyNumber || ''}" readonly/>
 
                 <div class="HexHoot_Input_label">
                     ${i18n.getText('ViewProfile.displayName')}</div>

@@ -305,6 +305,19 @@ class Keyring {
         return cipher;
     }
 
+    /**
+     * A key for keyed hashes (HMAC) of record ids, so that stored ids reveal
+     * nothing. It is zeroed when the keyring is locked.
+     * @return {Buffer} 32 bytes, HKDF(VK, "", "hexhoot/v2/index")
+     */
+    indexKey() {
+        this.assertUnlocked();
+        const key = hkdf(this.vk, Buffer.alloc(0),
+            Buffer.from('hexhoot/v2/index'));
+        this.ciphers.push({destroy: () => key.fill(0)});
+        return key;
+    }
+
     /** @throws {CryptoError} LOCKED */
     assertUnlocked() {
         if (!this.unlocked) {

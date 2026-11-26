@@ -1,7 +1,8 @@
 {
     "coprightMessage": "Copyright © 2022-2026 Zenin Easa Panthakkalakath",
     "internal": [
-        "Core"
+        "Core",
+        "I18n"
     ],
     "external": []
 }

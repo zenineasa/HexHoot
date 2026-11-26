@@ -25,7 +25,13 @@ const portPromise = new Promise(function(resolve) {
             if (request) {
                 pending.delete(data.id);
                 if (Object.hasOwn(data, 'error')) {
-                    request.reject(new Error(data.error));
+                    // Only the message crosses the context bridge, so the
+                    // code (and any details) go in front: "[CODE:a,b] text"
+                    const details = Array.isArray(data.problems) ?
+                        ':' + data.problems.join(',') : '';
+                    request.reject(new Error(data.code ?
+                        `[${data.code}${details}] ${data.error}` :
+                        data.error));
                 } else {
                     request.resolve(data.result);
                 }

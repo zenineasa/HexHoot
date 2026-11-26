@@ -113,7 +113,7 @@ class Chat {
         // Friend requests waiting for a decision are listed first
         const pending = await dbMessenger.getPendingFriendRequests();
         for (const key of Object.keys(pending)) {
-            if (!sanitize.isValidKey(key)) {
+            if (!sanitize.isValidAddress(key)) {
                 continue;
             }
             ul.appendChild(this.createPendingRequestListItem(pending[key]));
@@ -402,9 +402,10 @@ class Chat {
                 type: this.messageType.sent,
                 message: textAreaValue,
             };
-            this.insertChatMessageToDOM(message);
-            dbMessenger.sendChatMessage(userKey, message);
-            messageTextArea.value = '';
+            dbMessenger.sendChatMessage(userKey, message).then(() => {
+                this.insertChatMessageToDOM(message);
+                messageTextArea.value = '';
+            }, () => alert(i18n.getText('Chat.notFriendYet')));
         }
     }
 

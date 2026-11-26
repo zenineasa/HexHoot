@@ -2,6 +2,7 @@
     "coprightMessage": "Copyright © 2022-2026 Zenin Easa Panthakkalakath",
     "internal": [
         "Layout",
+        "DBMessenger",
         "ImagePack",
         "I18n",
         "Sanitize",

@@ -68,7 +68,8 @@ test('Over the LAN carrier', async (t) => {
     const bob = await peer([bobLan]);
     t.after(() => Promise.all([alice.messenger.stop(),
         bob.messenger.stop()]));
-    await waitFor(() => bobLan.peers.size === 1, 'discovery');
+    await waitFor(() => bobLan.peers.size === 1 && aliceLan.peers.size === 1,
+        'discovery both ways');
     await chat(alice, bob);
 
     // GET / says nothing about who is here (finding T2)

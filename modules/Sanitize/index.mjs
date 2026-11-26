@@ -13,11 +13,9 @@ const MAX_DISPLAY_NAME_LENGTH = 64;
 const MAX_ABOUT_LENGTH = 1000;
 const MAX_PHOTO_LENGTH = 2 * 1024 * 1024; // 2 MiB of base64
 const MAX_CHAT_MESSAGE_LENGTH = 64 * 1024;
-const MAX_KEY_LENGTH = 256;
 
 const SAFE_PHOTO_REGEX =
     /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/;
-const KEY_REGEX = /^[0-9a-fA-F]+$/;
 
 /**
  * Escape a value so that it can be inserted into HTML text or into a quoted
@@ -53,13 +51,14 @@ function safePhoto(photo) {
 }
 
 /**
- * Check that a value looks like a v1 public key (a hex string).
- * @param {*} key candidate key
- * @return {boolean} whether it is a well-formed key
+ * Check that a value looks like a HexHoot address (hh21…, Bech32m). Core
+ * checks the checksum; this is the quick check for the UI.
+ * @param {*} address candidate address
+ * @return {boolean} whether it has the right form
  */
-function isValidKey(key) {
-    return typeof key === 'string' && key.length > 0 &&
-        key.length <= MAX_KEY_LENGTH && KEY_REGEX.test(key);
+function isValidAddress(address) {
+    return typeof address === 'string' &&
+        /^hh21[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{58}$/.test(address);
 }
 
 /**
@@ -137,7 +136,8 @@ export {
     MAX_CHAT_MESSAGE_LENGTH,
     escapeHTML,
     safePhoto,
-    isValidKey,
+    isValidAddress,
+    clipString,
     sanitizeUserInfo,
     sanitizeChatMessage,
     tryParseJSON,

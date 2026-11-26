@@ -61,3 +61,53 @@ for (const transport of ['dht', 'lan']) {
         });
     });
 }
+
+// mallory's display name is an XSS payload; bob sees it as plain text in the
+// friend request, the friends list, the chat header and the profile (S1)
+const XSS_NAME = '<img src=x onerror="window.__hexhootPwned=true">';
+
+describe('A hostile display name stays text (S1)', () => {
+    const network = useNetwork({transport: 'lan', peers: ['bob', 'mallory']});
+
+    network.test('mallory\'s friend request and profile render as text',
+        async ({bob, mallory}) => {
+            await bob.login('Bobby Tables');
+            await mallory.login(XSS_NAME);
+            await Promise.all([bob.waitForTransports(),
+                mallory.waitForTransports()]);
+            await mallory.addFriend(bob.key);
+
+            const request = `[data-testid="pending-request"]` +
+                `[data-key="${mallory.key}"]`;
+            await bob.waitFor(`document.querySelector(
+                ${JSON.stringify(request)})`, 30000);
+            assert.deepEqual(await bob.evaluate(`(() => {
+                const li = document.querySelector(${JSON.stringify(request)});
+                return {name: li.querySelector('.name').textContent,
+                    images: li.getElementsByTagName('img').length};
+            })()`), {name: XSS_NAME, images: 0});
+
+            await bob.acceptFriendRequest(mallory.key);
+            await bob.waitForFriend(mallory.key, XSS_NAME);
+            await bob.openChat(mallory.key);
+            assert.equal(await bob.evaluate(`document.querySelector(
+                '#messageSenderInfo .name').textContent`), XSS_NAME);
+            await bob.click('#messageSenderInfo');
+            await bob.waitFor(`document.querySelector('#viewProfile')`);
+            assert.equal(await bob.evaluate(`document.querySelector(
+                '#viewProfile [name=displayName]').value`), XSS_NAME);
+            // Both sides see the same safety number
+            const number = await bob.evaluate(`document.querySelector(
+                '#viewProfile [name=safetyNumber]').value`);
+            assert.match(number, /^(\d{5} ){15}\d{5}$/);
+            assert.equal(number, await mallory.core('getSafetyNumber',
+                bob.key));
+            assert.equal(await bob.evaluate('window.__hexhootPwned'),
+                undefined);
+        });
+
+    network.test('No errors were logged', ({bob, mallory}) => {
+        assert.deepEqual(bob.errors, []);
+        assert.deepEqual(mallory.errors, []);
+    });
+});

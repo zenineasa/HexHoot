@@ -38,7 +38,8 @@ async function peer(network, options = {}) {
     const store = options.store || new MemoryMessengerStore();
     const messenger = new Messenger({identity, store,
         carriers: [network.carrier()], authorize: options.authorize,
-        retryMs: options.retryMs ?? 200, handshakeTimeoutMs: 1000});
+        retryMs: options.retryMs ?? 200,
+        handshakeTimeoutMs: options.handshakeTimeoutMs ?? 1000});
     const received = [];
     const delivered = [];
     messenger.onMessage((m) => received.push(m));
@@ -82,7 +83,9 @@ test('A friend request, receipts, and chat both ways', async (t) => {
 test('Messages wait in the outbox until the contact is online',
     async (t) => {
         const network = new MemoryNetwork();
-        const alice = await peer(network);
+        // A long handshake timeout: the first HS1 reaches nobody, so this
+        // only passes if HS1 is sent again on the retry ticks
+        const alice = await peer(network, {handshakeTimeoutMs: 60000});
         const bobIdentity = randomIdentity();
         t.after(() => alice.messenger.stop());
         await alice.messenger.send(bobIdentity.address, 'chat',

@@ -61,5 +61,12 @@ module.exports = function testHooks(app) {
         overrides.lanPeers = list(env.HEXHOOT_LAN_PEERS);
         overrides.lanPeers.forEach(parseAddress);
     }
+    // HEXHOOT_TEST_SCRYPT_N: a cheaper scrypt (for example 16384), so that
+    // logging in takes milliseconds instead of seconds. Identities made this
+    // way differ from real ones, which is fine for throwaway test accounts.
+    if (env.HEXHOOT_TEST_SCRYPT_N) {
+        overrides.scryptParams = {N: Number(env.HEXHOOT_TEST_SCRYPT_N), r: 8,
+            p: 1};
+    }
     return overrides;
 };

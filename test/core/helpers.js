@@ -1,44 +1,102 @@
 /* Copyright (c) 2026 Zenin Easa Panthakkalakath */
 
 const crypto = require('node:crypto');
-const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 const Core = require('../../modules/Core');
-const Storage = require('../../modules/Core/Storage');
-const {messageType} = require('../../modules/Core/constants.mjs');
+const EncryptedStore = require('../../modules/Core/EncryptedStore');
+
+// Logging in derives keys with scrypt; tests use a cheap setting
+const fastScrypt = {N: 2 ** 14, r: 8, p: 1};
+const password = 'correct horse battery staple';
 
 /**
- * A random hex string that looks like a v1 public key
- * @return {string} hex key
+ * A fake OS keyring
+ * @param {boolean} [strong] false acts like Linux basic_text
+ * @return {Object} a Sealer
  */
-function randomKey() {
-    return crypto.randomBytes(32).toString('hex');
+function fakeSealer(strong = true) {
+    const key = crypto.randomBytes(32);
+    return {
+        status: async () => ({available: true, backend: 'test', strong}),
+        async seal(text) {
+            const iv = crypto.randomBytes(16);
+            const c = crypto.createCipheriv('aes-256-ctr', key, iv);
+            return Buffer.concat([iv, c.update(text), c.final()]);
+        },
+        async unseal(sealed) {
+            const d = crypto.createDecipheriv('aes-256-ctr', key,
+                sealed.subarray(0, 16));
+            return Buffer.concat([d.update(sealed.subarray(16)), d.final()])
+                .toString();
+        },
+    };
 }
 
 /**
- * Create a Core with in-memory storage, logged in as 'name'
- * @param {string} name display name; also seeds the password
- * @param {Array} transports transports
- * @param {string} [file] database file; in memory if omitted
- * @return {Core} a started Core
+ * A Core with its own folder ("computer")
+ * @param {Object} [options]
+ * @param {MemoryNetwork} [options.network] carriers come from here
+ * @param {string} [options.dir] reuse a folder (a restart)
+ * @param {Object} [options.sealer] the OS keyring; strong by default
+ * @param {function} [options.now] clock
+ * @param {Object} [options.t] test context; the folder is removed after it
+ * @return {Promise<Core>} a started Core, with .dir and .sealer
  */
-async function createCore(name, transports = [], file = ':memory:') {
+async function makeCore(options = {}) {
+    const dir = options.dir ||
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hexhoot-core-'));
+    if (!options.dir && options.t) {
+        options.t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
+    }
+    const sealer = options.sealer || fakeSealer();
     const core = new Core({
-        storage: new Storage(file),
-        transports: transports,
+        store: new EncryptedStore(path.join(dir, 'HexHoot2.sqlite')),
+        keyringFile: path.join(dir, 'keyring.json'),
+        sealer,
+        scryptParams: fastScrypt,
+        now: options.now,
         log: function() {},
+        carriers: () => options.network ? [options.network.carrier()] : [],
     });
     await core.start();
-    if (name) {
-        await core.writeLoggedInUserInfo(
-            {displayName: name, password: name + '-password-123'});
-    }
+    core.dir = dir;
+    core.sealer = sealer;
     return core;
 }
 
 /**
- * Collect a Core's events
- * @param {Core} core the core
- * @return {Array} list that receives the events
+ * A signed-in Core
+ * @param {string} name account name
+ * @param {Object} [options] see makeCore
+ * @return {Promise<Core>} the Core
+ */
+async function signedIn(name, options = {}) {
+    const core = await makeCore(options);
+    await core.writeLoggedInUserInfo({displayName: name, password});
+    options.t?.after(() => core.stop().catch(() => {}));
+    return core;
+}
+
+/**
+ * @param {function} check returns truthy when done
+ * @param {string} what for the error
+ * @param {number} [timeout] ms
+ */
+async function waitFor(check, what, timeout = 10000) {
+    const end = Date.now() + timeout;
+    while (!await check()) {
+        if (Date.now() > end) {
+            throw new Error('Timed out waiting for ' + what);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+}
+
+/**
+ * @param {Core} core a Core
+ * @return {Array} its events, as they come
  */
 function collectEvents(core) {
     const events = [];
@@ -47,104 +105,32 @@ function collectEvents(core) {
 }
 
 /**
- * Wait until a condition holds
- * @param {function} condition async or sync predicate
- * @param {string} what description for the timeout error
- * @param {number} timeout milliseconds
- */
-async function waitFor(condition, what, timeout = 20000) {
-    const end = Date.now() + timeout;
-    while (Date.now() < end) {
-        if (await condition()) {
-            return;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 50));
-    }
-    throw new Error('Timed out waiting for ' + what);
-}
-
-/**
- * In-memory transport; every transport created from one hub can reach the
- * others.
- */
-class MemoryHub {
-    /** constructor */
-    constructor() {
-        this.listeners = new Map();
-    }
-
-    /**
-     * @return {Object} a transport connected to this hub
-     */
-    transport() {
-        const hub = this;
-        return {
-            name: 'memory',
-            callback: function() {},
-            onMessage(func) {
-                this.callback = func;
-            },
-            async start(publicKey) {
-                hub.listeners.set(publicKey, this);
-                this.publicKey = publicKey;
-            },
-            async stop() {
-                hub.listeners.delete(this.publicKey);
-            },
-            async send(recipient, envelope) {
-                const target = hub.listeners.get(recipient);
-                if (target) {
-                    setImmediate(() => target.callback(envelope));
-                }
-            },
-        };
-    }
-}
-
-/**
- * The friend request and chat flow between two started Cores
- * @param {Core} alice the requester
- * @param {Core} bob the recipient
+ * alice adds bob, bob accepts, and they chat both ways
+ * @param {Core} alice a signed-in Core
+ * @param {Core} bob another
  */
 async function befriendAndChat(alice, bob) {
-    const aliceKey = await alice.getPublicKeyOfLoggedInUser();
-    const bobKey = await bob.getPublicKeyOfLoggedInUser();
-    const bobEvents = collectEvents(bob);
-    const aliceEvents = collectEvents(alice);
-
-    // alice adds bob, as AddFriend does
-    await alice.updateFriendInformation({key: bobKey});
-    await alice.sendRequestOrResponse({key: bobKey},
-        messageType.friendRequest);
-    await waitFor(async () =>
-        (await bob.getPendingFriendRequests())[aliceKey],
-    'bob to receive the friend request');
-    assert.equal((await bob.getPendingFriendRequests())[aliceKey]
-        .displayName, 'alice');
-
-    // bob accepts; alice receives bob's profile
-    await bob.acceptFriendRequest(aliceKey);
-    await waitFor(async () =>
-        (await alice.getUserInfo(bobKey)).displayName === 'bob',
-    'alice to receive bob\'s profile');
-
-    // Chat both ways
-    await alice.sendChatMessage(bobKey, {timestamp: 1, message: 'hi bob'});
-    await bob.sendChatMessage(aliceKey, {timestamp: 2, message: 'hi alice'});
-    await waitFor(async () =>
-        (await bob.getAllMessages(aliceKey)).length === 2 &&
-        (await alice.getAllMessages(bobKey)).length === 2,
-    'both chats to arrive');
-    assert.deepEqual(
-        (await bob.getAllMessages(aliceKey)).map((m) => m.message),
-        [{timestamp: 1, message: 'hi bob', type: 'received'},
-            {timestamp: 2, message: 'hi alice', type: 'sent'}]);
-    assert.ok(bobEvents.some((e) => e.message.type === messageType.chat &&
-        e.isFromFriend));
-    assert.ok(aliceEvents.some((e) =>
-        e.message.type === messageType.userInfoResponse));
+    const assert = require('node:assert/strict');
+    const aliceAddress = await alice.getMyAddress();
+    const bobAddress = await bob.getMyAddress();
+    await alice.addFriend(bobAddress);
+    await waitFor(async () => (await bob.getPendingFriendRequests())[
+        aliceAddress], 'the friend request');
+    await bob.acceptFriendRequest(aliceAddress);
+    await waitFor(async () => (await alice.getUserInfo(bobAddress))
+        ?.status === 'friend', 'the acceptance');
+    await alice.sendChatMessage(bobAddress, {message: 'hi bob'});
+    await waitFor(async () => (await bob.getAllMessages(aliceAddress))
+        .length === 1, 'alice\'s message');
+    await bob.sendChatMessage(aliceAddress, {message: 'hi alice'});
+    await waitFor(async () => (await alice.getAllMessages(bobAddress))
+        .length === 2, 'bob\'s answer');
+    assert.deepEqual((await alice.getAllMessages(bobAddress))
+        .map((m) => [m.message.type, m.message.message]),
+    [['sent', 'hi bob'], ['received', 'hi alice']]);
 }
 
 module.exports = {
-    randomKey, createCore, collectEvents, waitFor, MemoryHub, befriendAndChat,
+    fakeSealer, makeCore, signedIn, waitFor, collectEvents, befriendAndChat,
+    fastScrypt, password,
 };

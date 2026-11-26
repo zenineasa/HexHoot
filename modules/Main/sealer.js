@@ -14,7 +14,11 @@ module.exports = function createSealer(safeStorage,
     platform = process.platform) {
     return {
         async status() {
-            const available = safeStorage.isEncryptionAvailable();
+            // The synchronous calls are deprecated since Electron 45; the
+            // async ones read and write the same format
+            const available = safeStorage.isAsyncEncryptionAvailable ?
+                await safeStorage.isAsyncEncryptionAvailable() :
+                safeStorage.isEncryptionAvailable();
             const backend = {
                 darwin: 'keychain',
                 win32: 'dpapi',
@@ -24,10 +28,14 @@ module.exports = function createSealer(safeStorage,
                 backend !== 'basic_text' && backend !== 'unknown'};
         },
         async seal(text) {
-            return safeStorage.encryptString(text);
+            return safeStorage.encryptStringAsync ?
+                safeStorage.encryptStringAsync(text) :
+                safeStorage.encryptString(text);
         },
         async unseal(sealed) {
-            return safeStorage.decryptString(sealed);
+            return safeStorage.decryptStringAsync ?
+                (await safeStorage.decryptStringAsync(sealed)).result :
+                safeStorage.decryptString(sealed);
         },
     };
 };

@@ -1,48 +1,46 @@
 /* Copyright (c) 2026 Zenin Easa Panthakkalakath */
 
-// L2 tests: two Cores in one process exchange a friend request and chat over
-// the real transports, the LAN carrier on 127.0.0.1 and Hyperswarm on a
-// private DHT testnet (never the public DHT).
+// L2 tests: two Cores befriend and chat over the real carriers, the LAN
+// carrier on 127.0.0.1 and Hyperswarm on a private testnet.
 
 const test = require('node:test');
 const createTestnet = require('hyperdht/testnet');
-const DhtTransport = require('../../modules/Core/DhtTransport');
-const LanTransport = require('../../modules/Core/LanTransport');
-const {createCore, befriendAndChat, waitFor} = require('./helpers');
+const DhtCarrier = require('../../modules/Protocol/DhtCarrier');
+const LanCarrier = require('../../modules/Protocol/LanCarrier');
+const {signedIn, befriendAndChat, waitFor} = require('./helpers');
 
-const quiet = function() {};
+/**
+ * @param {Array} carriers carriers to hand out
+ * @return {Object} a network-like object for makeCore
+ */
+function fixed(carriers) {
+    return {carrier: () => carriers.shift()};
+}
 
-test('Two Cores befriend and chat over the LAN carrier', async () => {
-    const aliceLan = new LanTransport({port: 0, peers: [], log: quiet});
-    const alice = await createCore('alice', [aliceLan]);
-    const bobLan = new LanTransport({
-        port: 0, peers: ['127.0.0.1:' + aliceLan.port], log: quiet});
-    const bob = await createCore('bob', [bobLan]);
-    try {
-        // The LAN carrier drops envelopes for peers it has not discovered
-        await waitFor(() => Object.keys(aliceLan.peers).length === 1 &&
-            Object.keys(bobLan.peers).length === 1, 'LAN discovery');
-        await befriendAndChat(alice, bob);
-    } finally {
-        await alice.stop();
-        await bob.stop();
-    }
+test('Two Cores befriend and chat over the LAN carrier', async (t) => {
+    const aliceLan = new LanCarrier({port: 0, peers: []});
+    const alice = await signedIn('Alice Liddell', {t,
+        network: fixed([aliceLan])});
+    const bobLan = new LanCarrier({port: 0,
+        peers: ['127.0.0.1:' + aliceLan.port]});
+    const bob = await signedIn('Bobby Tables', {t,
+        network: fixed([bobLan])});
+    await waitFor(() => aliceLan.peers.size === 1 && bobLan.peers.size === 1,
+        'LAN discovery');
+    await befriendAndChat(alice, bob);
 });
 
-test('Two Cores befriend and chat over a DHT testnet', async () => {
+test('Two Cores befriend and chat over a DHT testnet', async (t) => {
     const testnet = await createTestnet(3);
-    const options = {bootstrap: testnet.bootstrap, log: quiet};
-    const aliceDht = new DhtTransport(options);
-    const bobDht = new DhtTransport(options);
-    const alice = await createCore('alice', [aliceDht]);
-    const bob = await createCore('bob', [bobDht]);
-    try {
-        // Peers can only be found once their announce has completed
-        await Promise.all([aliceDht.announced, bobDht.announced]);
-        await befriendAndChat(alice, bob);
-    } finally {
-        await alice.stop();
-        await bob.stop();
+    const options = {bootstrap: testnet.bootstrap};
+    const aliceDht = new DhtCarrier(options);
+    const bobDht = new DhtCarrier(options);
+    const alice = await signedIn('Alice Liddell', {network: fixed([aliceDht])});
+    const bob = await signedIn('Bobby Tables', {network: fixed([bobDht])});
+    t.after(async () => {
+        await Promise.all([alice.stop(), bob.stop()]);
         await testnet.destroy();
-    }
+    });
+    await Promise.all([aliceDht.announced, bobDht.announced]);
+    await befriendAndChat(alice, bob);
 });

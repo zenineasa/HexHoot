@@ -40,13 +40,14 @@ test('safePhoto only allows base64 png, jpeg and webp data URLs', function() {
     }
 });
 
-test('isValidKey accepts hex only', function() {
-    assert.equal(sanitize.isValidKey('04abcdef0123'), true);
-    assert.equal(sanitize.isValidKey(''), false);
-    assert.equal(sanitize.isValidKey('04ab cd'), false);
-    assert.equal(sanitize.isValidKey('__proto__'), false);
-    assert.equal(sanitize.isValidKey(123), false);
-    assert.equal(sanitize.isValidKey('a'.repeat(257)), false);
+test('isValidAddress accepts hh21 addresses only', function() {
+    const address = 'hh21' + 'q'.repeat(58);
+    assert.equal(sanitize.isValidAddress(address), true);
+    assert.equal(sanitize.isValidAddress(address.toUpperCase()), false);
+    assert.equal(sanitize.isValidAddress(address + 'q'), false);
+    assert.equal(sanitize.isValidAddress('hh21' + 'b'.repeat(58)), false);
+    assert.equal(sanitize.isValidAddress('04abcdef0123'), false);
+    assert.equal(sanitize.isValidAddress(123), false);
 });
 
 test('sanitizeUserInfo keeps profile fields and the given key', function() {

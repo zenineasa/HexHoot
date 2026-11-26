@@ -57,7 +57,7 @@ AES-GCM is the only AEAD built into Electron. Deriving a fresh key for each reco
 
 # Implementation (2026-11-26)
 
-The keyring is built and tested as a library in `modules/Crypto`. Core does not use it yet: it is wired in with the new login screen in Phase 4, which replaces v1's password-derived key ([ADR-004](/decisions/adr-004-account-model.md)).
+The keyring is built and tested as a library in `modules/Crypto`. **Core uses it since Phase 4** (`modules/Core/EncryptedStore.js`). Every record goes through a `RecordCipher`. Record and group ids in the database are HMACs under a keyring-derived index key (`keyring.indexKey()`, `HKDF(VK, "", "hexhoot/v2/index")`), so the file shows neither contact addresses nor message ids. `safeStorage` lives in the main process and is reached by Core over the parent port, using the async API, since Electron 45 deprecates the synchronous calls.
 
 | File | What it does |
 |---|---|

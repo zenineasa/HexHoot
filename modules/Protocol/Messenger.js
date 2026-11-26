@@ -289,8 +289,17 @@ class Messenger {
         // never came
         const waiting = entry && !entry.ratchet.canSend &&
             now - entry.createdAt < this.options.handshakeTimeoutMs;
-        if (due.length > 0 && !waiting && !this.pendingTo.has(address)) {
+        if (due.length === 0 || waiting) {
+            return;
+        }
+        const pending = this.initiators.get(this.pendingTo.get(address));
+        if (!pending) {
             this.startHandshake(address);
+        } else if (now - pending.sentAt >= this.options.retryMs) {
+            // HS1 may have been lost (or reached nobody yet): send the same
+            // M1 again; a responder answers a repeat with the same M2
+            pending.sentAt = now;
+            this.sendHs1(address, pending.envelope);
         }
     }
 
@@ -337,10 +346,19 @@ class Messenger {
             expected: address});
         const m1 = initiator.start();
         const key = initiator.sid.toString('hex');
-        this.initiators.set(key, {initiator, address, at: this.now()});
-        this.pendingTo.set(address, key);
         const envelope = wire.encodeEnvelope(wire.kinds.hs1,
             this.topicOf(address), m1);
+        this.initiators.set(key, {initiator, address, envelope,
+            at: this.now(), sentAt: this.now()});
+        this.pendingTo.set(address, key);
+        this.sendHs1(address, envelope);
+    }
+
+    /**
+     * @param {string} address the contact
+     * @param {Buffer} envelope an HS1 envelope
+     */
+    sendHs1(address, envelope) {
         for (const carrier of this.carriers) {
             carrier.send(this.topicOf(address), envelope);
         }

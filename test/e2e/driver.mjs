@@ -87,11 +87,14 @@ async function connectCDP(url) {
  * @param {Object} [options]
  * @param {string} [options.name] peer name, used in logs
  * @param {Object} [options.env] extra environment variables
+ * @param {string} [options.userData] reuse this profile (a restart); it is
+ * then kept on close
  * @return {Object} a handle; see the returned object
  */
 export async function launchApp(options = {}) {
     const name = options.name || 'app';
-    const userData = fs.mkdtempSync(path.join(os.tmpdir(), `hexhoot-${name}-`));
+    const userData = options.userData ||
+        fs.mkdtempSync(path.join(os.tmpdir(), `hexhoot-${name}-`));
     const args = ['.', '--interaction-test', `--user-data-dir=${userData}`,
         '--remote-debugging-port=0', '--use-mock-keychain'];
     if (process.platform === 'linux' && process.env.CI) {
@@ -100,7 +103,9 @@ export async function launchApp(options = {}) {
     const log = [];
     const child = spawn(electron, args, {
         cwd: root,
-        env: Object.assign({}, process.env, options.env),
+        // Cheap scrypt, so logging in takes milliseconds (testHooks.js)
+        env: Object.assign({HEXHOOT_TEST_SCRYPT_N: '16384'}, process.env,
+            options.env),
         stdio: ['ignore', 'pipe', 'pipe'],
     });
     child.stdout.on('data', (chunk) => log.push(chunk.toString()));
@@ -112,11 +117,14 @@ export async function launchApp(options = {}) {
             child.kill();
             await exited;
         }
-        fs.rmSync(userData, {recursive: true, force: true});
+        if (!options.userData) {
+            fs.rmSync(userData, {recursive: true, force: true});
+        }
     };
 
     try {
         const portFile = path.join(userData, 'DevToolsActivePort');
+        fs.rmSync(portFile, {force: true}); // from an earlier run
         const port = await poll(() => fs.existsSync(portFile) &&
             fs.readFileSync(portFile, 'utf8').split('\n')[0],
         'the DevTools port', 30000);

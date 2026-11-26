@@ -1,7 +1,7 @@
 /* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
 import Layout from '../Layout/index.mjs';
-import dbMessenger from '../DBMessenger/index.mjs';
+import dbMessenger, {errorCode} from '../DBMessenger/index.mjs';
 import * as sanitize from '../Sanitize/index.mjs';
 import i18n from '../I18n/index.mjs';
 import {html, loadStyle} from '../Html/index.mjs';
@@ -18,7 +18,7 @@ class AddFriend {
     async render(backCallback) {
         await Layout.render();
         await loadStyle(new URL('./style.css', import.meta.url));
-        const publicKey = await dbMessenger.getPublicKeyOfLoggedInUser();
+        const publicKey = await dbMessenger.getMyAddress();
 
         // Sidebar related
         document.getElementById('sidebar').insertAdjacentHTML('beforeend',
@@ -73,21 +73,22 @@ class AddFriend {
             navigator.clipboard.writeText(publicKey);
         };
         document.getElementById('addFriendButton').onclick = async () => {
-            const key = document.getElementById('theirPublicKey').value.trim();
-            if (!sanitize.isValidKey(key) || key === publicKey) {
+            const key = document.getElementById('theirPublicKey').value
+                .replace(/\s+/g, '').toLowerCase();
+            if (!sanitize.isValidAddress(key) || key === publicKey) {
                 alert(i18n.getText('AddFriend.invalidKey'));
                 return;
             }
-            const otherUserInfo = {key: key};
-            const pending = await dbMessenger.getPendingFriendRequests();
-            if (pending[key]) {
-                // They had already sent us a request; accept it
-                await dbMessenger.acceptFriendRequest(key);
-            } else {
-                await dbMessenger.updateFriendInformation(otherUserInfo);
+            try {
+                // Accepts their request instead, if they sent one first
+                await dbMessenger.addFriend(key);
+            } catch (err) {
+                if (errorCode(err).code === 'BAD_ADDRESS') {
+                    alert(i18n.getText('AddFriend.invalidKey'));
+                    return;
+                }
+                throw err;
             }
-            dbMessenger.sendRequestOrResponse(
-                otherUserInfo, dbMessenger.messageType.friendRequest);
             backCallback();
         };
     }

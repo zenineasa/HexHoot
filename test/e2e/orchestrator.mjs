@@ -72,7 +72,7 @@ function addActions(app, otherPeers) {
             await app.type('[name=password]', password);
             await app.click('#loginButton');
             await app.waitFor(`document.getElementById('friendsList')`);
-            app.key = await app.core('getPublicKeyOfLoggedInUser');
+            app.key = await app.core('getMyAddress');
             return app.key;
         },
 
