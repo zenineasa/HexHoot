@@ -107,5 +107,5 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 
 - ~~Migration screen~~: dropped 2026-11-27, because v1 has no users ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)).
 - Update the README (the account model and the reworded "zero-knowledge" claim) and add a `SECURITY.md`. **Done 2026-11-27**, together with the [external review package](/plan/external-review.md).
-- L5: run the packaged-build smoke tests on every OS.
+- L5: run the packaged-build smoke tests on every OS. **Done 2026-11-27:** `npm run test:packaged`, run on release tags by `.github/workflows/packaged.yml`; passes on macOS (arm64) locally.
 - **External cryptographic review** of the handshake, ratchet, keyring, and wire protocol, against the frozen spec. This is required: HexHoot owns its protocol ([ADR-002](/decisions/adr-002-builtin-crypto-only.md)), so a 2.0.0 release waits on the review.

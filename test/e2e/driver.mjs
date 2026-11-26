@@ -89,19 +89,24 @@ async function connectCDP(url) {
  * @param {Object} [options.env] extra environment variables
  * @param {string} [options.userData] reuse this profile (a restart); it is
  * then kept on close
+ * @param {string} [options.executable] a packaged app to run instead of
+ * the sources (L5)
  * @return {Object} a handle; see the returned object
  */
 export async function launchApp(options = {}) {
     const name = options.name || 'app';
     const userData = options.userData ||
         fs.mkdtempSync(path.join(os.tmpdir(), `hexhoot-${name}-`));
-    const args = ['.', '--interaction-test', `--user-data-dir=${userData}`,
+    const args = ['--interaction-test', `--user-data-dir=${userData}`,
         '--remote-debugging-port=0', '--use-mock-keychain'];
+    if (!options.executable) {
+        args.unshift('.');
+    }
     if (process.platform === 'linux' && process.env.CI) {
         args.push('--no-sandbox'); // CI containers lack user namespaces
     }
     const log = [];
-    const child = spawn(electron, args, {
+    const child = spawn(options.executable || electron, args, {
         cwd: root,
         // Cheap scrypt, so logging in takes milliseconds (testHooks.js)
         env: Object.assign({HEXHOOT_TEST_SCRYPT_N: '16384'}, process.env,

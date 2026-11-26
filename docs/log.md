@@ -2,6 +2,7 @@
 
 ## 2026-11-27
 
+* **Update**: Phase 5, commit 3: L5 packaged smoke tests (`npm run test:packaged`) and a workflow that runs them on release tags. Against a fresh macOS build: fuses set, no tests or docs in `app.asar`, every test hook ignored (the real-cost known-answer address came out), renderer locked down, restart signs in, no errors ([testing infrastructure](/design/testing-infrastructure.md)).
 * **Update**: Phase 5, commit 2. The README describes v2: the name-and-password account, addresses, friend requests, safety numbers, delivery without a server, and the algorithms. The "Zero-Knowledge-Proof based authentication" claim is replaced with what HexHoot actually does, and a status note says v2 is unreviewed. New `SECURITY.md` (reporting, what is and is not protected) and [external review package](/plan/external-review.md).
 * **Update**: Phase 5, commit 1. Resends back off from 3 s to 60 s, and whatever waits is sent at once when a carrier sees a peer appear (Q15); the L3 restart test went from 50 s to 7 s. Messages keep arrival order rather than the sender's clock (Q16). ADR-001 is amended: no v1 export screen, since v1 has no users ([open questions](/plan/open-questions.md)).
 * **Update**: Phase 4, commit 4: the L3 scenario table (50 messages each way over each transport and with faults, restarts, three peers at once, the same account in a fresh profile) and the L4 adversarial peer (`test/peers/evilPeer.js`), covering T2, S1–S3, replays, tampering, and malformed and oversized frames ([testing infrastructure](/design/testing-infrastructure.md)).
