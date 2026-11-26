@@ -6,13 +6,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
-const {Identity} = require('../../modules/Crypto/Identity');
+const {randomIdentity} = require('./helpers');
 const {Initiator, Responder} = require('../../modules/Crypto/handshake');
 const {Ratchet, sizes, internals} = require('../../modules/Crypto/Ratchet');
 const RecordCipher = require('../../modules/Crypto/RecordCipher');
 
-const aliceId = Identity.generate();
-const bobId = Identity.generate();
+const aliceId = randomIdentity();
+const bobId = randomIdentity();
 
 /**
  * A fresh session between alice and bob

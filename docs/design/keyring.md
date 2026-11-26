@@ -18,7 +18,7 @@ This follows the keyring and key-vault pattern: one **vault key** (VK, 256 bits,
 |---|---|---|
 | `os-keyring` | `safeStorage.encryptString` → macOS Keychain, Windows DPAPI, or Linux libsecret/kwallet | Yes, when available |
 | `passphrase` | scrypt(passphrase, 32-byte salt, N=2²⁰, r=8, p=1, 1 GiB) → KEK → AES-256-GCM wrap | Required when the OS backend is weak (see below). Optional otherwise, as an extra lock. |
-| `recovery` | The recovery phrase ([identity](/design/identity-and-addresses.md)) | Used only for restoring onto a new machine |
+| `recovery` | Name and password ([identity](/design/identity-and-addresses.md), [ADR-004](/decisions/adr-004-account-model.md)). They re-derive the identity on a new machine, and a new vault is made there. | Used only for setting up a new machine |
 
 On Linux, `safeStorage.getSelectedStorageBackend()` can return `basic_text`, meaning no secret service is running. In that case HexHoot **must** require the passphrase unlocker and must not silently store the key with obfuscation only.
 
@@ -49,7 +49,7 @@ AES-GCM is the only AEAD built into Electron. Deriving a fresh key for each reco
 
 # Lifecycle
 
-- **First run:** generate the identity → show the recovery phrase → create the VK → wrap it with `os-keyring` (and `passphrase` if needed or chosen).
+- **First run:** derive the identity from name and password → create the VK → wrap it with `os-keyring` (and `passphrase` if needed or chosen).
 - **Launch:** unwrap the VK, keep it only in Core memory, and zero the buffers on lock or quit.
 - **Lock:** a manual lock and an optional idle timeout drop the VK from memory.
 - **Backup export:** the user picks a backup passphrase → scrypt (N=2²⁰) → AES-256-GCM over `{identity seed, contacts, messages, preferences}`. **No ratchet state** goes in the backup. The file extension is `.hexhoot2`, and it replaces the plaintext `.hexhootjson`.

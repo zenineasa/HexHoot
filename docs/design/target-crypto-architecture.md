@@ -33,7 +33,7 @@ Each choice is the **strongest option Electron offers** ([ADR-003](/decisions/ad
 | Local record encryption | AES-256-GCM under per-record HKDF-SHA-512-derived keys |
 | Hash, KDF, MAC | SHA-512, HKDF-SHA-512, and HMAC-SHA-512, with `hexhoot/v2/…` labels |
 | Passphrase KDF | scrypt N=2²⁰, r=8, p=1 (1 GiB). This is Electron's ceiling, since 2²¹ crashes. Argon2id is not available. |
-| Recovery entropy | 256 bits (24 words) |
+| Identity entropy | Name and password through scrypt N=2²⁰ ([ADR-004](/decisions/adr-004-account-model.md)) |
 | Root secret at rest | OS keyring through `safeStorage` (Keychain, DPAPI, libsecret or kwallet) |
 | Address, fingerprint, topic | SHA-512 with labels, truncated to 256 bits |
 

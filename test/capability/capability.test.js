@@ -36,7 +36,7 @@ test('ML-KEM-1024: sizes, round trip, deterministic seed', function() {
     tampered[0] ^= 1;
     assert.notDeepEqual(crypto.decapsulate(privateKey, tampered), sharedKey);
 
-    // Keys derived from the recovery phrase: same 64-byte seed, same key
+    // Keys derived from a seed: same 64-byte seed, same key
     const seed = Buffer.alloc(64, 7);
     const fromSeed = () => crypto.createPublicKey(crypto.createPrivateKey({
         key: seed, format: 'raw-seed', asymmetricKeyType: 'ml-kem-1024',

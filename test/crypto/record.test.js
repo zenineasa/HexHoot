@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const RecordCipher = require('../../modules/Crypto/RecordCipher');
 const {
-    encodeParts, scrypt, checkScryptParams,
+    encodeParts, scrypt, checkScryptParams, scryptOutlook,
 } = require('../../modules/Crypto/primitives');
 
 const key = Buffer.alloc(32, 7);
@@ -109,10 +109,13 @@ test('scrypt parameters are capped before scrypt runs', async () => {
         {code: 'BAD_PARAMS'});
 });
 
-test('scrypt refuses to start when memory is low', async () => {
+test('scrypt refuses only machines with too little memory', async () => {
     const params = {N: 2 ** 20, r: 8, p: 1};
     await assert.rejects(scrypt('pw', Buffer.alloc(32), params,
-        {availableMemory: () => 1.2 * 2 ** 30}), {code: 'LOW_MEMORY'});
+        {totalMemory: () => 1.5 * 2 ** 30}), {code: 'LOW_MEMORY'});
+    const outlook = scryptOutlook(params);
+    assert.equal(outlook.needBytes, 2 ** 30);
+    assert.equal(typeof outlook.likelySlow, 'boolean');
 });
 
 test('scrypt normalizes the passphrase (NFKC)', async () => {

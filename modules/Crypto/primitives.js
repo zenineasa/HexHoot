@@ -4,15 +4,20 @@
 // Electron's built-in crypto (BoringSSL) is used; see ADR-002 and ADR-003.
 
 const crypto = require('node:crypto');
+const os = require('node:os');
 
 // scrypt limits. N=2^21 crashes Electron with SIGTRAP, which cannot be
 // caught, so N is capped here before scrypt is ever called.
 const scryptDefaults = Object.freeze({N: 2 ** 20, r: 8, p: 1});
 const scryptMinN = 2 ** 14;
 const scryptMaxN = 2 ** 20;
-// Refuse to start scrypt unless this much more than its own memory need is
-// available, rather than pushing the machine into swap (Q14)
-const scryptHeadroom = 1.5;
+// scrypt is refused only on machines with less total memory than this
+// multiple of its need; anywhere else it runs, slowly if memory is tight,
+// because the identity cannot be derived without it (Q14, ADR-004)
+const scryptTotalMemoryFactor = 2;
+// Below this multiple of its need in available memory, warn that it may
+// take minutes
+const scryptComfortFactor = 1.25;
 
 /** An error with a stable code that callers can branch on */
 class CryptoError extends Error {
@@ -126,7 +131,7 @@ function checkScryptParams(params) {
  * @param {Object} [params] {N, r, p}; scryptDefaults if omitted
  * @param {Object} [options]
  * @param {number} [options.length] output bytes
- * @param {function} [options.availableMemory] returns free bytes; for tests
+ * @param {function} [options.totalMemory] returns total RAM; for tests
  * @return {Promise<Buffer>} the key
  * @throws {CryptoError} BAD_PARAMS, LOW_MEMORY
  */
@@ -137,13 +142,11 @@ async function scrypt(passphrase, salt, params = scryptDefaults,
         throw new CryptoError('BAD_PASSPHRASE', 'A passphrase is needed');
     }
     const need = 128 * N * r;
-    // process.availableMemory() counts reclaimable memory (macOS inactive
-    // pages, Linux MemAvailable); os.freemem() reports almost 0 on macOS.
-    const available = (options.availableMemory ||
-        process.availableMemory)();
-    if (available < need * scryptHeadroom) {
-        throw new CryptoError('LOW_MEMORY', `scrypt needs about ` +
-            `${Math.ceil(need * scryptHeadroom / 2 ** 20)} MiB of free memory`);
+    const total = (options.totalMemory || os.totalmem)();
+    if (total < need * scryptTotalMemoryFactor) {
+        throw new CryptoError('LOW_MEMORY', 'This computer needs at least ' +
+            `${Math.ceil(need * scryptTotalMemoryFactor / 2 ** 30)} GiB ` +
+            'of memory');
     }
     const password = Buffer.from(passphrase.normalize('NFKC'), 'utf8');
     try {
@@ -156,7 +159,24 @@ async function scrypt(passphrase, salt, params = scryptDefaults,
     }
 }
 
+/**
+ * How a scrypt run is likely to go right now, so the UI can say "this may
+ * take a few minutes" before starting
+ * @param {Object} [params] {N, r, p}; scryptDefaults if omitted
+ * @return {Object} {needBytes, availableBytes, likelySlow}
+ */
+function scryptOutlook(params = scryptDefaults) {
+    const {N, r} = checkScryptParams(params);
+    const need = 128 * N * r;
+    // process.availableMemory() counts reclaimable memory (macOS inactive
+    // pages, Linux MemAvailable); os.freemem() reports almost 0 on macOS.
+    const available = process.availableMemory();
+    return {needBytes: need, availableBytes: available,
+        likelySlow: available < need * scryptComfortFactor};
+}
+
 module.exports = {
+    scryptOutlook,
     CryptoError, encodeParts, hkdf, seal, open, scrypt, checkScryptParams,
     scryptDefaults,
 };

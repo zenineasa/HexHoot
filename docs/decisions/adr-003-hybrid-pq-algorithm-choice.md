@@ -30,7 +30,7 @@ Each row is the **strongest option Electron 45 provides**, as measured by the [c
 | Hash | **SHA-512** | 256-bit collision resistance | SHA-3 is not in BoringSSL |
 | KDF and ratchet chains | **HKDF-SHA-512 and HMAC-SHA-512** | — | — |
 | Passphrase KDF | **scrypt N=2²⁰, r=8, p=1** (1 GiB, about 8 s) | The highest cost that runs: N=2²¹ crashes Electron (SIGTRAP) | Argon2id is not in BoringSSL |
-| Recovery entropy | **256 bits** (24 words) | Matches category 5 | — |
+| Identity entropy | From name and password through scrypt N=2²⁰ ([ADR-004](/decisions/adr-004-account-model.md)) | Limited by the password, not by the algorithms | A random 256-bit identity with a recovery phrase was rejected by the maintainer |
 | Hybrid combining | KEM *and* ECDH secrets plus the full transcript go into HKDF-SHA-512 | Secure if either half holds | — |
 | Signature combining | **Both** must verify (AND) | Unforgeable if either half holds | — |
 | Ratchet post-quantum healing | ML-KEM-1024 in **every** turn | Fastest healing possible | — |

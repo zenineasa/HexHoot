@@ -6,15 +6,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
-const {Identity} = require('../../modules/Crypto/Identity');
+const {randomIdentity} = require('./helpers');
 const hk = require('../../modules/Crypto/hybridKem');
 const {Initiator, Responder, resolveSimultaneous, sizes} =
     require('../../modules/Crypto/handshake');
 const {encodeParts} = require('../../modules/Crypto/primitives');
 
-const alice = Identity.generate();
-const bob = Identity.generate();
-const mallory = Identity.generate();
+const alice = randomIdentity();
+const bob = randomIdentity();
+const mallory = randomIdentity();
 
 /**
  * Run a handshake, optionally changing messages on the way

@@ -2,7 +2,7 @@
 
 const crypto = require('node:crypto');
 const {CryptoError, encodeParts, hkdf} = require('./primitives');
-const {entropyToPhrase, phraseToEntropy} = require('./phrase');
+const credentials = require('./credentials');
 const address = require('./address');
 
 // Sizes (ADR-003)
@@ -188,7 +188,8 @@ class PublicIdentity {
 
 /**
  * Our own identity (docs/design/identity-and-addresses.md). Everything is
- * derived from 32 bytes of entropy, which the recovery phrase encodes:
+ * derived from 32 bytes of entropy, which come from the name and password
+ * (credentials.js, ADR-004):
  *
  *     seed  = HKDF(entropy, 0^64, "hexhoot/v2/identity-seed", 64)
  *     ik_pq = ML-DSA-87 from HKDF(seed, "", "hexhoot/v2/ik-pq", 32)
@@ -197,11 +198,12 @@ class PublicIdentity {
  */
 class Identity {
     /**
-     * Use generate(), fromPhrase() or fromSecret()
+     * Use fromCredentials() or fromSecret(). Tests may call it directly.
      * @param {Buffer} entropy 32 bytes; the identity keeps it
      * @param {number} createdAt creation time (ms)
+     * @param {string} [name] the normalized account name
      */
-    constructor(entropy, createdAt) {
+    constructor(entropy, createdAt, name = '') {
         if (!Buffer.isBuffer(entropy) || entropy.length !== 32) {
             throw new CryptoError('BAD_PARAMS', 'Entropy must be 32 bytes');
         }
@@ -210,6 +212,7 @@ class Identity {
         }
         this.entropy = entropy;
         this.createdAt = createdAt;
+        this.name = name;
 
         const seed = hkdf(entropy, Buffer.alloc(64),
             Buffer.from('hexhoot/v2/identity-seed'), 64);
@@ -246,45 +249,63 @@ class Identity {
     }
 
     /**
-     * A new identity
-     * @param {number} [createdAt] creation time (ms)
-     * @return {Identity} the identity; show identity.phrase() to the user
+     * Create or restore an identity from a name and password. The same
+     * name and password give the same keys and address on any device. This
+     * runs scrypt at N=2^20: about 8 s and 1 GiB.
+     * @param {string} name as typed; see credentials.normalizeName
+     * @param {string} password as typed
+     * @param {Object} [options] {createdAt}; for tests also scryptParams
+     * and totalMemory
+     * @return {Promise<Identity>} the identity
+     * @throws {CryptoError} WEAK_CREDENTIALS, LOW_MEMORY
      */
-    static generate(createdAt = Date.now()) {
-        return new Identity(crypto.randomBytes(32), createdAt);
-    }
-
-    /**
-     * Restore an identity from its recovery phrase. The keys, fingerprint
-     * and address are the same as before; the bundle gets a new time.
-     * @param {string} phrase 24 words
-     * @param {number} [createdAt] creation time (ms)
-     * @return {Identity} the identity
-     * @throws {CryptoError} BAD_PHRASE
-     */
-    static fromPhrase(phrase, createdAt = Date.now()) {
-        return new Identity(phraseToEntropy(phrase), createdAt);
+    static async fromCredentials(name, password, options = {}) {
+        const entropy = await credentials.deriveEntropy(name, password,
+            options);
+        return new Identity(entropy, options.createdAt ?? Date.now(),
+            credentials.normalizeName(name));
     }
 
     /**
      * Load an identity from secret() as stored in the keyring
-     * @param {Object} secret {entropy (base64), createdAt}
+     * @param {Object} secret {entropy (base64), createdAt, name}
      * @return {Identity} the identity
      */
     static fromSecret(secret) {
         return new Identity(Buffer.from(secret.entropy, 'base64'),
-            secret.createdAt);
+            secret.createdAt, secret.name || '');
     }
 
-    /** @return {string} the 24-word recovery phrase */
-    phrase() {
-        return entropyToPhrase(this.entropy);
+    /**
+     * Whether the user still remembers their password, for the occasional
+     * check (credentials.nextPasswordCheck). Runs the full derivation.
+     * @param {string} password as typed
+     * @param {Object} [options] for tests: scryptParams, totalMemory
+     * @return {Promise<boolean>} whether it gives this identity
+     * @throws {CryptoError} LOW_MEMORY
+     */
+    async checkPassword(password, options = {}) {
+        let candidate;
+        try {
+            candidate = await credentials.deriveEntropy(this.name, password,
+                options);
+        } catch (err) {
+            if (err.code === 'WEAK_CREDENTIALS') {
+                return false; // it cannot be the password we derived from
+            }
+            throw err;
+        }
+        try {
+            return crypto.timingSafeEqual(candidate, this.entropy);
+        } finally {
+            candidate.fill(0);
+        }
     }
 
     /** @return {Object} what the keyring stores ('secrets' purpose) */
     secret() {
         return {entropy: this.entropy.toString('base64'),
-            createdAt: this.createdAt};
+            createdAt: this.createdAt, name: this.name};
     }
 
     /** @return {Buffer} the 32-byte fingerprint */

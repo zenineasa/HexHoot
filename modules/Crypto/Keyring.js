@@ -50,7 +50,7 @@ class Keyring {
         this.sealer = options.sealer || null;
         this.scryptParams = checkScryptParams(
             options.scryptParams || scryptDefaults);
-        this.availableMemory = options.availableMemory;
+        this.totalMemory = options.totalMemory;
         this.vk = null;
         this.ciphers = [];
     }
@@ -64,7 +64,7 @@ class Keyring {
      * @param {string} [options.passphrase] adds a passphrase unlocker
      * @param {Object} [options.scryptParams] {N, r, p}; 2^20, 8, 1 if
      * omitted. Lower values are for tests only.
-     * @param {function} [options.availableMemory] for tests
+     * @param {function} [options.totalMemory] for tests
      * @return {Promise<Keyring>} the keyring, unlocked
      * @throws {CryptoError} EXISTS, PASSPHRASE_REQUIRED, LOW_MEMORY
      */
@@ -231,7 +231,7 @@ class Keyring {
         const params = checkScryptParams(unlocker);
         const kek = await scrypt(passphrase,
             Buffer.from(unlocker.salt, 'base64'), params,
-            {availableMemory: this.availableMemory});
+            {totalMemory: this.totalMemory});
         let vk;
         try {
             vk = open(kek, Buffer.from(unlocker.wrapped, 'base64'),
@@ -366,7 +366,7 @@ class Keyring {
         const params = this.scryptParams;
         const salt = crypto.randomBytes(32);
         const kek = await scrypt(passphrase, salt, params,
-            {availableMemory: this.availableMemory});
+            {totalMemory: this.totalMemory});
         try {
             return {type: 'passphrase', kdf: 'scrypt', ...params,
                 salt: salt.toString('base64'),

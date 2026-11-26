@@ -1,6 +1,6 @@
 /* Copyright (c) 2026 Zenin Easa Panthakkalakath */
 
-// L1 tests of identities, recovery phrases and addresses
+// L1 tests of identities, name-and-password derivation and addresses
 // (docs/design/identity-and-addresses.md).
 
 const test = require('node:test');
@@ -8,30 +8,14 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const {Identity, PublicIdentity, sizes} =
     require('../../modules/Crypto/Identity');
-const {entropyToPhrase, phraseToEntropy, wordlist} =
-    require('../../modules/Crypto/phrase');
+const credentials = require('../../modules/Crypto/credentials');
+const {randomIdentity} = require('./helpers');
 const address = require('../../modules/Crypto/address');
 const {encodeParts} = require('../../modules/Crypto/primitives');
 
-// 256-bit vectors from trezor/python-mnemonic vectors.json (BIP-39)
-const bip39Vectors = [
-    ['00'.repeat(32), 'abandon '.repeat(23) + 'art'],
-    ['7f'.repeat(32), 'legal winner thank year wave sausage worth useful ' +
-        'legal winner thank year wave sausage worth useful legal winner ' +
-        'thank year wave sausage worth title'],
-    ['80'.repeat(32), 'letter advice cage absurd amount doctor acoustic ' +
-        'avoid letter advice cage absurd amount doctor acoustic avoid ' +
-        'letter advice cage absurd amount doctor acoustic bless'],
-    ['ff'.repeat(32), 'zoo '.repeat(23) + 'vote'],
-    ['68a79eaca2324873eacc50cb9c6eca8cc68ea5d936f98787c60c7ebc74e6ce7c',
-        'hamster diagram private dutch cause delay private meat slide ' +
-        'toddler razor book happy fancy gospel tennis maple dilemma loan ' +
-        'word shrug inflict delay length'],
-    ['f585c11aec520db57dd353c69554b21a89b20fb0650966fa0a9d6f74fd989d8f',
-        'void come effort suffer camp survey warrior heavy shoot primary ' +
-        'clutch crush open amazing screen patrol group space point ten ' +
-        'exist slush involve unfold'],
-];
+// Cheap scrypt for most tests; the real cost runs in the slow test below
+const fast = {scryptParams: {N: 2 ** 14, r: 8, p: 1}};
+const password = 'correct horse battery staple';
 
 // Known-answer values for entropy 00 01 … 1f, created at 1e12 ms. They pin
 // the derivation; the WebCrypto test below checks it independently.
@@ -47,38 +31,6 @@ const kat = {
 
 const sha256 = (data) => crypto.createHash('sha256').update(data)
     .digest('hex');
-
-test('The word list is the published BIP-39 list', () => {
-    const list = wordlist();
-    assert.equal(list.length, 2048);
-    assert.equal(new Set(list).size, 2048);
-    // Every word is identified by its first four letters
-    assert.equal(new Set(list.map((w) => w.slice(0, 4))).size, 2048);
-});
-
-test('Recovery phrases match the BIP-39 vectors', () => {
-    for (const [entropy, phrase] of bip39Vectors) {
-        assert.equal(entropyToPhrase(Buffer.from(entropy, 'hex')), phrase);
-        assert.equal(phraseToEntropy(phrase).toString('hex'), entropy);
-    }
-});
-
-test('Phrases are read as typed, and mistakes are caught', () => {
-    const [entropy, phrase] = bip39Vectors[4];
-    const sloppy = '  ' + phrase.toUpperCase().replace(/ /g, ' \n\t ') + ' ';
-    assert.equal(phraseToEntropy(sloppy).toString('hex'), entropy);
-
-    const words = phrase.split(' ');
-    assert.throws(() => phraseToEntropy(words.slice(1).join(' ')),
-        {code: 'BAD_PHRASE', message: /24 words, not 23/});
-    assert.throws(() => phraseToEntropy(['hamstr', ...words.slice(1)]
-        .join(' ')), {code: 'BAD_PHRASE', word: 'hamstr'});
-    // Swapping two words breaks the checksum
-    const swapped = [...words];
-    [swapped[0], swapped[1]] = [swapped[1], swapped[0]];
-    assert.throws(() => phraseToEntropy(swapped.join(' ')),
-        {code: 'BAD_PHRASE', message: /checksum/});
-});
 
 test('An identity is derived deterministically from its entropy', () => {
     const identity = new Identity(Buffer.from(kat.entropy), kat.createdAt);
@@ -116,22 +68,95 @@ test('The derivation matches an independent WebCrypto HKDF', async () => {
     assert.deepEqual(identity.public.ikPq, pq);
 });
 
-test('The phrase restores the same keys and address', () => {
-    const original = Identity.generate(1000);
-    const restored = Identity.fromPhrase(original.phrase(), 2000);
-    assert.equal(restored.address, original.address);
-    assert.deepEqual(restored.fingerprint, original.fingerprint);
+test('The name is normalized, and weak credentials are refused', () => {
+    assert.equal(credentials.normalizeName('  Alice \t Liddell '),
+        'alice liddell');
+    assert.equal(credentials.normalizeName('ＡＬＩＣＥ'), 'alice'); // NFKC
+    const problems = (name, pass) => credentials.checkCredentials(name, pass);
+    assert.deepEqual(problems('Alice Liddell', password), []);
+    assert.deepEqual(problems('Al', password), ['nameTooShort']);
+    assert.deepEqual(problems('Alice Liddell', 'fifteen chars!!'),
+        ['passwordTooShort']);
+    assert.deepEqual(problems('Alice Liddell', 'my name is alice liddell'),
+        ['passwordContainsName']);
+    assert.deepEqual(problems('Alice Liddell', 'aaaabbbbaaaabbbbaaaa'),
+        ['passwordRepetitive']);
+    // 16 characters, counted as characters rather than bytes
+    assert.deepEqual(problems('Alice Liddell', 'ಉಪ್ಪಿನಕಾಯಿ ಮತ್ತು ಅನ್ನ'), []);
+});
+
+test('The same name and password give the same identity', async () => {
+    const original = await Identity.fromCredentials('Alice Liddell',
+        password, {...fast, createdAt: 1000});
+    const again = await Identity.fromCredentials(' alice   LIDDELL', password,
+        {...fast, createdAt: 2000});
+    assert.equal(again.address, original.address);
+    assert.equal(again.name, 'alice liddell');
     // The bundle is re-signed with the new time; both are valid
-    assert.notDeepEqual(restored.bundle, original.bundle);
-    assert.equal(PublicIdentity.fromBundle(restored.bundle).createdAt, 2000);
+    assert.notDeepEqual(again.bundle, original.bundle);
+    assert.equal(PublicIdentity.fromBundle(again.bundle).createdAt, 2000);
     assert.equal(Identity.fromSecret(original.secret()).address,
         original.address);
-    assert.notEqual(Identity.generate().address, original.address);
+
+    const otherPassword = await Identity.fromCredentials('Alice Liddell',
+        password + '!', fast);
+    const otherName = await Identity.fromCredentials('Bobby Tables',
+        password, fast);
+    assert.notEqual(otherPassword.address, original.address);
+    assert.notEqual(otherName.address, original.address);
+    await assert.rejects(Identity.fromCredentials('Alice Liddell', 'short',
+        fast), (err) => err.code === 'WEAK_CREDENTIALS' &&
+        err.problems.includes('passwordTooShort'));
+});
+
+test('The derivation matches scrypt computed directly', async () => {
+    const entropy = await credentials.deriveEntropy('Alice Liddell',
+        password, fast);
+    const salt = crypto.createHash('sha512').update(encodeParts(
+        'hexhoot/v2/identity-salt', 'alice liddell')).digest();
+    assert.deepEqual(entropy, crypto.scryptSync(password, salt, 32,
+        {N: 2 ** 14, r: 8, p: 1}));
+});
+
+test('checkPassword tells whether the password is remembered', async () => {
+    const identity = await Identity.fromCredentials('Alice Liddell',
+        password, fast);
+    const restored = Identity.fromSecret(identity.secret());
+    assert.equal(await restored.checkPassword(password, fast), true);
+    assert.equal(await restored.checkPassword(password + ' ', fast), false);
+    assert.equal(await restored.checkPassword('Correct horse battery staple',
+        fast), false);
+    assert.equal(await restored.checkPassword('short', fast), false);
+    await assert.rejects(restored.checkPassword(password,
+        {totalMemory: () => 2 ** 30}), {code: 'LOW_MEMORY'});
+});
+
+test('Password checks come sooner after a miss, later after a hit', () => {
+    const day = 24 * 3600 * 1000;
+    let state = credentials.nextPasswordCheck({},
+        {now: 0, result: 'created'});
+    assert.deepEqual(state, {streak: 0, nextAt: 3 * day});
+    const gaps = [];
+    for (let i = 0; i < 7; i++) {
+        const next = credentials.nextPasswordCheck(state,
+            {now: state.nextAt, result: 'right'});
+        gaps.push((next.nextAt - state.nextAt) / day);
+        state = next;
+    }
+    assert.deepEqual(gaps, [7, 14, 30, 60, 90, 90, 90]);
+    const missed = credentials.nextPasswordCheck(state,
+        {now: 0, result: 'wrong'});
+    assert.deepEqual(missed, {streak: 0, nextAt: day});
+    const skipped = credentials.nextPasswordCheck(state,
+        {now: 0, result: 'skipped'});
+    assert.deepEqual(skipped, {streak: state.streak, nextAt: 2 * day});
+    assert.throws(() => credentials.nextPasswordCheck(state,
+        {now: 0, result: 'maybe'}), {code: 'BAD_PARAMS'});
 });
 
 test('A bundle is checked against its address and signature', () => {
-    const alice = Identity.generate();
-    const bob = Identity.generate();
+    const alice = randomIdentity();
+    const bob = randomIdentity();
     const pub = PublicIdentity.fromBundle(alice.bundle,
         {expected: alice.address});
     assert.equal(pub.address, alice.address);
@@ -159,8 +184,8 @@ test('A bundle is checked against its address and signature', () => {
 });
 
 test('Hybrid signatures need both halves and the right purpose', () => {
-    const alice = Identity.generate();
-    const mallory = Identity.generate();
+    const alice = randomIdentity();
+    const mallory = randomIdentity();
     const pub = alice.public;
     const message = Buffer.from('transcript');
     const signature = alice.sign('handshake', message);
@@ -239,8 +264,8 @@ test('Both sides compute the same safety number', () => {
     assert.equal(number, address.safetyNumber(b, a));
     assert.match(number, /^(\d{5} ){15}\d{5}$/);
     assert.notEqual(number, address.safetyNumber(a, crypto.randomBytes(32)));
-    const alice = Identity.generate();
-    const bob = Identity.generate();
+    const alice = randomIdentity();
+    const bob = randomIdentity();
     assert.equal(alice.public.safetyNumber(bob.public),
         bob.public.safetyNumber(alice.public));
 });
@@ -253,8 +278,21 @@ test('The topic is not the fingerprint (finding T1)', () => {
 });
 
 test('destroy() zeroes the entropy', () => {
-    const identity = Identity.generate();
+    const identity = randomIdentity();
     const entropy = identity.entropy;
     identity.destroy();
     assert.deepEqual(entropy, Buffer.alloc(32));
 });
+
+// The real cost: scrypt N=2^20, about 5-8 s and 1 GiB
+const runSlow = Boolean(process.env.CI || process.env.HEXHOOT_SLOW_TESTS);
+test('Name and password at the real cost give the known identity',
+    {skip: runSlow ? false : 'set HEXHOOT_SLOW_TESTS=1 to run'},
+    async () => {
+        const identity = await Identity.fromCredentials('Alice Liddell',
+            password, {createdAt: 1e12});
+        assert.equal(identity.entropy.toString('hex'),
+            '6b648e70478402aff342374f1ea02b951c4d4b397013c71f1694d92d364318af');
+        assert.equal(identity.address,
+            'hh21plj59s5zh6nwax5gvxmt3wv90ft2hq6k2g65whjef9xmw5m45vkqyrc0n9');
+    });
