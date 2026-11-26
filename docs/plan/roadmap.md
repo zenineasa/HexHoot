@@ -39,6 +39,7 @@ Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 
 # Phase 2: Core-process split and crypto spike
 
+- **Renderer lockdown done (2026-11-26).** The window runs with `contextIsolation`, `sandbox`, and no Node.js. The page is native ES modules served from `app://hexhoot/modules/…`, and the handler serves only renderer file types. `preload.js` exposes only `window.hexhoot.core.call` and `.onEvent`. The `eval` templates are now an escaping `html` tagged template (`modules/Html`). The CSP has no `'unsafe-eval'`, and inline styles are limited to attributes (`style-src-attr`, for the logo SVG). External links open only when they are on the `Social/links.json` list. Only notification and clipboard-write permissions are granted. Karma is retired: non-UI checks are now L1, and UI checks are single-app E2E scenarios (`npm run test:e2e`, `test/e2e/driver.mjs` over CDP). The packaged app contains only `modules/`, production `node_modules`, `package.json`, `README`, and `LICENSE`. Finding S4 was found and fixed during the rewrite.
 - Turn on `contextIsolation: true` and `nodeIntegration: false`. Add `preload.js` with a narrow `contextBridge` API (`window.hexhoot.*`).
 - Move DBMessenger, the transports, and storage into a **Core** (the main process or an Electron `utilityProcess`). Core must be **importable from plain Node**, with `safeStorage`, paths, and transports injected, so L2 tests can run it without Electron. The renderer becomes UI only. Replace the `eval` template rendering with plain template functions.
   - **Core split done (2026-11-26).** `modules/Core` holds storage (`node:sqlite`), the v1 protocol, and the DHT and LAN transports, with no Electron imports. The main process forks it as a `utilityProcess` and gives each window its own `MessagePort`. Renderers can call only the methods in `rendererMethods`. `modules/DBMessenger` is now a thin client with the same method names, so the UI is unchanged. L2 tests (`npm run test:core`) run two Cores over an in-memory transport, the LAN carrier on 127.0.0.1, and a hyperdht testnet. This closes T7 and fixes T4 and T5. Old IndexedDB data is not migrated, because there are no users. The renderer lockdown (`contextIsolation`, sandbox, no `eval`) is the next commit.
@@ -68,7 +69,7 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 - LAN: carrier only, no channel disclosure. Fix T2–T4.
 - UI: the new Login (create / restore), Add friend by `hh2:` address or QR, pending requests, and safety-number verification.
 
-- Build the L4 evil peer, and run the full L3 scenario table across alice, bob, and carol on the hyperdht testnet. Remove Karma.
+- Build the L4 evil peer, and run the full L3 scenario table across alice, bob, and carol on the hyperdht testnet. (Karma was removed in Phase 2.)
 
 **Exit:** the L3 and L4 suites are green on Linux per push and on macOS and Windows nightly, covering DHT only, LAN only, and both, with fault injection. Two real machines chat over the public DHT as a manual check. All findings F1–F9 and T1–T5 are closed, each with a regression test.
 

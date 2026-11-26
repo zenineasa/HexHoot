@@ -2,6 +2,8 @@
 
 ## 2026-11-26
 
+* **Update**: Renderer lockdown done. The window is sandboxed with context isolation and no Node.js. The page is ES modules over `app://`, with escaping templates instead of `eval`, and the CSP has no `'unsafe-eval'`. Karma is replaced by `node --test` and a CDP-driven E2E suite ([roadmap](/plan/roadmap.md) Phase 2, [testing](/design/testing-infrastructure.md), [Q5](/plan/open-questions.md)).
+* **Finding**: S4. Saving the Edit Profile form gave every user the same private key. Fixed in Core, with regression tests ([findings](/assessment/crypto-findings.md)).
 * **Update**: Core split done. Storage (`node:sqlite`), the v1 protocol, and the DHT and LAN transports run in a `utilityProcess`, and the renderer talks to Core over a `MessagePort`. Two instances now befriend and chat through the UI, which closes T7. T4 and T5 are fixed. L2 tests run with `npm run test:core` ([roadmap](/plan/roadmap.md) Phase 2, [findings](/assessment/crypto-findings.md), [testing](/design/testing-infrastructure.md)).
 * **Creation**: Added the capability guard (`npm run test:capability`). [Q6](/plan/open-questions.md) is resolved as `node:sqlite`. scrypt at 2²⁰ took 59–153 s on an 8 GiB Mac under memory pressure ([probe](/assessment/electron-crypto-capabilities.md), [Q14](/plan/open-questions.md)).
 * **Update**: The maintainer confirmed that v1 has no users to protect, so no 1.0.6 patch release ships. The Phase 0 hardening and the Phase 1 toolchain upgrade are done on the same branch ([roadmap](/plan/roadmap.md), [Q3](/plan/open-questions.md)).

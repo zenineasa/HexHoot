@@ -4,7 +4,7 @@ const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
 const Core = require('../../modules/Core');
 const Storage = require('../../modules/Core/Storage');
-const {messageType} = require('../../modules/Core/constants');
+const {messageType} = require('../../modules/Core/constants.mjs');
 
 /**
  * A random hex string that looks like a v1 public key

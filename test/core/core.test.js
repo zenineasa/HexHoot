@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const {messageType, tableNames} = require('../../modules/Core/constants');
+const {messageType, tableNames} = require('../../modules/Core/constants.mjs');
 const v1Crypto = require('../../modules/Core/v1Crypto');
 const {
     randomKey, createCore, collectEvents, MemoryHub, befriendAndChat,
@@ -243,4 +243,27 @@ test('Two Cores befriend and chat over an in-memory transport', async () => {
     await befriendAndChat(alice, bob);
     await alice.stop();
     await bob.stop();
+});
+
+test('Editing the profile keeps the private key (finding S4)', async () => {
+    const alice = await createCore('alice');
+    const bob = await createCore('bob');
+    const aliceKey = await alice.getPublicKeyOfLoggedInUser();
+    await alice.writeLoggedInUserInfo({displayName: 'Alice', about: 'hi',
+        privateKey: '11111111111111111111111111111111'});
+    await bob.writeLoggedInUserInfo({displayName: 'Bob'});
+    assert.equal(await alice.getPublicKeyOfLoggedInUser(), aliceKey,
+        'A profile edit must not change the key.');
+    assert.notEqual(await alice.getPublicKeyOfLoggedInUser(),
+        await bob.getPublicKeyOfLoggedInUser(),
+        'Two users who edit their profile must not share a key.');
+    const info = await alice.getLoggedInUserInfoPublic();
+    assert.equal(info.displayName, 'Alice');
+    assert.equal(info.about, 'hi');
+
+    const fresh = await createCore(null);
+    await assert.rejects(fresh.writeLoggedInUserInfo({displayName: 'x'}));
+    await alice.stop();
+    await bob.stop();
+    await fresh.stop();
 });

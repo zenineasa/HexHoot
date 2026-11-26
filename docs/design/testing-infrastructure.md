@@ -12,7 +12,7 @@ sources:
 
 # What exists today
 
-Karma + karma-electron + QUnit run UI checks inside one Electron window. There are no unit tests for crypto or protocol code, and nothing tests two peers talking to each other. So any break in messaging is invisible to CI.
+*(Before 2026-11-26.)* Karma + karma-electron + QUnit ran UI checks inside one Electron window. There are no unit tests for crypto or protocol code, and nothing tests two peers talking to each other. So any break in messaging is invisible to CI.
 
 # Ideas taken from Konjugate
 
@@ -92,4 +92,4 @@ L2 exists since 2026-11-26: `test/core/` runs Core with in-memory storage and in
 
 # Retiring Karma
 
-Move the existing `test/*/t*.js` checks to L1 (pure logic) or L3 (UI), then delete Karma, karma-electron, karma-qunit, and QUnit. `npm test` becomes `node --test`, and `npm run test:e2e` runs the orchestrator.
+Done 2026-11-26. The non-UI checks (package name and version, copyright headers, translations) are in `test/unit/repo.test.js`. The UI checks are in `test/e2e/ui.e2e.mjs`, which launches the app with a temporary profile and `--interaction-test`, and drives it over CDP (`test/e2e/driver.mjs`). Dialogs are accepted and recorded, and any page error fails the run. Code sent through DevTools is exempt from the CSP, so CSP checks run their probes from page timers. `modules/Main/testHooks.js` supports only `HEXHOOT_TRANSPORTS` so far. The multi-instance orchestrator extends the same driver.

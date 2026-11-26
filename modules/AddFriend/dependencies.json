@@ -1,11 +1,11 @@
 {
-    "coprightMessage": "Copyright © 2022-2023 Zenin Easa Panthakkalakath",
+    "coprightMessage": "Copyright © 2022-2026 Zenin Easa Panthakkalakath",
     "internal": [
         "Layout",
         "DBMessenger",
         "I18n",
-        "ReadText",
-        "Sanitize"
+        "Sanitize",
+        "Html"
     ],
     "external": []
 }

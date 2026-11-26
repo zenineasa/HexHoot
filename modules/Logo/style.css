@@ -20,3 +20,6 @@
     display: inline-block;
     vertical-align: bottom;
 }
+#logoWithText.small {
+    zoom: 0.5;
+}

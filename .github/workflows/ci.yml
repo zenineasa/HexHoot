@@ -41,11 +41,11 @@ jobs:
       - run: npm run test:unit
       - run: npm run test:capability
       - run: npm run test:core
-      - name: UI tests (Electron)
+      - name: E2E tests (Electron)
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            xvfb-run --auto-servernum npm run test:ui
+            xvfb-run --auto-servernum npm run test:e2e
           else
-            npm run test:ui
+            npm run test:e2e
           fi

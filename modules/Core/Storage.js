@@ -1,7 +1,7 @@
 /* Copyright (c) 2026 Zenin Easa Panthakkalakath */
 
 const {DatabaseSync} = require('node:sqlite');
-const {tableNames} = require('./constants');
+const {tableNames} = require('./constants.mjs');
 
 const keyedTables = [
     tableNames.friends,

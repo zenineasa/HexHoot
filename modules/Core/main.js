@@ -12,7 +12,7 @@ const Core = require('./index');
 const Storage = require('./Storage');
 const DhtTransport = require('./DhtTransport');
 const LanTransport = require('./LanTransport');
-const {rendererMethods} = require('./constants');
+const {rendererMethods} = require('./constants.mjs');
 
 let core = null;
 let ready = null;

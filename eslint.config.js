@@ -7,9 +7,9 @@ module.exports = [
         'ignores': ['out/**', 'node_modules/**'],
     },
     {
-        'files': ['**/*.js'],
+        'files': ['**/*.js', '**/*.mjs'],
         'languageOptions': {
-            'ecmaVersion': 2022,
+            'ecmaVersion': 'latest',
             'sourceType': 'module',
         },
         'rules': {

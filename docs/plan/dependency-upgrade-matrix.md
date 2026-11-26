@@ -37,7 +37,7 @@ The latest versions were taken from the npm registry on 2026-11-25. "Phase" refe
 | `eslint` | ^9.1.1 | ^10.15.0 | 1 | |
 | `eslint-config-google` | ^0.14.0 | replace if incompatible | 1 | Unmaintained. Copy its rule values into `eslint.config.js`. |
 | `glob` | ^10.3.12 | ^14.0.6 | 1 | Fixes the `minimatch` advisory |
-| `karma`, `karma-electron`, `karma-qunit`, `qunit` | — | **remove** | 1 → 4 | Replaced by `node:test` and the multi-instance harness ([testing infrastructure](/design/testing-infrastructure.md)) |
+| `karma`, `karma-electron`, `karma-qunit`, `qunit` | — | **removed 2026-11-26** | 2 | Replaced by `node:test` and the multi-instance harness ([testing infrastructure](/design/testing-infrastructure.md)) |
 | `@noble/post-quantum` (dev) | — | ^0.7.1 | 3 | **Test oracle only, never shipped.** Cross-checks ML-KEM and ML-DSA. |
 | `hyperdht` (dev) | — | ^6.37.0 (added 2026-11-26) | 2 | `createTestnet` gives tests a local DHT bootstrap |
 | `copyright-header` | ^0.4.6 | keep | — | Dev-only and stale |

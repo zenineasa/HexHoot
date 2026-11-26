@@ -2,8 +2,8 @@
 
 const os = require('os');
 const v1Crypto = require('./v1Crypto');
-const sanitize = require('./../Sanitize');
-const {tableNames, messageType} = require('./constants');
+const sanitize = require('./../Sanitize/index.mjs');
+const {tableNames, messageType} = require('./constants.mjs');
 
 // Name of the preference that holds friend requests waiting for the user to
 // accept or decline them
@@ -162,16 +162,30 @@ class Core {
     }
 
     /**
-     * Write information about the user. The private key is derived from the
-     * password when one is given.
+     * Write information about the user. A new private key is derived only
+     * when a password is given (login); a profile edit keeps the existing
+     * key. A private key supplied by the caller is never used.
      * @param {Object} info information about the user
      */
     async writeLoggedInUserInfo(info) {
-        info = Object.assign({}, info);
-        info.privateKey = v1Crypto.generatePrivateKey(info);
-        delete info.password;
-        info.key = 0;
-        this.storage.put(tableNames.loggedInUser, info);
+        const existing = this.storage.get(tableNames.loggedInUser, 0);
+        const profile = {
+            key: 0,
+            displayName: typeof info.displayName === 'string' ?
+                info.displayName : existing?.displayName ?? '',
+            about: typeof info.about === 'string' ?
+                info.about : existing?.about ?? '',
+            photo: typeof info.photo === 'string' ?
+                info.photo : existing?.photo ?? '',
+        };
+        if (typeof info.password === 'string' && info.password !== '') {
+            profile.privateKey = v1Crypto.generatePrivateKey(info);
+        } else if (existing) {
+            profile.privateKey = existing.privateKey;
+        } else {
+            throw new Error('A password is needed to create an account');
+        }
+        this.storage.put(tableNames.loggedInUser, profile);
 
         // The public key may have changed, so listen on the new channel
         await this.restartTransports();

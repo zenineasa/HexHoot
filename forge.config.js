@@ -11,6 +11,12 @@ module.exports = {
         asar: true,
         // No extension: the packager picks .icns / .ico per target platform
         icon: imagePack.getPath('desktop.mac').replace(/\.icns$/, ''),
+        // Ship only the app: no tests, docs, scripts or tool configuration
+        ignore: [
+            /^\/(test|docs|scripts|\.github)(\/|$)/,
+            /^\/(\.clabot|\.gitignore|makefile)$/,
+            /^\/(eslint|forge)\.config\.js$/,
+        ],
     },
     rebuildConfig: {},
     makers: [

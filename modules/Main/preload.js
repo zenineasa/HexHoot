@@ -1,37 +1,58 @@
-/* Copyright (c) 2022-2024 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
-const i18n = require('../I18n')();
-const Social = require('../Social');
-const Copyright = require('../Copyright');
-const Login = require('../Login');
-const Chat = require('../Chat');
+// Runs sandboxed, before the page. It gets a MessagePort to Core from the
+// main process and gives the page exactly two functions, as window.hexhoot:
+//   core.call(method, args) -> Promise   (Core accepts only rendererMethods)
+//   core.onEvent(func)                   (Core events, such as new messages)
 
-window.addEventListener('DOMContentLoaded', function() {
-    /**
-     * The reload function; this was found to be not thread safe. For instance
-     * if you run the following function multiple times, the rendering was
-     * observed to be invoked multiple times parallely, resulting in unintended
-     * behaviour. Therefore, a locking mechanism has been implemented here.
-     */
-    async function reload() {
-        i18n.render();
-        const login = new Login();
-        if (await login.isLoggedIn()) {
-            const chat = new Chat();
-            chat.render();
-        } else {
-            login.render();
-        }
-    };
-    let queue = Promise.resolve();
-    window.reload = function() {
-        const result = queue.then(function() {
-            return reload();
-        });
-        queue = result.then(function() {}, function() {});
-    };
-    window.reload();
+const {contextBridge, ipcRenderer} = require('electron');
 
-    Social.render();
-    Copyright.render();
+const pending = new Map();
+const eventListeners = [];
+let nextId = 1;
+
+const portPromise = new Promise(function(resolve) {
+    ipcRenderer.once('core:port', function(event) {
+        const port = event.ports[0];
+        port.onmessage = function({data}) {
+            if (data.event) {
+                for (const func of eventListeners) {
+                    func(data.event);
+                }
+                return;
+            }
+            const request = pending.get(data.id);
+            if (request) {
+                pending.delete(data.id);
+                if (Object.hasOwn(data, 'error')) {
+                    request.reject(new Error(data.error));
+                } else {
+                    request.resolve(data.result);
+                }
+            }
+        };
+        resolve(port);
+    });
+});
+ipcRenderer.send('core:connect');
+
+contextBridge.exposeInMainWorld('hexhoot', {
+    core: {
+        call: async function(method, args) {
+            if (typeof method !== 'string' || !Array.isArray(args)) {
+                throw new Error('Invalid Core call');
+            }
+            const port = await portPromise;
+            const id = nextId++;
+            return new Promise(function(resolve, reject) {
+                pending.set(id, {resolve, reject});
+                port.postMessage({id, method, args});
+            });
+        },
+        onEvent: function(func) {
+            if (typeof func === 'function') {
+                eventListeners.push(func);
+            }
+        },
+    },
 });

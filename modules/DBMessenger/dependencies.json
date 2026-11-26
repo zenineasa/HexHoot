@@ -3,7 +3,5 @@
     "internal": [
         "Core"
     ],
-    "external": [
-        "electron"
-    ]
+    "external": []
 }
