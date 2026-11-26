@@ -77,7 +77,14 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 - **Removed:** v1 crypto, storage, transports and the `ecdh` package.
 - **UI:** adapted where v1 assumptions broke. Addresses replace keys, passwords need 16 characters with Core's reasons shown, there is an unlock form, a passphrase dialog for backups, and safety numbers on profiles. New strings come in five languages.
 - **Tests:** L2 (`test/core`), and L3 adds a hostile display name sent by a real third peer and a restart that signs in through the OS keyring.
-- **Next:** the UI commit (the password check box, progress, polishing the add-friend and verification flows), then the L3 scenario table and L4.
+
+**Commit 3 done (2026-11-27):** the UI for v2.
+- **Password checks:** a box in the corner (`modules/PasswordCheck`) with the ADR-004 messages in five languages. It is checked on every render and hourly, and it never blocks the app.
+- **Progress:** an animated bar while scrypt runs, on login and unlock. Enter submits both forms.
+- **Add friend:** opens on "Their code", with a hint on each tab and "Copied" feedback.
+- **Verification:** the safety number in 16 groups of five digits, a "The numbers match" button that marks the contact verified (`Core#setVerified`, which peers cannot set), and a ✓ in the chat header.
+- **Tests:** L3 covers the check being due after a restart 4 days later, a wrong answer, a right answer the next day, and "Not now". It also covers the default add-friend tab and marking a contact verified. The new hook is `HEXHOOT_TEST_CLOCK_OFFSET_DAYS`.
+- **Next:** the L3 scenario table (carol, restarts, both transports, fault injection) and the L4 evil peer.
 
 - [Wire protocol v2](/design/wire-protocol-v2.md): framing, envelopes, the inner schema, and padding.
 - Hyperswarm: one long-lived swarm, `topic = SHA-512("hexhoot/v2/topic" ‖ fp)[0..32]`, and connection reuse keyed by fingerprint. Fix T5.

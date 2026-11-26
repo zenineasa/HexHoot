@@ -38,8 +38,16 @@ export default class Login {
             </div>
         </div>`;
 
-        // Login button
-        document.getElementById('loginButton').onclick = () => {
+        // Login button; Enter in either field does the same
+        const loginButton = document.getElementById('loginButton');
+        for (const input of containerDOM.querySelectorAll('#login input')) {
+            input.onkeydown = (event) => {
+                if (event.key === 'Enter' && !loginButton.disabled) {
+                    loginButton.click();
+                }
+            };
+        }
+        loginButton.onclick = () => {
             const info = {};
             const inputs = containerDOM.querySelectorAll(
                 'input[type=text],input[type=password]');
@@ -73,14 +81,29 @@ export default class Login {
                     placeholder="${i18n.getText('Login.password')}" />
                 <button class="HexHoot_Button" id="unlockButton">
                     ${i18n.getText('Login.unlock')}</button>
+                <div id="loginStatus" data-state="idle"></div>
             </div>
         </div>`;
-        document.getElementById('unlockButton').onclick = async () => {
+        const button = document.getElementById('unlockButton');
+        const input = containerDOM.querySelector('[name=password]');
+        const status = document.getElementById('loginStatus');
+        input.onkeydown = (event) => {
+            if (event.key === 'Enter' && !button.disabled) {
+                button.click();
+            }
+        };
+        button.onclick = async () => {
+            // Unlocking runs scrypt: a few seconds
+            button.disabled = true;
+            status.textContent = i18n.getText('PasswordCheck.checking');
+            status.dataset.state = 'working';
             try {
-                await dbMessenger.unlock(containerDOM
-                    .querySelector('[name=password]').value);
+                await dbMessenger.unlock(input.value);
                 window.reload();
             } catch (err) {
+                button.disabled = false;
+                status.textContent = '';
+                status.dataset.state = 'idle';
                 alert(i18n.getText('Login.wrongPassword'));
             }
         };

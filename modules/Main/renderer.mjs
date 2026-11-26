@@ -8,6 +8,7 @@ import Social from '../Social/index.mjs';
 import Copyright from '../Copyright/index.mjs';
 import Login from '../Login/index.mjs';
 import Chat from '../Chat/index.mjs';
+import PasswordCheck from '../PasswordCheck/index.mjs';
 
 /**
  * Render the app for the current state (logged in or not)
@@ -17,7 +18,10 @@ async function render() {
     const login = new Login();
     if (await login.isLoggedIn()) {
         await new Chat().render();
+        // Not awaited: the check never holds up the app
+        PasswordCheck.render().catch(() => {});
     } else {
+        PasswordCheck.remove();
         await login.render();
     }
 }
@@ -36,3 +40,9 @@ await i18n.selectLanguageFromPreferences();
 window.reload();
 Social.render();
 Copyright.render();
+// A check can fall due while the app stays open
+setInterval(async () => {
+    if (await new Login().isLoggedIn()) {
+        PasswordCheck.render().catch(() => {});
+    }
+}, 3600 * 1000);

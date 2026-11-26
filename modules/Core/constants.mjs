@@ -33,6 +33,7 @@ export const rendererMethods = Object.freeze([
     'acceptFriendRequest',
     'declineFriendRequest',
     'getSafetyNumber',
+    'setVerified',
     'sendChatMessage',
     'getAllMessages',
     'markChatRead',

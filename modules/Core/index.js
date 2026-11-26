@@ -502,6 +502,22 @@ class Core {
         }
     }
 
+    /**
+     * Mark that the user compared safety numbers with a contact. Only the
+     * user sets it; profiles from peers are sanitized and cannot.
+     * @param {string} address the contact
+     * @param {boolean} verified whether the numbers matched
+     */
+    async setVerified(address, verified) {
+        this.assertReady();
+        const contact = this.store.get('Contacts', String(address));
+        if (!contact) {
+            throw failure('NOT_A_CONTACT', 'No such contact');
+        }
+        this.store.put('Contacts', contact.key, {...contact,
+            verified: Boolean(verified)});
+    }
+
     // ---- Chat -----------------------------------------------------------
 
     /**

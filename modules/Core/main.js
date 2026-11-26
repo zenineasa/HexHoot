@@ -51,6 +51,7 @@ const sealer = {
  * @param {number} [config.lanPort] first LAN port to try
  * @param {Array} [config.lanPeers] static LAN peers ("host:port")
  * @param {Object} [config.scryptParams] tests only (testHooks.js)
+ * @param {number} [config.clockOffsetMs] tests only (testHooks.js)
  */
 async function init(config) {
     const enabled = config.transports || ['dht', 'lan'];
@@ -60,6 +61,8 @@ async function init(config) {
         keyringFile: path.join(config.userData, 'keyring.json'),
         sealer,
         scryptParams: config.scryptParams,
+        now: config.clockOffsetMs ?
+            () => Date.now() + config.clockOffsetMs : undefined,
         watchNetwork: true,
         carriers: () => [
             ...enabled.includes('dht') ?

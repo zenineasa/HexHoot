@@ -1,5 +1,9 @@
 # Log
 
+## 2026-11-27
+
+* **Update**: Phase 4, commit 3: the v2 UI. The password check is a box in the corner with the [ADR-004](/decisions/adr-004-account-model.md) messages, and it never blocks the app. A progress bar shows while scrypt runs. Add friend opens on the tab most people need. Profiles show the safety number in groups, with a "The numbers match" button that marks a contact verified, and a ✓ in the chat header. Only the user can set that mark ([roadmap](/plan/roadmap.md)).
+
 ## 2026-11-26
 
 * **Update**: Phase 4, commit 2: Core runs on v2, with name-and-password accounts, encrypted storage, contacts by address, ratchets and receipts. v1 crypto and transports are removed. F1, F3–F9, T1 and T2 are closed in the running app, and T6 is accepted ([findings](/assessment/crypto-findings.md)). The packaged macOS app logs in at the real cost, with no CSP violations or exceptions. `safeStorage` now uses the async API, since the sync one is deprecated in Electron 45.

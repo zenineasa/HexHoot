@@ -68,5 +68,14 @@ module.exports = function testHooks(app) {
         overrides.scryptParams = {N: Number(env.HEXHOOT_TEST_SCRYPT_N), r: 8,
             p: 1};
     }
+    // HEXHOOT_TEST_CLOCK_OFFSET_DAYS: Core's clock runs this many days
+    // ahead, so a restart can find a password check due
+    if (env.HEXHOOT_TEST_CLOCK_OFFSET_DAYS) {
+        const days = Number(env.HEXHOOT_TEST_CLOCK_OFFSET_DAYS);
+        if (!Number.isFinite(days)) {
+            throw new Error('Invalid HEXHOOT_TEST_CLOCK_OFFSET_DAYS');
+        }
+        overrides.clockOffsetMs = days * 24 * 3600 * 1000;
+    }
     return overrides;
 };

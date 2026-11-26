@@ -158,7 +158,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
     protocol.handle('app', serveAppFile);
-    // Notifications and copying the public key are the only permissions
+    // Notifications and copying our address are the only permissions
     // the app uses.
     const allowed = new Set(['notifications', 'clipboard-sanitized-write']);
     session.defaultSession.setPermissionRequestHandler(

@@ -54,7 +54,7 @@ address     = Bech32m("hh2", fingerprint) = "hh21" + 52 data + 6 checksum chars 
 
 - 256 bits gives second-preimage resistance of 2²⁵⁶ classically and 2¹²⁸ against Grover, which is category 5. [ADR-003](/decisions/adr-003-hybrid-pq-algorithm-choice.md) explains why a longer address would not add security.
 - The full bundle arrives during the handshake and is checked against the fingerprint.
-- **Safety number:** `HKDF-SHA-512(sorted(fp_A, fp_B), "", "hexhoot/v2/safety", 80 bytes)`, shown as 80 digits (16 groups of 5). Users compare it out of band to move a contact from *TOFU* to *verified*.
+- **Safety number:** `HKDF-SHA-512(sorted(fp_A, fp_B), "", "hexhoot/v2/safety", 80 bytes)`, shown as 80 digits (16 groups of 5). Users compare it out of band to move a contact from *TOFU* to *verified*. The profile page shows it as a 4×4 grid, and the "The numbers match" button stores `verified` on the contact (`Core#setVerified`). Profiles from peers are sanitized, so they cannot set the mark.
 
 # Rendezvous topic
 

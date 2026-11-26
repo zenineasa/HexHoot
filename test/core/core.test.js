@@ -177,14 +177,33 @@ test('Profiles: only the sender\'s own is updated (S2), and sanitized',
         await bob.messenger.send(aliceAddress, 'profile', {
             key: 'hh21someoneelse', displayName: 'B'.repeat(500),
             photo: 'javascript:alert(1)', status: 'pending-in',
-            isRead: true});
+            isRead: true, verified: true});
         await waitFor(async () => (await alice.getUserInfo(bobAddress))
             .displayName.length === 64, 'the profile');
         const contact = await alice.getUserInfo(bobAddress);
         assert.equal(contact.key, bobAddress);
         assert.equal(contact.status, 'friend');
         assert.equal(contact.photo, '');
+        assert.equal(contact.verified, undefined);
         assert.equal((await alice.getAllFriends()).length, 1);
+    });
+
+test('Only the user marks a contact verified; profiles keep the mark',
+    async (t) => {
+        const network = new MemoryNetwork();
+        const alice = await signedIn('Alice Liddell', {t, network});
+        const bob = await signedIn('Bobby Tables', {t, network});
+        await befriendAndChat(alice, bob);
+        const bobAddress = await bob.getMyAddress();
+        await alice.setVerified(bobAddress, true);
+        await bob.updateProfile({about: 'new about'});
+        await waitFor(async () => (await alice.getUserInfo(bobAddress))
+            .about === 'new about', 'the profile update');
+        assert.equal((await alice.getUserInfo(bobAddress)).verified, true);
+        await alice.setVerified(bobAddress, false);
+        assert.equal((await alice.getUserInfo(bobAddress)).verified, false);
+        await assert.rejects(alice.setVerified('hh21nobody', true),
+            {code: 'NOT_A_CONTACT'});
     });
 
 test('A message id cannot overwrite another message (F6)', async (t) => {

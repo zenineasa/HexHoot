@@ -1,0 +1,47 @@
+/* Copyright (c) 2026 Zenin Easa Panthakkalakath */
+
+#passwordCheck {
+    position: fixed;
+    right: 1em;
+    bottom: 3em;
+    width: 20em;
+    padding: 1em;
+    border-radius: 0.2em;
+    background: rgba(0, 0, 0, 0.9);
+    border-left: 0.3em solid rgba(0, 180, 255, 0.8);
+    font-size: 0.85em;
+    text-align: left;
+    z-index: 10;
+    user-select: text;
+}
+#passwordCheck .title {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+#passwordCheck .buttons {
+    display: flex;
+}
+#passwordCheck .HexHoot_Button {
+    margin: 0.5em 0.25em 0;
+}
+#passwordCheck[data-state="checking"] .text::after {
+    content: '';
+    display: block;
+    height: 0.2em;
+    margin-top: 0.5em;
+    background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.8),
+        transparent);
+    background-size: 50% 100%;
+    background-repeat: no-repeat;
+    animation: passwordCheckWorking 1.2s linear infinite;
+}
+#passwordCheck[data-state="right"] {
+    border-left-color: #3fb950;
+}
+#passwordCheck[data-state="wrong"] {
+    border-left-color: #d29922;
+}
+@keyframes passwordCheckWorking {
+    from { background-position: -100% 0; }
+    to { background-position: 200% 0; }
+}

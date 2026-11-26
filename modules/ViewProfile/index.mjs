@@ -40,8 +40,14 @@ class ViewProfile {
 
                 <div class="HexHoot_Input_label">
                     ${i18n.getText('ViewProfile.safetyNumber')}</div>
-                <input class="HexHoot_Input" name="safetyNumber"
-                    value="${safetyNumber || ''}" readonly/>
+                <div id="safetyNumber" data-testid="safety-number"
+                    data-value="${safetyNumber || ''}">
+                    ${(safetyNumber || '').split(' ').map((group) =>
+        html`<span>${group}</span>`)}
+                </div>
+                <div class="help">
+                    ${i18n.getText('ViewProfile.safetyNumberHelp')}</div>
+                <div id="verification"></div>
 
                 <div class="HexHoot_Input_label">
                     ${i18n.getText('ViewProfile.displayName')}</div>
@@ -58,6 +64,39 @@ class ViewProfile {
                 <div class="value">
                     <img src="${this.getProfilePic(userInfo.photo)}"></div>
             </div>`;
+        if (safetyNumber) {
+            // Fresh from Core: the caller's copy may predate a change
+            const contact = await dbMessenger.getUserInfo(userInfo.key);
+            this.renderVerification(userInfo.key, Boolean(contact?.verified));
+        }
+    }
+
+    /**
+     * Show whether the user compared safety numbers, with a button to change
+     * it
+     * @param {string} address the contact
+     * @param {boolean} verified whether they are marked verified
+     */
+    renderVerification(address, verified) {
+        const box = document.getElementById('verification');
+        box.dataset.verified = String(verified);
+        const button = document.createElement('button');
+        button.className = 'HexHoot_Button';
+        button.name = 'verify';
+        button.textContent = i18n.getText(verified ?
+            'ViewProfile.unmarkVerified' : 'ViewProfile.markVerified');
+        button.onclick = async () => {
+            await dbMessenger.setVerified(address, !verified);
+            this.renderVerification(address, !verified);
+        };
+        box.replaceChildren();
+        if (verified) {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = i18n.getText('ViewProfile.verified');
+            box.appendChild(note);
+        }
+        box.appendChild(button);
     }
 
     /**

@@ -23,6 +23,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+#mainContent #messageSenderInfo .verified {
+    padding: 0.5em 0;
+    color: #3fb950;
+}
 #mainContent #messageReader {
     height: calc(100% - 2em - 5em);
     overflow-y: scroll;

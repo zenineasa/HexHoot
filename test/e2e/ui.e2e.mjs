@@ -13,8 +13,12 @@ import {launchApp} from './driver.mjs';
 let app;
 // Kept across a restart of the app
 const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'hexhoot-ui-'));
-const launch = () => launchApp({name: 'ui', userData,
-    env: {HEXHOOT_TRANSPORTS: 'none'}});
+const launch = (days = 0) => launchApp({name: 'ui', userData,
+    env: {HEXHOOT_TRANSPORTS: 'none',
+        HEXHOOT_TEST_CLOCK_OFFSET_DAYS: String(days)}});
+const PASSWORD = 'ThisIsProbablyAGoodPassword';
+const texts = JSON.parse(fs.readFileSync(new URL(
+    '../../modules/I18n/lang.json', import.meta.url)));
 
 /**
  * Wait until the app has shown more than 'count' dialogs
@@ -117,7 +121,7 @@ test('Weak passwords are rejected, with the reason', async () => {
 
 test('Logging in shows the chat screen', async () => {
     await app.type('[name=displayName]', 'ZatMan');
-    await app.type('[name=password]', 'ThisIsProbablyAGoodPassword');
+    await app.type('[name=password]', PASSWORD);
     await app.click('#loginButton');
     await app.waitFor(`document.getElementById('friendsList')`);
     assert.deepEqual(await app.evaluate(`({
@@ -136,18 +140,23 @@ test('Logging in shows the chat screen', async () => {
 test('Add friend: tabs, invalid key, back', async () => {
     await app.click('#addFriendButton');
     await app.waitFor(`document.getElementById('theirPublicKey')`);
-    assert.deepEqual(await app.evaluate(`(() => {
-        const tabs = document.querySelectorAll('.tab');
-        const contents = document.querySelectorAll('.tabContent');
+    const tabs = `(() => {
+        const shown = [...document.querySelectorAll('.tabContent')]
+            .filter((c) => getComputedStyle(c).display !== 'none');
         return {
-            tabs: tabs.length,
-            contents: contents.length,
-            hidden: [...contents].every((c) =>
-                getComputedStyle(c).display === 'none'),
+            tabs: document.querySelectorAll('.tab').length,
+            shown: shown.map((c) => c.id),
+            active: document.querySelector('.tab.active').getAttribute('name'),
             myKey: document.querySelector('[name=myPublicKey]').value
                 .length,
         };
-    })()`), {tabs: 2, contents: 2, hidden: true, myKey: 62});
+    })()`;
+    // Adding someone is shown first
+    assert.deepEqual(await app.evaluate(tabs), {tabs: 2,
+        shown: ['theirCode'], active: 'theirCode', myKey: 62});
+    await app.click('.tab[name=myCode]');
+    assert.deepEqual(await app.evaluate(tabs), {tabs: 2,
+        shown: ['myCode'], active: 'myCode', myKey: 62});
 
     await app.type('#theirPublicKey', 'not a key');
     const dialogs = app.dialogs.length;
@@ -191,6 +200,72 @@ test('After a restart the OS keyring signs in by itself', async () => {
     await app.waitFor(`document.getElementById('friendsList')`);
     assert.equal(await app.core('getMyAddress'), address);
     assert.equal((await app.core('getPreference', 'language')).value, 'de');
+});
+
+/**
+ * Restart the app with Core's clock some days ahead
+ * @param {number} days how far
+ */
+async function restartLater(days) {
+    assert.deepEqual(app.errors, []);
+    await app.close();
+    app = await launch(days);
+    await app.waitFor(`document.getElementById('friendsList')`);
+}
+
+/**
+ * Answer the password check box
+ * @param {string} password what to type
+ * @param {string} state the outcome expected: 'right' or 'wrong'
+ * @return {string} the message shown
+ */
+async function answerPasswordCheck(password, state) {
+    await app.type('#passwordCheck [name=password]', password);
+    await app.click('#passwordCheck [name=check]');
+    await app.waitFor(`document.querySelector('#passwordCheck')
+        .dataset.state === ${JSON.stringify(state)}`);
+    const shown = await app.evaluate(`document.querySelector(
+        '#passwordCheck .text').textContent`);
+    await app.click('#passwordCheck [name=close]');
+    await app.waitFor(`!document.getElementById('passwordCheck')`);
+    assert.equal((await app.core('getPasswordCheck')).due, false);
+    return shown;
+}
+
+test('No password check before it is due', async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    assert.equal(await app.evaluate(
+        `document.getElementById('passwordCheck')`), null);
+});
+
+test('A due password check is a box that blocks nothing', async () => {
+    await restartLater(4);
+    await app.waitFor(`document.getElementById('passwordCheck')`);
+    // The app still works around it
+    await app.click('#addFriendButton');
+    await app.waitFor(`document.getElementById('theirPublicKey')`);
+    await app.click('#backButton');
+    await app.waitFor(`document.getElementById('friendsList')`);
+    assert.ok(await app.evaluate(
+        `document.getElementById('passwordCheck')`));
+    // Language is German since the earlier test
+    assert.equal(await answerPasswordCheck('not my password at all',
+        'wrong'), texts.PasswordCheck.wrong.de);
+});
+
+test('A wrong answer asks again the next day; then it is right', async () => {
+    await restartLater(5.5);
+    await app.waitFor(`document.getElementById('passwordCheck')`);
+    assert.equal(await answerPasswordCheck(PASSWORD, 'right'),
+        texts.PasswordCheck.rightAfterMiss.de);
+});
+
+test('"Not now" puts the check off', async () => {
+    await restartLater(400);
+    await app.waitFor(`document.getElementById('passwordCheck')`);
+    await app.click('#passwordCheck [name=later]');
+    await app.waitFor(`!document.getElementById('passwordCheck')`);
+    assert.equal((await app.core('getPasswordCheck')).due, false);
 });
 
 test('No errors were logged', () => {

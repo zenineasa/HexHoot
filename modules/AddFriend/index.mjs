@@ -30,12 +30,14 @@ class AddFriend {
         const keyPlaceholder = i18n.getText('AddFriend.publicKey');
         const mainContentDOMNode = document.getElementById('mainContent');
         mainContentDOMNode.innerHTML = html`
-            <div id="title">Add friend</div>
+            <div id="title">${i18n.getText('AddFriend.addFriend')}</div>
             <div id="tabs">
                 <div class="tabContentContainer">
                     <div class="tabContent" id="myCode">
                         <input class="HexHoot_Input" name="myPublicKey"
                             type="text" value="${publicKey}" readonly />
+                        <div class="hint">
+                            ${i18n.getText('AddFriend.myHint')}</div>
                         <button class="HexHoot_Button"
                             id="copyToClipboardButton">
                             ${i18n.getText('AddFriend.copyToClipboard')}
@@ -45,6 +47,8 @@ class AddFriend {
                         <input class="HexHoot_Input" id="theirPublicKey"
                             name="theirPublicKey" type="text"
                             placeholder="${keyPlaceholder}" />
+                        <div class="hint">
+                            ${i18n.getText('AddFriend.theirHint')}</div>
                         <button class="HexHoot_Button" id="addFriendButton">
                             ${i18n.getText('AddFriend.add')}</button>
                     </div>
@@ -57,20 +61,34 @@ class AddFriend {
                 </div>
             </div>`;
 
-        for (const tab of mainContentDOMNode.getElementsByClassName('tab')) {
-            tab.onclick = function() {
-                const tabName = this.getAttribute('name');
-                for (const content of mainContentDOMNode
-                    .getElementsByClassName('tabContent')) {
-                    content.style.display =
-                        content.id === tabName ? 'flex' : 'none';
-                }
-            };
+        const tabs = [...mainContentDOMNode.getElementsByClassName('tab')];
+        const showTab = (tabName) => {
+            for (const content of mainContentDOMNode
+                .getElementsByClassName('tabContent')) {
+                content.style.display =
+                    content.id === tabName ? 'flex' : 'none';
+            }
+            for (const tab of tabs) {
+                tab.classList.toggle('active',
+                    tab.getAttribute('name') === tabName);
+            }
+        };
+        for (const tab of tabs) {
+            tab.onclick = () => showTab(tab.getAttribute('name'));
         }
+        // Adding someone is the usual reason to come here
+        showTab('theirCode');
+        document.getElementById('theirPublicKey').focus();
 
         // Button callback
-        document.getElementById('copyToClipboardButton').onclick = () => {
-            navigator.clipboard.writeText(publicKey);
+        const copyButton = document.getElementById('copyToClipboardButton');
+        copyButton.onclick = async () => {
+            await navigator.clipboard.writeText(publicKey);
+            copyButton.textContent = i18n.getText('AddFriend.copied');
+            setTimeout(() => {
+                copyButton.textContent =
+                    i18n.getText('AddFriend.copyToClipboard');
+            }, 2000);
         };
         document.getElementById('addFriendButton').onclick = async () => {
             const key = document.getElementById('theirPublicKey').value

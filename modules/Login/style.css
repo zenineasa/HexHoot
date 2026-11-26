@@ -7,6 +7,18 @@
 #login input, #login textarea {
     font-size: 1.5em;
 }
-#login #generatePrivateKey {
-    width: 4em;
+#loginStatus[data-state="working"]::after {
+    content: '';
+    display: block;
+    height: 0.2em;
+    margin: 0.5em 1em;
+    background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.8),
+        transparent);
+    background-size: 50% 100%;
+    background-repeat: no-repeat;
+    animation: loginWorking 1.2s linear infinite;
+}
+@keyframes loginWorking {
+    from { background-position: -100% 0; }
+    to { background-position: 200% 0; }
 }

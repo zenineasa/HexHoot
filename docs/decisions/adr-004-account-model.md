@@ -44,7 +44,7 @@ Users who are never asked for their password forget it, and without a server a f
 - **Spacing.** The first check comes 3 days after the account is made. Each right answer pushes the next one further out: 7, 14, 30, 60, then 90 days. A wrong answer brings it back to 1 day, and dismissing it postpones it by 2 days (`credentials.nextPasswordCheck`).
 - **How it is checked.** The password goes through the full derivation, so the check takes as long as a login, and the result is compared with the stored secret in constant time (`Identity#checkPassword`). No faster password hash is stored anywhere.
 
-Draft messages for the UI (Phase 4, to be translated):
+Messages in the UI (`PasswordCheck.*` in `modules/I18n/lang.json`, in all five languages since Phase 4 commit 3):
 
 | Result | Message |
 |---|---|

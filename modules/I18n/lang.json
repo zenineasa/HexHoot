@@ -91,6 +91,27 @@
             "de": "Zurück",
             "fr": "Retour",
             "it": "Indietro"
+        },
+        "copied": {
+            "en": "Copied",
+            "ml": "കോപ്പി ചെയ്തു",
+            "de": "Kopiert",
+            "fr": "Copié",
+            "it": "Copiato"
+        },
+        "myHint": {
+            "en": "Send this address to a friend. When they add it, their request appears in your list of friends.",
+            "ml": "ഈ വിലാസം ഒരു സുഹൃത്തിന് അയയ്ക്കുക. അവർ ഇത് ചേർക്കുമ്പോൾ, അവരുടെ അഭ്യർത്ഥന നിങ്ങളുടെ സുഹൃത്തുക്കളുടെ പട്ടികയിൽ കാണാം.",
+            "de": "Senden Sie diese Adresse an einen Freund. Sobald er sie hinzufügt, erscheint seine Anfrage in Ihrer Freundesliste.",
+            "fr": "Envoyez cette adresse à un ami. Quand il l’ajoutera, sa demande apparaîtra dans votre liste d’amis.",
+            "it": "Invia questo indirizzo a un amico. Quando lo aggiungerà, la sua richiesta comparirà nel tuo elenco di amici."
+        },
+        "theirHint": {
+            "en": "Paste your friend's address. They get a friend request and can accept it.",
+            "ml": "നിങ്ങളുടെ സുഹൃത്തിന്റെ വിലാസം ഇവിടെ പേസ്റ്റ് ചെയ്യുക. അവർക്ക് ഒരു സൗഹൃദ അഭ്യർത്ഥന ലഭിക്കും, അവർക്ക് അത് സ്വീകരിക്കാം.",
+            "de": "Fügen Sie die Adresse Ihres Freundes ein. Er erhält eine Freundschaftsanfrage und kann sie annehmen.",
+            "fr": "Collez l’adresse de votre ami. Il recevra une demande d’ami et pourra l’accepter.",
+            "it": "Incolla l’indirizzo del tuo amico. Riceverà una richiesta di amicizia e potrà accettarla."
         }
     },
 
@@ -383,6 +404,34 @@
             "de": "Sicherheitsnummer (vergleichen Sie sie persönlich oder in einem Anruf)",
             "fr": "Numéro de sécurité (comparez-le en personne ou lors d’un appel)",
             "it": "Numero di sicurezza (confrontalo di persona o durante una chiamata)"
+        },
+        "safetyNumberHelp": {
+            "en": "If you both see the same number, your messages go only to each other.",
+            "ml": "നിങ്ങൾ ഇരുവരും ഒരേ നമ്പർ കാണുന്നുവെങ്കിൽ, നിങ്ങളുടെ സന്ദേശങ്ങൾ നിങ്ങൾക്കിടയിൽ മാത്രമേ പോകൂ.",
+            "de": "Wenn Sie beide dieselbe Nummer sehen, gehen Ihre Nachrichten nur an Sie beide.",
+            "fr": "Si vous voyez tous les deux le même numéro, vos messages ne vont qu’à vous deux.",
+            "it": "Se vedete entrambi lo stesso numero, i vostri messaggi arrivano solo a voi due."
+        },
+        "markVerified": {
+            "en": "The numbers match",
+            "ml": "നമ്പറുകൾ ഒന്നുതന്നെ",
+            "de": "Die Nummern stimmen überein",
+            "fr": "Les numéros correspondent",
+            "it": "I numeri corrispondono"
+        },
+        "verified": {
+            "en": "✓ Verified: you compared safety numbers.",
+            "ml": "✓ പരിശോധിച്ചു: നിങ്ങൾ സുരക്ഷാ നമ്പറുകൾ ഒത്തുനോക്കി.",
+            "de": "✓ Verifiziert: Sie haben die Sicherheitsnummern verglichen.",
+            "fr": "✓ Vérifié : vous avez comparé les numéros de sécurité.",
+            "it": "✓ Verificato: avete confrontato i numeri di sicurezza."
+        },
+        "unmarkVerified": {
+            "en": "Remove the mark",
+            "ml": "അടയാളം നീക്കുക",
+            "de": "Markierung entfernen",
+            "fr": "Retirer la marque",
+            "it": "Rimuovi il segno"
         }
     },
 
@@ -421,6 +470,72 @@
             "de": "Das ist keine HexHoot-Sicherungsdatei.",
             "fr": "Ce n'est pas un fichier de sauvegarde HexHoot.",
             "it": "Questo non è un file di backup di HexHoot."
+        }
+    },
+
+    "PasswordCheck": {
+        "title": {
+            "en": "Do you still remember your password?",
+            "ml": "നിങ്ങളുടെ പാസ്‌വേഡ് ഇപ്പോഴും ഓർമ്മയുണ്ടോ?",
+            "de": "Erinnern Sie sich noch an Ihr Passwort?",
+            "fr": "Vous souvenez-vous encore de votre mot de passe ?",
+            "it": "Ricordi ancora la tua password?"
+        },
+        "text": {
+            "en": "Type it here to make sure. It's only practice: you stay signed in either way.",
+            "ml": "ഉറപ്പാക്കാൻ ഇവിടെ ടൈപ്പ് ചെയ്യുക. ഇതൊരു പരിശീലനം മാത്രമാണ്: എന്തായാലും നിങ്ങൾ സൈൻ ഇൻ ചെയ്ത നിലയിൽ തുടരും.",
+            "de": "Geben Sie es hier ein, um sicherzugehen. Es ist nur eine Übung: Sie bleiben in jedem Fall angemeldet.",
+            "fr": "Saisissez-le ici pour vérifier. Ce n’est qu’un exercice : vous restez connecté dans tous les cas.",
+            "it": "Scrivila qui per verificarla. È solo un esercizio: in ogni caso il tuo accesso resta attivo."
+        },
+        "check": {
+            "en": "Check",
+            "ml": "പരിശോധിക്കുക",
+            "de": "Prüfen",
+            "fr": "Vérifier",
+            "it": "Verifica"
+        },
+        "later": {
+            "en": "Not now",
+            "ml": "ഇപ്പോൾ വേണ്ട",
+            "de": "Nicht jetzt",
+            "fr": "Pas maintenant",
+            "it": "Non ora"
+        },
+        "checking": {
+            "en": "Checking… This takes a few seconds.",
+            "ml": "പരിശോധിക്കുന്നു… ഇതിന് കുറച്ച് സെക്കൻഡുകൾ എടുക്കും.",
+            "de": "Wird geprüft … Das dauert ein paar Sekunden.",
+            "fr": "Vérification… Cela prend quelques secondes.",
+            "it": "Verifica in corso… Ci vorranno alcuni secondi."
+        },
+        "right": {
+            "en": "That's it! Your password is safe in your memory. We'll check in again in a while.",
+            "ml": "ശരിയാണ്! നിങ്ങളുടെ പാസ്‌വേഡ് നിങ്ങളുടെ ഓർമ്മയിൽ സുരക്ഷിതമാണ്. കുറച്ചു കാലത്തിനു ശേഷം ഞങ്ങൾ വീണ്ടും ചോദിക്കാം.",
+            "de": "Genau! Ihr Passwort sitzt sicher in Ihrem Gedächtnis. Wir fragen in einiger Zeit wieder nach.",
+            "fr": "C’est bien ça ! Votre mot de passe est bien ancré dans votre mémoire. Nous vous le redemanderons dans quelque temps.",
+            "it": "Esatto! La tua password è al sicuro nella tua memoria. Te la richiederemo tra un po’."
+        },
+        "rightAfterMiss": {
+            "en": "You've got it now! Practice makes it stick.",
+            "ml": "ഇപ്പോൾ ശരിയായി! പരിശീലിക്കുന്തോറും ഓർമ്മ ഉറയ്ക്കും.",
+            "de": "Jetzt haben Sie es! Übung macht den Meister.",
+            "fr": "Cette fois, c’est la bonne ! C’est en s’exerçant qu’on retient.",
+            "it": "Ora ci sei! Con la pratica si ricorda meglio."
+        },
+        "wrong": {
+            "en": "Not quite, and that's okay: you're still signed in and nothing has changed. If you have your password written down somewhere safe, take a look. We'll ask again tomorrow.",
+            "ml": "അത് ശരിയല്ല, പക്ഷേ സാരമില്ല: നിങ്ങൾ ഇപ്പോഴും സൈൻ ഇൻ ചെയ്തിരിക്കുന്നു, ഒന്നും മാറിയിട്ടില്ല. പാസ്‌വേഡ് എവിടെയെങ്കിലും സുരക്ഷിതമായി എഴുതി വെച്ചിട്ടുണ്ടെങ്കിൽ, അതൊന്ന് നോക്കൂ. നാളെ ഞങ്ങൾ വീണ്ടും ചോദിക്കാം.",
+            "de": "Nicht ganz, und das ist in Ordnung: Sie sind weiterhin angemeldet, und nichts hat sich geändert. Falls Sie Ihr Passwort an einem sicheren Ort notiert haben, schauen Sie dort nach. Wir fragen morgen wieder.",
+            "fr": "Pas tout à fait, et ce n’est pas grave : vous êtes toujours connecté et rien n’a changé. Si vous avez noté votre mot de passe en lieu sûr, jetez-y un œil. Nous vous le redemanderons demain.",
+            "it": "Non proprio, ma va bene così: il tuo accesso resta attivo e non è cambiato nulla. Se hai scritto la password in un posto sicuro, dacci un’occhiata. Te la richiederemo domani."
+        },
+        "close": {
+            "en": "Close",
+            "ml": "അടയ്ക്കുക",
+            "de": "Schließen",
+            "fr": "Fermer",
+            "it": "Chiudi"
         }
     }
 }

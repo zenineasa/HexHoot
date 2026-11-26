@@ -98,10 +98,19 @@ describe('A hostile display name stays text (S1)', () => {
                 '#viewProfile [name=displayName]').value`), XSS_NAME);
             // Both sides see the same safety number
             const number = await bob.evaluate(`document.querySelector(
-                '#viewProfile [name=safetyNumber]').value`);
+                '[data-testid="safety-number"]').dataset.value`);
             assert.match(number, /^(\d{5} ){15}\d{5}$/);
             assert.equal(number, await mallory.core('getSafetyNumber',
                 bob.key));
+            // Shown in 16 groups of five digits
+            assert.equal(await bob.evaluate(`document.querySelectorAll(
+                '[data-testid="safety-number"] span').length`), 16);
+            // bob marks the numbers as compared; Core keeps it
+            await bob.click('#verification [name=verify]');
+            await bob.waitFor(`document.getElementById('verification')
+                .dataset.verified === 'true'`);
+            assert.equal((await bob.core('getUserInfo', mallory.key))
+                .verified, true);
             assert.equal(await bob.evaluate('window.__hexhootPwned'),
                 undefined);
         });

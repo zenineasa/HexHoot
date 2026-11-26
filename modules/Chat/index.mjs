@@ -250,6 +250,13 @@ class Chat {
             name.className = 'name';
             name.textContent = this.getDisplayName(friend);
             messageSenderInfo.appendChild(name);
+            if (friend.verified) {
+                const mark = document.createElement('div');
+                mark.className = 'verified';
+                mark.textContent = '✓';
+                mark.title = i18n.getText('ViewProfile.verified');
+                messageSenderInfo.appendChild(mark);
+            }
             messageSenderInfo.onclick = function() {
                 ViewProfile.render(this.render.bind(this), friend);
             }.bind(this);
