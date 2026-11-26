@@ -4,7 +4,7 @@ title: Keyring and encrypted storage
 description: A vault key sealed by the OS keyring through Electron safeStorage, with a scrypt (N=2^20) passphrase fallback, encrypting every local record and every backup with AES-256-GCM under HKDF-SHA-512-derived keys, all with built-in Electron crypto at maximum strength.
 tags: [design, keyring, keychain, safeStorage, storage]
 status: draft
-generated: { by: claude-code/claude-opus-5-5, at: 2026-11-25T13:00:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-11-26T15:00:00Z }
 sources:
   - { id: safestorage, resource: "https://www.electronjs.org/docs/latest/api/safe-storage", title: Electron safeStorage API }
   - { id: probe, resource: /assessment/electron-crypto-capabilities.md, title: Electron 45 crypto capability probe }
@@ -54,3 +54,58 @@ AES-GCM is the only AEAD built into Electron. Deriving a fresh key for each reco
 - **Lock:** a manual lock and an optional idle timeout drop the VK from memory.
 - **Backup export:** the user picks a backup passphrase → scrypt (N=2²⁰) → AES-256-GCM over `{identity seed, contacts, messages, preferences}`. **No ratchet state** goes in the backup. The file extension is `.hexhoot2`, and it replaces the plaintext `.hexhootjson`.
 - **Reset:** delete `keyring.json`, delete the store, and remove the entry from the OS keyring.
+
+# Implementation (2026-11-26)
+
+The keyring is built and tested as a library in `modules/Crypto`. Core does not use it yet: it is wired in with the new login screen in Phase 4, which replaces v1's password-derived key ([ADR-004](/decisions/adr-004-account-model.md)).
+
+| File | What it does |
+|---|---|
+| `modules/Crypto/primitives.js` | `encodeParts`, HKDF-SHA-512, AES-256-GCM `seal`/`open`, and `scrypt` with its limits |
+| `modules/Crypto/RecordCipher.js` | Per-record encryption |
+| `modules/Crypto/Keyring.js` | The vault key, its unlockers, `keyring.json` |
+| `modules/Main/sealer.js` | The OS keyring, through `safeStorage` (main process only) |
+
+## Exact formats
+
+`parts(a, b, …)` is each part as a 4-byte big-endian length followed by its bytes (UTF-8 for strings). Every HKDF `info` and AEAD associated data uses it, so `("ab", "c")` and `("a", "bc")` can never be confused. The `‖` in the sketch above is this encoding.
+
+```
+record blob = 0x01 ‖ salt (32) ‖ nonce (12) ‖ ciphertext ‖ tag (16)
+K_rec       = HKDF-SHA-512(K_x, salt, parts("hexhoot/v2/rec", table, id))
+ad          = parts("hexhoot/v2/rec", 0x01, table, id)
+K_db        = HKDF-SHA-512(VK, "", "hexhoot/v2/db")        (32 bytes)
+K_secrets   = HKDF-SHA-512(VK, "", "hexhoot/v2/secrets")
+check       = HKDF-SHA-512(VK, "", "hexhoot/v2/keyring/check")
+KEK         = scrypt(NFKC(passphrase), salt (32), N, r, p, 32 bytes)
+wrapped     = nonce (12) ‖ AES-256-GCM(KEK, VK, ad = parts("hexhoot/v2/keyring/passphrase", "scrypt", N, r, p)) ‖ tag
+```
+
+`keyring.json` (mode 0600, written atomically):
+
+```json
+{"format": "hexhoot-keyring", "version": 1, "check": "<base64>",
+ "unlockers": [
+   {"type": "os-keyring", "backend": "keychain", "sealed": "<base64 safeStorage output>"},
+   {"type": "passphrase", "kdf": "scrypt", "N": 1048576, "r": 8, "p": 1,
+    "salt": "<base64>", "wrapped": "<base64>"}]}
+```
+
+## Decisions made while building it
+
+- **`check` value.** `safeStorage` does not authenticate what it decrypts (on macOS it is AES-CBC with no MAC). The check detects a wrong vault key from the OS keyring before anything is decrypted with it. It reveals nothing about VK.
+- **KDF parameters are associated data.** Editing `N`, `r` or `p` in the file makes unlocking fail instead of quietly weakening anything. N is capped at 2²⁰ *before* scrypt runs, because 2²¹ kills Electron with an uncatchable SIGTRAP.
+- **Low-memory check.** scrypt refuses to start unless 1.5× its memory need is available ([Q14](/plan/open-questions.md)). It uses `process.availableMemory()`, which counts reclaimable memory (macOS inactive pages, Linux `MemAvailable`). `os.freemem()` reported 0.08 GiB on an 8 GiB Mac that had 1.7 GiB available, so it would have refused every time.
+- **KDF upgrade.** A passphrase unlocker with a lower N than the current default is re-made on the next successful unlock. Test keyrings use N=2¹⁴, and the default-cost test (create and unlock at 2²⁰) took 8.4 s on the 8 GiB Mac.
+- **Weak OS keyring.** `basic_text` and `unknown` backends on Linux, and `isEncryptionAvailable() === false` anywhere, count as weak. A passphrase is then required, and the weak backend is never used.
+- **Reset** deletes `keyring.json`. `safeStorage` has one key for the whole app and no per-entry delete, so there is no OS keyring entry to remove; the sealed vault key lived only in the file.
+- **Zeroing** is best effort. The vault key, KEKs, record keys and passphrase bytes are `fill(0)`-ed after use or on `lock()`, but JavaScript strings (the passphrase as typed, and the base64 text passed to `safeStorage`) cannot be wiped.
+
+## Tests
+
+- `npm run test:crypto` (L1, under Electron's BoringSSL):
+  - Round trips, tampering with every byte, moving a record to another table or id, and a format vector that WebCrypto's separate HKDF and AES-GCM path decrypts.
+  - Both unlockers, a weak backend, a wrong key from the OS keyring, tampered parameters or wrapped key, a corrupt file, locking, changing and removing the passphrase, and the KDF upgrade.
+  - The scrypt cap, the low-memory check and NFKC normalization.
+  - The default-cost run (CI, or `HEXHOOT_SLOW_TESTS=1`).
+- `test/e2e/keyring.e2e.mjs` runs the keyring with the real `safeStorage` in an Electron main process: strong with `--use-mock-keychain` on macOS, and a passphrase fallback where Linux CI has no secret service.

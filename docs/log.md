@@ -2,6 +2,7 @@
 
 ## 2026-11-26
 
+* **Update**: Keyring done as a library (`modules/Crypto`): vault key, OS-keyring and passphrase unlockers, and per-record AES-256-GCM. The exact formats are now in the [keyring design](/design/keyring.md). The low-memory check for scrypt uses `process.availableMemory()`, because `os.freemem()` reports almost nothing on macOS ([Q14](/plan/open-questions.md)).
 * **Update**: Multi-instance harness done. `test/e2e/orchestrator.mjs` launches several apps, each with its own profile, on a private hyperdht testnet or the LAN carrier on 127.0.0.1. The first L3 test has alice and bob exchange a friend request and chat through the UI over each transport. `npm run test:e2e` retries a failed file once and reports it as flaky, and failed tests leave logs and screenshots in `test-results/e2e` ([testing infrastructure](/design/testing-infrastructure.md)).
 * **Finding**: S5. The v1 key depended on the password alone, because the login form never sent the username that the key derivation reads. Found by the first two-app run, where alice and bob got the same key. Fixed in Core ([findings](/assessment/crypto-findings.md)).
 * **Update**: Renderer lockdown done. The window is sandboxed with context isolation and no Node.js. The page is ES modules over `app://`, with escaping templates instead of `eval`, and the CSP has no `'unsafe-eval'`. Karma is replaced by `node --test` and a CDP-driven E2E suite ([roadmap](/plan/roadmap.md) Phase 2, [testing](/design/testing-infrastructure.md), [Q5](/plan/open-questions.md)).

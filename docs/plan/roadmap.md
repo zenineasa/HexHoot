@@ -53,7 +53,7 @@ Follow the [dependency upgrade matrix](/plan/dependency-upgrade-matrix.md).
 
 A new `modules/Crypto` (in Core), with unit tests in Node (`node:test`).
 
-1. **Keyring** ([design](/design/keyring.md)): the vault key, the safeStorage and passphrase unlockers, and the encrypted record store.
+1. **Keyring** ([design](/design/keyring.md)): the vault key, the safeStorage and passphrase unlockers, and the encrypted record store. **Done 2026-11-26** as a library with L1 tests and a real-`safeStorage` test; Core starts using it with the new login in Phase 4.
 2. **Identity** ([design](/design/identity-and-addresses.md)): the recovery phrase, deterministic `ik_ec` (P-521, with rejection sampling) and `ik_pq` (ML-DSA-87), the bundle and its signatures, the `hh2:` address, and the safety number.
 3. **Hybrid KEM** (`HK`) and the **SIGMA-I handshake** ([spec](/design/session-and-ratchet.md)).
 4. **Double Ratchet + ML-KEM** turns, skipped-key handling, and session persistence through the encrypted store.

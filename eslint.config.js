@@ -7,7 +7,7 @@ module.exports = [
         'ignores': ['out/**', 'node_modules/**', 'test-results/**'],
     },
     {
-        'files': ['**/*.js', '**/*.mjs'],
+        'files': ['**/*.js', '**/*.cjs', '**/*.mjs'],
         'languageOptions': {
             'ecmaVersion': 'latest',
             'sourceType': 'module',
