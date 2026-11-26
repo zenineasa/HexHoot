@@ -268,6 +268,26 @@ test('"Not now" puts the check off', async () => {
     assert.equal((await app.core('getPasswordCheck')).due, false);
 });
 
+test('The same name and password give the same address elsewhere',
+    async () => {
+        const address = await app.core('getMyAddress');
+        // Another computer: a fresh profile
+        const elsewhere = await launchApp({name: 'elsewhere',
+            env: {HEXHOOT_TRANSPORTS: 'none'}});
+        try {
+            await elsewhere.waitFor(`document.getElementById('loginButton')`);
+            await elsewhere.type('[name=displayName]', '  zatman ');
+            await elsewhere.type('[name=password]', PASSWORD);
+            await elsewhere.click('#loginButton');
+            await elsewhere.waitFor(
+                `document.getElementById('friendsList')`);
+            assert.equal(await elsewhere.core('getMyAddress'), address);
+            assert.deepEqual(elsewhere.errors, []);
+        } finally {
+            await elsewhere.close();
+        }
+    });
+
 test('No errors were logged', () => {
     assert.deepEqual(app.errors, []);
 });

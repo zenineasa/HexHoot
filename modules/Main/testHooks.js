@@ -4,6 +4,8 @@
 // started from source with --interaction-test; packaged builds ignore them.
 // The orchestrator (test/e2e/orchestrator.mjs) sets them for each peer.
 
+const {parseFaults} = require('../Protocol/faults');
+
 /**
  * Parse a "host:port" string
  * @param {string} address the address
@@ -76,6 +78,20 @@ module.exports = function testHooks(app) {
             throw new Error('Invalid HEXHOOT_TEST_CLOCK_OFFSET_DAYS');
         }
         overrides.clockOffsetMs = days * 24 * 3600 * 1000;
+    }
+    // HEXHOOT_TEST_FAULTS: "drop:0.1,dup:0.05,reorder:0.1,delay:0-500"
+    // drops, duplicates, reorders and delays what the carriers send
+    if (env.HEXHOOT_TEST_FAULTS) {
+        overrides.faults = parseFaults(env.HEXHOOT_TEST_FAULTS);
+    }
+    // HEXHOOT_TEST_RETRY_MS: resend unacknowledged messages sooner than
+    // the 30 s default, so lossy runs (HEXHOOT_TEST_FAULTS) finish quickly
+    if (env.HEXHOOT_TEST_RETRY_MS) {
+        const ms = Number(env.HEXHOOT_TEST_RETRY_MS);
+        if (!Number.isInteger(ms) || ms < 100) {
+            throw new Error('Invalid HEXHOOT_TEST_RETRY_MS');
+        }
+        overrides.retryMs = ms;
     }
     return overrides;
 };

@@ -56,6 +56,7 @@ class Core {
      * @param {function} [options.carriers] () => [carriers]; called once
      * the account is open
      * @param {Object} [options.scryptParams] tests only: a cheaper scrypt
+     * @param {number} [options.retryMs] tests only: resend sooner
      * @param {boolean} [options.watchNetwork] restart the carriers when the
      * network interfaces change
      * @param {function} [options.now] clock
@@ -67,6 +68,7 @@ class Core {
         this.sealer = options.sealer || null;
         this.makeCarriers = options.carriers || (() => []);
         this.scryptParams = options.scryptParams;
+        this.retryMs = options.retryMs;
         this.watchNetwork = Boolean(options.watchNetwork);
         this.now = options.now || Date.now;
         this.log = options.log || console.log;
@@ -270,6 +272,7 @@ class Core {
             carriers: this.makeCarriers(),
             now: this.now,
             log: this.log,
+            ...this.retryMs ? {retryMs: this.retryMs} : {},
             // Anyone may complete a handshake, so friend requests can
             // arrive; what strangers may send is decided per message
             authorize: () => true,

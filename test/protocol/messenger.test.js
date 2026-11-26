@@ -147,6 +147,44 @@ test('A contact that lost its session gets a new handshake (RESET)',
         await waitFor(() => alice.texts().includes('back'), 'the answer');
     });
 
+test('A forged RESET costs one handshake and nothing more (T8)',
+    async (t) => {
+        const network = new MemoryNetwork();
+        const alice = await peer(network, {retryMs: 1000});
+        const bob = await peer(network, {retryMs: 1000});
+        t.after(() => Promise.all([alice.messenger.stop(),
+            bob.messenger.stop()]));
+        await alice.messenger.send(bob.address, 'chat', {text: 'one'});
+        await waitFor(() => bob.received.length === 1 &&
+            alice.messenger.outbox.size === 0, 'the first message');
+
+        // Anyone who saw a MSG envelope knows its session tag
+        const seen = network.log.find((e) => e[1] === wire.kinds.msg);
+        const forged = wire.encodeEnvelope(wire.kinds.reset,
+            seen.subarray(2, 34), Buffer.alloc(0));
+        const link = {broadcast: false, reply() {}};
+        const hs1Before = network.log.filter((e) =>
+            e[1] === wire.kinds.hs1).length;
+        for (let i = 0; i < 3; i++) {
+            await alice.messenger.receive(forged, link);
+        }
+        // alice has nothing to send. bob still sends on the old session,
+        // and alice still reads it at once
+        await bob.messenger.send(alice.address, 'chat', {text: 'old'});
+        await waitFor(() => alice.texts().includes('old') &&
+            bob.messenger.outbox.size === 0, 'bob\'s message and receipt');
+        await alice.messenger.send(bob.address, 'chat', {text: 'two'});
+        await waitFor(() => bob.texts().includes('two') &&
+            alice.messenger.outbox.size === 0, 'alice\'s message');
+        assert.equal(network.log.filter((e) => e[1] === wire.kinds.hs1)
+            .length, hs1Before + 1);
+        // No RESET went back and forth: bob's old session was never refused
+        assert.equal(network.log.filter((e) => e[1] === wire.kinds.reset)
+            .length, 0);
+        assert.deepEqual(bob.texts(), ['one', 'two']);
+        assert.deepEqual(alice.texts(), ['old']);
+    });
+
 test('A restart with the stored sessions needs no new handshake',
     async (t) => {
         const network = new MemoryNetwork();

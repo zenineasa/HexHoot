@@ -7,6 +7,7 @@ const test = require('node:test');
 const createTestnet = require('hyperdht/testnet');
 const DhtCarrier = require('../../modules/Protocol/DhtCarrier');
 const LanCarrier = require('../../modules/Protocol/LanCarrier');
+const {parseFaults, withFaults} = require('../../modules/Protocol/faults');
 const {signedIn, befriendAndChat, waitFor} = require('./helpers');
 
 /**
@@ -25,6 +26,20 @@ test('Two Cores befriend and chat over the LAN carrier', async (t) => {
         peers: ['127.0.0.1:' + aliceLan.port]});
     const bob = await signedIn('Bobby Tables', {t,
         network: fixed([bobLan])});
+    await waitFor(() => aliceLan.peers.size === 1 && bobLan.peers.size === 1,
+        'LAN discovery');
+    await befriendAndChat(alice, bob);
+});
+
+test('Over a LAN that loses, repeats and reorders frames', async (t) => {
+    const faults = parseFaults('drop:0.1,dup:0.05,reorder:0.1,delay:0-200');
+    const aliceLan = new LanCarrier({port: 0, peers: []});
+    const alice = await signedIn('Alice Liddell', {t, retryMs: 1000,
+        network: fixed([withFaults(aliceLan, faults)])});
+    const bobLan = new LanCarrier({port: 0,
+        peers: ['127.0.0.1:' + aliceLan.port]});
+    const bob = await signedIn('Bobby Tables', {t, retryMs: 1000,
+        network: fixed([withFaults(bobLan, faults)])});
     await waitFor(() => aliceLan.peers.size === 1 && bobLan.peers.size === 1,
         'LAN discovery');
     await befriendAndChat(alice, bob);

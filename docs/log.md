@@ -2,6 +2,11 @@
 
 ## 2026-11-27
 
+* **Update**: Phase 4, commit 4: the L3 scenario table (50 messages each way over each transport and with faults, restarts, three peers at once, the same account in a fresh profile) and the L4 adversarial peer (`test/peers/evilPeer.js`), covering T2, S1–S3, replays, tampering, and malformed and oversized frames ([testing infrastructure](/design/testing-infrastructure.md)).
+* **Fix**: The chat box was cleared when Core confirmed a send, not when Send was pressed, so a message typed in between was wiped and never sent. Found when the 50-message run lost about one message in seven.
+* **Finding**: T8. The L4 evil peer showed that anyone who sees one envelope can forge a RESET for its session, which made both sides drop the session and re-handshake. **Fixed:** a RESET now retires the session for sending only, so a forged one costs a single handshake ([findings](/assessment/crypto-findings.md)).
+* **Fix**: Two friends-list refreshes close together could interleave and show every entry twice. The list is now rebuilt in one step, and only the newest refresh writes it. Found by the three-peer run.
+* **Finding**: Messenger resends after 30 s, so one lost frame delays a message by 30–45 s ([Q15](/plan/open-questions.md)). Under reordering, messages are shown in arrival order ([Q16](/plan/open-questions.md)).
 * **Update**: Phase 4, commit 3: the v2 UI. The password check is a box in the corner with the [ADR-004](/decisions/adr-004-account-model.md) messages, and it never blocks the app. A progress bar shows while scrypt runs. Add friend opens on the tab most people need. Profiles show the safety number in groups, with a "The numbers match" button that marks a contact verified, and a ✓ in the chat header. Only the user can set that mark ([roadmap](/plan/roadmap.md)).
 
 ## 2026-11-26

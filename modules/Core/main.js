@@ -15,6 +15,7 @@ const Core = require('./index');
 const EncryptedStore = require('./EncryptedStore');
 const DhtCarrier = require('../Protocol/DhtCarrier');
 const LanCarrier = require('../Protocol/LanCarrier');
+const {withFaults} = require('../Protocol/faults');
 const {rendererMethods} = require('./constants.mjs');
 
 let core = null;
@@ -52,6 +53,8 @@ const sealer = {
  * @param {Array} [config.lanPeers] static LAN peers ("host:port")
  * @param {Object} [config.scryptParams] tests only (testHooks.js)
  * @param {number} [config.clockOffsetMs] tests only (testHooks.js)
+ * @param {Object} [config.faults] tests only (testHooks.js)
+ * @param {number} [config.retryMs] tests only (testHooks.js)
  */
 async function init(config) {
     const enabled = config.transports || ['dht', 'lan'];
@@ -61,6 +64,7 @@ async function init(config) {
         keyringFile: path.join(config.userData, 'keyring.json'),
         sealer,
         scryptParams: config.scryptParams,
+        retryMs: config.retryMs,
         now: config.clockOffsetMs ?
             () => Date.now() + config.clockOffsetMs : undefined,
         watchNetwork: true,
@@ -70,7 +74,8 @@ async function init(config) {
             ...enabled.includes('lan') ?
                 [new LanCarrier({port: config.lanPort,
                     peers: config.lanPeers})] : [],
-        ],
+        ].map((carrier) => config.faults ?
+            withFaults(carrier, config.faults) : carrier),
     });
     await core.start();
 }

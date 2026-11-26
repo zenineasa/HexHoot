@@ -84,7 +84,13 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 - **Add friend:** opens on "Their code", with a hint on each tab and "Copied" feedback.
 - **Verification:** the safety number in 16 groups of five digits, a "The numbers match" button that marks the contact verified (`Core#setVerified`, which peers cannot set), and a ✓ in the chat header.
 - **Tests:** L3 covers the check being due after a restart 4 days later, a wrong answer, a right answer the next day, and "Not now". It also covers the default add-friend tab and marking a contact verified. The new hook is `HEXHOOT_TEST_CLOCK_OFFSET_DAYS`.
-- **Next:** the L3 scenario table (carol, restarts, both transports, fault injection) and the L4 evil peer.
+
+**Commit 4 done (2026-11-27):** the L3 scenario table and the L4 adversarial peer ([testing infrastructure](/design/testing-infrastructure.md)).
+- **L3:** 50 messages each way through the UI over `dht`, over a faulty `lan`, and over both at once. Restarts mid-conversation, with the outbox delivered and the verified mark kept. alice, bob and carol talk at the same time over `lan` and over `dht`, with no cross-talk. The same name and password give the same address in a fresh profile.
+- **Fault injection:** `HEXHOOT_TEST_FAULTS` wraps every carrier (`modules/Protocol/faults.js`). L1 and L2 tests cover the wrapper and real LAN carriers under loss. `HEXHOOT_TEST_RETRY_MS` shortens resends for those runs ([Q15](/plan/open-questions.md)).
+- **L4:** `test/peers/evilPeer.js` attacks a real app with its UI open: T2, S1–S3, malformed bodies, unknown types, replays, bit flips, and malformed and oversized frames.
+- **Fixed:** the chat box was cleared only after Core answered, so text typed meanwhile was wiped and lost (found by the 50-message run). Two friends-list refreshes could interleave and list everyone twice (found by the three-peer run). A forged RESET made both sides drop a good session; RESET now only retires it for sending (T8, found by L4).
+- **Left for Phase 5:** two real machines over the public DHT (manual), and macOS and Windows runs in CI. The resend timing (Q15) and the display order under reordering (Q16) are open.
 
 - [Wire protocol v2](/design/wire-protocol-v2.md): framing, envelopes, the inner schema, and padding.
 - Hyperswarm: one long-lived swarm, `topic = SHA-512("hexhoot/v2/topic" ‖ fp)[0..32]`, and connection reuse keyed by fingerprint. Fix T5.

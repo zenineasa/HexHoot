@@ -99,35 +99,43 @@ class Chat {
      * Load friends in the sidebar from the database
      */
     async loadFriendsInSidebar() {
+        // Events can start several of these at once: read everything
+        // first, then replace the list in one step, and let only the
+        // newest call write it (the list was once shown twice)
+        const generation = this.sidebarGeneration =
+            (this.sidebarGeneration || 0) + 1;
+        const [friends, pending] = await Promise.all([
+            dbMessenger.getAllFriends(),
+            dbMessenger.getPendingFriendRequests(),
+        ]);
         const ul = document.getElementById('friendsList');
-        ul.innerHTML = ''; // Clear everything
+        if (generation !== this.sidebarGeneration || !ul) {
+            return;
+        }
 
-        // Load friends from the DB
-        this.allFriends = await dbMessenger.getAllFriends();
-
-        // Sort 'allFriends' by 'lastMessageTimestamp'
-        this.allFriends.sort(function(a, b) {
+        // Sort by 'lastMessageTimestamp'
+        this.allFriends = friends.sort(function(a, b) {
             return b.lastMessageTimestamp - a.lastMessageTimestamp;
         });
 
         // Friend requests waiting for a decision are listed first
-        const pending = await dbMessenger.getPendingFriendRequests();
+        const items = [];
         for (const key of Object.keys(pending)) {
-            if (!sanitize.isValidAddress(key)) {
-                continue;
+            if (sanitize.isValidAddress(key)) {
+                items.push(this.createPendingRequestListItem(pending[key]));
             }
-            ul.appendChild(this.createPendingRequestListItem(pending[key]));
         }
-
-        for (let i = 0; i < this.allFriends.length; i++) {
-            const li = this.createProfileListItem(this.allFriends[i]);
-            li.id = this.sidebarLiIdPrefix + this.allFriends[i].key;
+        for (const friend of this.allFriends) {
+            const li = this.createProfileListItem(friend);
+            li.id = this.sidebarLiIdPrefix + friend.key;
             li.dataset.testid = 'friend';
-            li.onclick = this.loadChat(this.allFriends[i]);
-            ul.appendChild(li);
-
-            if (!this.allFriends[i].isRead) {
-                this.doNotify(this.allFriends[i].key);
+            li.onclick = this.loadChat(friend);
+            items.push(li);
+        }
+        ul.replaceChildren(...items);
+        for (const friend of this.allFriends) {
+            if (!friend.isRead) {
+                this.doNotify(friend.key);
             }
         }
     }
@@ -409,10 +417,17 @@ class Chat {
                 type: this.messageType.sent,
                 message: textAreaValue,
             };
+            // Cleared now, not when Core answers: by then the user may have
+            // typed the next message
+            messageTextArea.value = '';
             dbMessenger.sendChatMessage(userKey, message).then(() => {
                 this.insertChatMessageToDOM(message);
-                messageTextArea.value = '';
-            }, () => alert(i18n.getText('Chat.notFriendYet')));
+            }, () => {
+                if (messageTextArea.value === '') {
+                    messageTextArea.value = textAreaValue;
+                }
+                alert(i18n.getText('Chat.notFriendYet'));
+            });
         }
     }
 

@@ -41,6 +41,7 @@ function fakeSealer(strong = true) {
  * @param {string} [options.dir] reuse a folder (a restart)
  * @param {Object} [options.sealer] the OS keyring; strong by default
  * @param {function} [options.now] clock
+ * @param {number} [options.retryMs] Messenger resend interval
  * @param {Object} [options.t] test context; the folder is removed after it
  * @return {Promise<Core>} a started Core, with .dir and .sealer
  */
@@ -56,6 +57,7 @@ async function makeCore(options = {}) {
         keyringFile: path.join(dir, 'keyring.json'),
         sealer,
         scryptParams: fastScrypt,
+        retryMs: options.retryMs,
         now: options.now,
         log: function() {},
         carriers: () => options.network ? [options.network.carrier()] : [],

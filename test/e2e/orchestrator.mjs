@@ -13,13 +13,16 @@
 
 import {test, before, after} from 'node:test';
 import {createRequire} from 'node:module';
+import {fork} from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
+import os from 'node:os';
 import path from 'node:path';
 import {launchApp} from './driver.mjs';
 
 const require = createRequire(import.meta.url);
 const createTestnet = require('hyperdht/testnet');
+const electron = require('electron');
 const root = path.resolve(import.meta.dirname, '../..');
 
 export const artifactsRoot = process.env.HEXHOOT_E2E_ARTIFACTS ||
@@ -175,19 +178,98 @@ function addActions(app, otherPeers) {
 }
 
 /**
+ * Start an adversarial peer (test/peers/evilPeer.js): a headless Core on
+ * the LAN carrier, driven over IPC
+ * @param {string} name its display name
+ * @param {number} lanPort its port
+ * @param {Array} lanPeers "host:port" of the others
+ * @return {Object} a handle: {name, key, log, errors, dialogs, call(cmd,
+ * ...args), saveArtifacts(dir), close()}
+ */
+async function startEvilPeer(name, lanPort, lanPeers) {
+    const child = fork(path.join(root, 'test', 'peers', 'evilPeer.js'), [], {
+        execPath: electron,
+        // Not the test runner's flags (--secure-heap...), which Electron
+        // refuses
+        execArgv: [],
+        env: Object.assign({}, process.env, {ELECTRON_RUN_AS_NODE: '1'}),
+        // JSON: the V8 format differs between Node and Electron's Node
+        serialization: 'json',
+        stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
+    });
+    const log = [];
+    child.stdout.on('data', (chunk) => log.push(chunk.toString()));
+    child.stderr.on('data', (chunk) => log.push(chunk.toString()));
+    const exited = new Promise((resolve) => child.once('exit', resolve));
+    const waiting = new Map();
+    let nextId = 0;
+    child.on('message', ({id, result, error}) => {
+        const {resolve, reject} = waiting.get(id);
+        waiting.delete(id);
+        if (error) {
+            reject(new Error(`${name}: ${error}`));
+        } else {
+            resolve(result);
+        }
+    });
+    exited.then(() => {
+        for (const {reject} of waiting.values()) {
+            reject(new Error(`${name} exited\n${log.join('')}`));
+        }
+    });
+    const call = (cmd, ...args) => new Promise((resolve, reject) => {
+        const id = nextId++;
+        waiting.set(id, {resolve, reject});
+        child.send({id, cmd, args});
+    });
+    const handle = {
+        name, log, errors: [], dialogs: [], call,
+        saveArtifacts: async (dir) => fs.writeFileSync(
+            path.join(dir, `${name}.log`), log.join('')),
+        close: async () => {
+            if (child.exitCode === null) {
+                await Promise.race([call('stop').catch(() => {}),
+                    new Promise((resolve) => setTimeout(resolve, 5000))]);
+                child.kill();
+                await exited;
+            }
+        },
+    };
+    try {
+        // Display names need five characters or more
+        handle.key = await call('start', {name: name + ' peer', lanPort,
+            lanPeers});
+    } catch (err) {
+        child.kill();
+        throw err;
+    }
+    return handle;
+}
+
+/**
  * Launch a network of apps
  * @param {Object} options
  * @param {string} options.transport 'dht', 'lan' or 'dht,lan'
  * @param {Array} options.peers peer names, for example ['alice', 'bob']
+ * @param {Array} [options.evil] names of adversarial headless peers
+ * (test/peers/evilPeer.js); LAN only
+ * @param {Object} [options.env] more environment variables for every app,
+ * for example {HEXHOOT_TEST_FAULTS: 'drop:0.1'}
  * @return {Object} {peers: {name: handle}, step(text), saveArtifacts(label),
- * close()}
+ * close()}. App handles have restart(whileDown): the same profile, port
+ * and settings, in place.
  */
 export async function launchNetwork(options) {
-    const names = options.peers;
+    const evil = options.evil || [];
+    const names = [...options.peers, ...evil];
     const transports = options.transport.split(',');
+    if (evil.length && !transports.includes('lan')) {
+        throw new Error('Evil peers need the LAN transport');
+    }
     const steps = [];
     const step = (text) => steps.push(`${new Date().toISOString()} ${text}`);
-    const env = {HEXHOOT_TRANSPORTS: options.transport};
+    const env = Object.assign({HEXHOOT_TRANSPORTS: options.transport},
+        options.env);
 
     let testnet = null;
     if (transports.includes('dht')) {
@@ -203,23 +285,54 @@ export async function launchNetwork(options) {
     }
 
     const peers = {};
+    const profiles = [];
     const close = async () => {
         await Promise.allSettled(Object.values(peers).map((p) => p.close()));
         await testnet?.destroy();
+        for (const dir of profiles) {
+            fs.rmSync(dir, {recursive: true, force: true});
+        }
     };
-    try {
-        const apps = await Promise.all(names.map((name, i) => launchApp({
-            name,
+    const lanPeers = (i) => ports.filter((_, j) => j !== i)
+        .map((port) => '127.0.0.1:' + port);
+    /**
+     * @param {string} name the peer
+     * @param {number} i its index
+     * @return {Object} its app handle, with actions and restart()
+     */
+    const launchPeer = async (name, i) => {
+        const userData = fs.mkdtempSync(path.join(os.tmpdir(),
+            `hexhoot-${name}-`));
+        profiles.push(userData);
+        const launchOptions = {name, userData,
             env: Object.assign({}, env, ports.length ? {
                 HEXHOOT_LAN_PORT: String(ports[i]),
-                HEXHOOT_LAN_PEERS: ports.filter((_, j) => j !== i)
-                    .map((port) => '127.0.0.1:' + port).join(),
-            } : {}),
-        }).then((app) => {
-            peers[name] = app;
-            return app;
-        })));
-        apps.forEach((app) => addActions(app, names.length - 1));
+                HEXHOOT_LAN_PEERS: lanPeers(i).join(),
+            } : {})};
+        const app = addActions(await launchApp(launchOptions),
+            names.length - 1);
+        /**
+         * Close the app and start it again on the same profile
+         * @param {function} [whileDown] runs while the app is closed
+         */
+        app.restart = async (whileDown) => {
+            step('restart ' + name);
+            const errors = app.errors;
+            await app.close();
+            await whileDown?.();
+            // Same object, new process: scenarios keep their handle
+            Object.assign(app, await launchApp(launchOptions));
+            app.errors.unshift(...errors);
+        };
+        peers[name] = app;
+        return app;
+    };
+    try {
+        await Promise.all(options.peers.map(launchPeer));
+        for (const name of evil) {
+            const i = names.indexOf(name);
+            peers[name] = await startEvilPeer(name, ports[i], lanPeers(i));
+        }
         step('launched ' + names.join());
     } catch (err) {
         await close();
@@ -276,4 +389,18 @@ export function useNetwork(options) {
         }
     });
     return handle;
+}
+
+/**
+ * a adds b through the UI, b accepts, and both list each other
+ * @param {Object} a an app handle, logged in
+ * @param {Object} b another
+ * @param {string} aName a's display name
+ * @param {string} bName b's display name
+ */
+export async function befriend(a, b, aName, bName) {
+    await a.addFriend(b.key);
+    await b.acceptFriendRequest(a.key, 60000);
+    await a.waitForFriend(b.key, bName, 60000);
+    await b.waitForFriend(a.key, aName, 60000);
 }

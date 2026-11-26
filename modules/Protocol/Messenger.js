@@ -125,6 +125,7 @@ class Messenger {
                 tag: Buffer.from(e.tag, 'hex'),
                 sidA: Buffer.from(e.sidA, 'hex'),
                 createdAt: e.createdAt,
+                retired: Boolean(e.retired),
             }));
             this.setSessions(address, list);
         }
@@ -188,7 +189,7 @@ class Messenger {
      * @return {Object|null} {safetyNumber, canSend} of the current session
      */
     sessionInfo(address) {
-        const entry = this.sessions.get(address)?.[0];
+        const entry = this.current(address);
         return entry ? {
             safetyNumber: this.identity.public.safetyNumber(
                 entry.ratchet.peer),
@@ -270,7 +271,7 @@ class Messenger {
      */
     async flush(address, link) {
         const now = this.now();
-        const entry = this.sessions.get(address)?.[0];
+        const entry = this.current(address);
         const due = [...this.outbox.values()].filter((item) =>
             item.address === address &&
             now - item.sentAt >= this.options.retryMs);
@@ -540,7 +541,7 @@ class Messenger {
         }
         // Acknowledge every copy, so the sender stops resending, but
         // deliver each message once
-        const current = this.sessions.get(address)?.[0];
+        const current = this.current(address);
         if (current?.ratchet.canSend) {
             const receipt = this.encryptFor(current,
                 {type: 'receipt', body: {ids: [message.id]}});
@@ -564,21 +565,49 @@ class Messenger {
             body: message.body});
     }
 
-    /** @param {string} key tag hex of a session the peer no longer has */
+    /**
+     * The session to send on: the first one not retired by a RESET
+     * @param {string} address the contact
+     * @return {Object|undefined} the session entry
+     */
+    current(address) {
+        return (this.sessions.get(address) || []).find((e) => !e.retired);
+    }
+
+    /**
+     * The contact says it no longer has a session. RESET cannot be
+     * authenticated (the sender lost the keys), so anyone who saw a
+     * session's tag can forge one. The session is therefore only retired:
+     * no longer used for sending, which starts a new handshake, but kept
+     * for receiving, so a forged RESET costs one handshake and loses
+     * nothing. A retired session ignores further RESETs (finding T8).
+     * @param {string} key tag hex of a session the peer no longer has
+     */
     async receiveReset(key) {
         const known = this.byTag.get(key);
-        if (!known) {
+        if (!known || known.entry.retired) {
             return;
         }
         await this.withLock(known.address, async () => {
-            // Only that session goes; another one may still be good
-            this.setSessions(known.address, (this.sessions.get(
-                known.address) || []).filter((e) => e !== known.entry));
+            const entry = this.byTag.get(key)?.entry;
+            if (!entry || entry.retired) {
+                return;
+            }
+            entry.retired = true;
+            // Only that session; another one may still be good
+            this.setSessions(known.address, [...(this.sessions.get(
+                known.address) || []).filter((e) => e !== entry), entry]);
             await this.saveSessions(known.address);
             for (const item of this.outbox.values()) {
                 if (item.address === known.address) {
                     item.sentAt = 0;
                 }
+            }
+            // A new session at once, even with nothing to send: receipts
+            // for what arrives on the retired one need it
+            if (!this.current(known.address) &&
+                !this.pendingTo.has(known.address)) {
+                this.startHandshake(known.address);
             }
             await this.flush(known.address);
         });
@@ -599,13 +628,16 @@ class Messenger {
         const entry = {ratchet: Ratchet.fromHandshake(session),
             tag: wire.sessionTag(session.sessionAd),
             sidA: Buffer.from(sidA), createdAt: this.now()};
-        const existing = this.sessions.get(address)?.[0];
+        const existing = this.current(address);
         const keepExisting = existing &&
             this.now() - existing.createdAt <
                 this.options.simultaneousWindowMs &&
             Buffer.compare(existing.sidA, entry.sidA) < 0;
-        this.setSessions(address, keepExisting ? [existing, entry] :
-            [entry, ...(existing ? [existing] : [])]);
+        // Retired sessions stay last, for receiving, while there is room
+        const retired = (this.sessions.get(address) || [])
+            .filter((e) => e.retired);
+        this.setSessions(address, [...keepExisting ? [existing, entry] :
+            [entry, ...(existing ? [existing] : [])], ...retired]);
         await this.saveSessions(address);
         // Messages that overtook this handshake can be read now
         const tag = entry.tag.toString('hex');
@@ -651,6 +683,7 @@ class Messenger {
             (this.sessions.get(address) || []).map((e) => ({
                 state: e.ratchet.serialize(), tag: e.tag.toString('hex'),
                 sidA: e.sidA.toString('hex'), createdAt: e.createdAt,
+                retired: e.retired || undefined,
             })));
     }
 
