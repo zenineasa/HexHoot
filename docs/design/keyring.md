@@ -109,3 +109,24 @@ wrapped     = nonce (12) ‖ AES-256-GCM(KEK, VK, ad = parts("hexhoot/v2/keyring
   - The scrypt cap, the low-memory check and NFKC normalization.
   - The default-cost run (CI, or `HEXHOOT_SLOW_TESTS=1`).
 - `test/e2e/keyring.e2e.mjs` runs the keyring with the real `safeStorage` in an Electron main process: strong with `--use-mock-keychain` on macOS, and a passphrase fallback where Linux CI has no secret service.
+
+# Backup file (.hexhoot2), as implemented (2026-11-26)
+
+`modules/Crypto/backup.js`, tested in `test/crypto/backup.test.js`.
+
+```
+file    = "HEXHOOT2" ‖ 0x01 ‖ u32be header length ‖ header ‖ sealed
+header  = JSON {kdf: "scrypt", N, r, p, salt (32 B, base64)}          public, at most 4 KiB
+key     = HKDF-SHA-512(scrypt(NFKC(passphrase), salt, N, r, p), "", "hexhoot/v2/backup", 32)
+sealed  = nonce (12) ‖ AES-256-GCM(key, deflate-raw(JSON payload), ad) ‖ tag (16)
+ad      = parts("hexhoot/v2/backup", "HEXHOOT2", 0x01, header)
+payload = {format: "hexhoot-backup", version: 1, createdAt, identity: Identity#secret(), tables: {name: rows}}
+```
+
+- **The passphrase** needs 16 characters or more, the same rule as account passwords. The account password itself is fine to use.
+- **No session state.** A table named `Sessions` (the ratchet store), in any letter case, is refused at export. After a restore, each contact gets a new handshake. The test checks that the old session cannot read the new one.
+- **The KDF parameters are bound to the ciphertext.** Editing them makes the file unreadable rather than weaker, and N is capped at 2²⁰ before scrypt runs.
+- **Compressed before encryption.** It is a file at rest, not an interactive channel, so compression-based leaks (CRIME-style) do not apply.
+- **Cost:** export and import together took 9.6 s at N=2²⁰ on the 8 GiB Mac.
+- **Errors:** `NOT_A_BACKUP`, `UNSUPPORTED_VERSION`, `CORRUPT`, `BAD_PARAMS`, `BAD_PASSPHRASE` (wrong passphrase *or* a changed file: AES-GCM cannot tell them apart) and `LOW_MEMORY`.
+- **The v1 `.hexhootjson` export** (plaintext, including the private key, finding F7) stays in Core until Phase 4 switches the UI to this format.

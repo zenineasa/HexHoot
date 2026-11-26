@@ -57,11 +57,13 @@ A new `modules/Crypto` (in Core), with unit tests in Node (`node:test`).
 2. **Identity** ([design](/design/identity-and-addresses.md)): name-and-password derivation (scrypt 2²⁰, ADR-004; replaced the recovery phrase on 2026-11-26), deterministic `ik_ec` (P-521, with rejection sampling) and `ik_pq` (ML-DSA-87), the bundle and its signatures, the `hh2:` address, and the safety number. **Done 2026-11-26** as a library with L1 tests. The address became Bech32m (`hh21…`).
 3. **Hybrid KEM** (`HK`) and the **SIGMA-I handshake** ([spec](/design/session-and-ratchet.md)). **Done 2026-11-26** as a library with L1 tests (about 15 ms per handshake).
 4. **Double Ratchet + ML-KEM** turns, skipped-key handling, and session persistence through the encrypted store. **Done 2026-11-26** as a library with L1 tests: forward secrecy, healing, replay, forgery, reordering and loss, and a 400-step random conversation.
-5. **Encrypted backup** `.hexhoot2` with scrypt (N=2²⁰) + AES-256-GCM.
+5. **Encrypted backup** `.hexhoot2` with scrypt (N=2²⁰) + AES-256-GCM. **Done 2026-11-26** with L1 tests; it never contains session state.
 
 Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DSA results against `@noble/post-quantum` (dev-only) and the NIST ACVP vectors.
 
 **Exit:** test vectors and property tests pass, covering round trips, out-of-order delivery, simultaneous starts, healing after state compromise (classical *and* post-quantum), a tampered bundle or transcript rejected, replay rejected, and backup restore without ratchet state. The spec is frozen for external review.
+
+**Status (2026-11-26): done.** `modules/Crypto` holds the keyring, identity (name and password, ADR-004), HK, the handshake, the ratchet and the backup. It is covered by 63 L1 tests plus 3 slow ones at the real scrypt cost. Every exit item has a test: round trips, out-of-order delivery, simultaneous starts, healing (classical and post-quantum), tampered bundles and transcripts, replay, and restore without ratchet state. The crypto parts of the spec ([keyring](/design/keyring.md), [identity](/design/identity-and-addresses.md), [sessions](/design/session-and-ratchet.md)) are complete and proposed for freezing. The wire format around them is defined in Phase 4. Core does not use `modules/Crypto` yet; Phase 4 wires it in.
 
 # Phase 4: Transport and protocol v2
 
