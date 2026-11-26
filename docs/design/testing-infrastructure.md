@@ -4,7 +4,7 @@ title: Testing infrastructure
 description: Five test layers for HexHoot 2.0, centred on a multi-instance harness, modelled on Konjugate's interaction runner, that launches several HexHoot apps that message each other over a private DHT testnet and the LAN carrier.
 tags: [design, testing, e2e, multi-instance, ci]
 status: draft
-generated: { by: claude-code/claude-opus-5-5, at: 2026-11-25T12:30:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-11-26T12:00:00Z }
 sources:
   - { id: konjugate, resource: "file:/Users/mac/Desktop/konjugate (commit c2667b4)", title: "Konjugate interaction-test runner: scripts/runInteractionTests.mjs, tests/interactionRunner.mjs, tests/drivers/electronWindowDriver.mjs, scripts/interactionRetry.mjs, scripts/interactionArtifacts.mjs" }
   - { id: hyperdht, resource: "https://github.com/holepunchto/hyperdht", title: "hyperdht (createTestnet for local bootstrap nodes)" }
@@ -13,6 +13,21 @@ sources:
 # What exists today
 
 *(Before 2026-11-26.)* Karma + karma-electron + QUnit ran UI checks inside one Electron window. There are no unit tests for crypto or protocol code, and nothing tests two peers talking to each other. So any break in messaging is invisible to CI.
+
+# What exists now (2026-11-26)
+
+| Piece | File | Notes |
+|---|---|---|
+| Driver | `test/e2e/driver.mjs` | Launches `electron . --interaction-test --use-mock-keychain --user-data-dir=<mkdtemp>` and drives the window over CDP: `evaluate`, `waitFor`, `click`, `type`, `core(method, ...)`, `screenshot`, `saveArtifacts`. Page errors and dialogs are recorded. |
+| Orchestrator | `test/e2e/orchestrator.mjs` | `useNetwork({transport, peers})` starts a 3-node hyperdht testnet in the test process (for `dht`) or picks free ports (for `lan`). It then launches one app per peer and adds UI-level actions: `login`, `waitForTransports`, `addFriend`, `acceptFriendRequest`, `waitForFriend`, `openChat`, `send`, `messages`, `waitForMessage`. A failing test writes artifacts. |
+| Test hooks | `modules/Main/testHooks.js` | `HEXHOOT_TRANSPORTS`, `HEXHOOT_DHT_BOOTSTRAP`, `HEXHOOT_LAN_PORT`, `HEXHOOT_LAN_PEERS`. These are inert in packaged builds and without `--interaction-test`. |
+| Readiness | Core `getTransportStatus()` | Returns `{name, ready, peers}` per transport and no key material. Tests wait until the DHT announce has completed, or until each LAN carrier knows every other peer. |
+| Runner | `scripts/run-e2e.mjs` (`npm run test:e2e`) | Runs each `*.e2e.mjs` file separately. A failing file is run once more and reported as **flaky** if it then passes. Writes `results.json` and a GitHub step summary. `HEXHOOT_TEST_ONLY=friends,ui` filters by file name. |
+| Artifacts | `test-results/e2e/<transport>-<peers>-<test>/` | `orchestrator.log`, plus `<peer>.log` (main and Core output), `<peer>.json` (page errors, dialogs) and `<peer>.png` for each peer. CI uploads the folder. Override with `HEXHOOT_E2E_ARTIFACTS`. |
+| L3 tests | `test/e2e/friends-chat.e2e.mjs` | alice and bob over `dht`, then over `lan`: sign up, friend request, accept, profiles shown on both sides, chat both ways, no page errors. About 4 s per transport. |
+| Single-app tests | `test/e2e/ui.e2e.mjs` | Lockdown, login, add friend, S1, S4, language. |
+
+The design below differs from what was built in two ways. The control channel is CDP rather than a JSON-lines channel, because the page already exposes everything the tests need. Each peer's profile is set with Chromium's `--user-data-dir` rather than `HEXHOOT_TEST_USER_DATA`. Fault injection (`HEXHOOT_TEST_FAULTS`), the memory watchdog and the remaining scenarios in the table below are still to do.
 
 # Ideas taken from Konjugate
 
@@ -92,4 +107,4 @@ L2 exists since 2026-11-26: `test/core/` runs Core with in-memory storage and in
 
 # Retiring Karma
 
-Done 2026-11-26. The non-UI checks (package name and version, copyright headers, translations) are in `test/unit/repo.test.js`. The UI checks are in `test/e2e/ui.e2e.mjs`, which launches the app with a temporary profile and `--interaction-test`, and drives it over CDP (`test/e2e/driver.mjs`). Dialogs are accepted and recorded, and any page error fails the run. Code sent through DevTools is exempt from the CSP, so CSP checks run their probes from page timers. `modules/Main/testHooks.js` supports only `HEXHOOT_TRANSPORTS` so far. The multi-instance orchestrator extends the same driver.
+Done 2026-11-26. The non-UI checks (package name and version, copyright headers, translations) are in `test/unit/repo.test.js`. The UI checks are in `test/e2e/ui.e2e.mjs`, which launches the app with a temporary profile and `--interaction-test`, and drives it over CDP (`test/e2e/driver.mjs`). Dialogs are accepted and recorded, and any page error fails the run. Code sent through DevTools is exempt from the CSP, so CSP checks run their probes from page timers. The multi-instance orchestrator extends the same driver (see *What exists now*).

@@ -49,3 +49,11 @@ jobs:
           else
             npm run test:e2e
           fi
+      - name: Upload E2E artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-${{ matrix.os }}-node${{ matrix.node-version }}
+          path: test-results/e2e
+          if-no-files-found: ignore
+          retention-days: 14

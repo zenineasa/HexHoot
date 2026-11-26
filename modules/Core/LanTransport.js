@@ -68,6 +68,15 @@ class LanTransport {
         this.findDevicesRunningHexHoot();
     }
 
+    /**
+     * @return {Object} {name, ready, peers}; peers is the number of HexHoot
+     * instances found
+     */
+    status() {
+        return {name: this.name, ready: Boolean(this.server),
+            peers: Object.keys(this.peers).length};
+    }
+
     /** Stop the server */
     async stop() {
         this.stopped = true;

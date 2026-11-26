@@ -3,6 +3,7 @@
 // Launches the real app (from source) with a fresh profile and drives its
 // window over the Chrome DevTools Protocol. Test hooks (--interaction-test)
 // are on, so HEXHOOT_* variables configure Core; see Main/testHooks.js.
+// --use-mock-keychain keeps safeStorage away from the real OS keychain.
 
 import {spawn} from 'node:child_process';
 import {createRequire} from 'node:module';
@@ -92,7 +93,7 @@ export async function launchApp(options = {}) {
     const name = options.name || 'app';
     const userData = fs.mkdtempSync(path.join(os.tmpdir(), `hexhoot-${name}-`));
     const args = ['.', '--interaction-test', `--user-data-dir=${userData}`,
-        '--remote-debugging-port=0'];
+        '--remote-debugging-port=0', '--use-mock-keychain'];
     if (process.platform === 'linux' && process.env.CI) {
         args.push('--no-sandbox'); // CI containers lack user namespaces
     }
@@ -164,6 +165,13 @@ export async function launchApp(options = {}) {
             return result.result.value;
         };
 
+        /**
+         * Capture the window
+         * @return {Buffer} PNG
+         */
+        const screenshot = async () => Buffer.from((await cdp.send(
+            'Page.captureScreenshot', {format: 'png'})).data, 'base64');
+
         return {
             name,
             userData,
@@ -205,6 +213,23 @@ export async function launchApp(options = {}) {
             core: (method, ...args) => evaluate(
                 `window.hexhoot.core.call(${JSON.stringify(method)}, ` +
                 `${JSON.stringify(args)})`),
+            screenshot,
+            /**
+             * Write the log, page errors, dialogs and a screenshot
+             * @param {string} dir directory, created if needed
+             */
+            saveArtifacts: async (dir) => {
+                fs.mkdirSync(dir, {recursive: true});
+                fs.writeFileSync(path.join(dir, `${name}.log`), log.join(''));
+                fs.writeFileSync(path.join(dir, `${name}.json`),
+                    JSON.stringify({errors, dialogs}, null, 2));
+                try {
+                    fs.writeFileSync(path.join(dir, `${name}.png`),
+                        await screenshot());
+                } catch (err) {
+                    // The window may be gone; the log is still useful
+                }
+            },
             close: async () => {
                 cdp.close();
                 await close();

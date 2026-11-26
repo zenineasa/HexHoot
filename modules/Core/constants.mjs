@@ -41,4 +41,5 @@ export const rendererMethods = Object.freeze([
     'declineFriendRequest',
     'setPreference',
     'getPreference',
+    'getTransportStatus',
 ]);

@@ -109,6 +109,16 @@ class Core {
         }
     }
 
+    /**
+     * The state of each transport, for the UI and tests. Holds no key
+     * material.
+     * @return {Array} [{name, ready, ...}]
+     */
+    getTransportStatus() {
+        return this.transports.map((transport) => transport.status ?
+            transport.status() : {name: transport.name, ready: true});
+    }
+
     /** Delete everything and stop the transports */
     async deleteDatabaseContent() {
         this.storage.clear();
@@ -179,7 +189,10 @@ class Core {
                 info.photo : existing?.photo ?? '',
         };
         if (typeof info.password === 'string' && info.password !== '') {
-            profile.privateKey = v1Crypto.generatePrivateKey(info);
+            // v1 read 'username', which the login form never sent, so the
+            // key depended on the password alone (finding S5)
+            profile.privateKey = v1Crypto.generatePrivateKey({
+                username: profile.displayName, password: info.password});
         } else if (existing) {
             profile.privateKey = existing.privateKey;
         } else {

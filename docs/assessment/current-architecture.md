@@ -26,7 +26,7 @@ sources:
 
 # Identity and "login"
 
-- Login derives the private key deterministically: `SHA-256(saltPrefix + password + "√" + username + saltSuffix)`, then keeps the hex digest's last 32 characters (128 bits). It is a *brain wallet*, so the same username and password give the same key on any device.
+- Login derives the private key deterministically: `SHA-256(saltPrefix + password + "√" + username + saltSuffix)`, then keeps the hex digest's last 32 characters (128 bits). It is a *brain wallet*, so the same username and password give the same key on any device. In practice the username was always `undefined`, because the login form sends `displayName` (finding S5), so the key depended on the password alone.
 - The public key (secp128r1) is the user's address, their friend code, and their Hyperswarm topic.
 
 # Message flow (today)

@@ -267,3 +267,19 @@ test('Editing the profile keeps the private key (finding S4)', async () => {
     await bob.stop();
     await fresh.stop();
 });
+
+test('The name is part of the derived key (finding S5)', async () => {
+    const password = {password: 'the-same-password-123'};
+    const alice = await createCore(null);
+    const bob = await createCore(null);
+    const alice2 = await createCore(null);
+    await alice.writeLoggedInUserInfo({displayName: 'Alice', ...password});
+    await bob.writeLoggedInUserInfo({displayName: 'Bob', ...password});
+    await alice2.writeLoggedInUserInfo({displayName: 'Alice', ...password});
+    const key = await alice.getPublicKeyOfLoggedInUser();
+    assert.notEqual(await bob.getPublicKeyOfLoggedInUser(), key,
+        'Two users with the same password must not share a key.');
+    assert.equal(await alice2.getPublicKeyOfLoggedInUser(), key,
+        'The same name and password give the same key on any device.');
+    await Promise.all([alice, bob, alice2].map((core) => core.stop()));
+});

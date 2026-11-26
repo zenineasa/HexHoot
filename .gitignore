@@ -3,3 +3,4 @@ node_modules
 .vscode
 */node_modules/*
 out/
+test-results/

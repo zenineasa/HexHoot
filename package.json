@@ -14,7 +14,7 @@
         "test:unit": "node --test \"test/unit/**/*.test.js\"",
         "test:capability": "node scripts/electron-node.js --test \"test/capability/**/*.test.js\"",
         "test:core": "node scripts/electron-node.js --test --test-timeout=120000 \"test/core/**/*.test.js\"",
-        "test:e2e": "node --test --test-concurrency=1 \"test/e2e/**/*.e2e.mjs\"",
+        "test:e2e": "node scripts/run-e2e.mjs",
         "lint": "eslint . && copyright-header --copyrightHolder \"Zenin Easa Panthakkalakath\"",
         "package": "electron-forge package",
         "make": "electron-forge make"

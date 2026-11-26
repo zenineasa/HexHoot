@@ -4,7 +4,7 @@
 // not enable any of its rules; these are the rules that were in effect.
 module.exports = [
     {
-        'ignores': ['out/**', 'node_modules/**'],
+        'ignores': ['out/**', 'node_modules/**', 'test-results/**'],
     },
     {
         'files': ['**/*.js', '**/*.mjs'],

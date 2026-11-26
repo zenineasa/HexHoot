@@ -19,7 +19,8 @@ test('The package name is hexhoot', () => {
 test('Every code file has the copyright message', async () => {
     const files = await glob.glob('**/*.+(html|js|mjs|json|css)', {
         cwd: root,
-        ignore: ['out/**', 'node_modules/**', 'package-lock.json'],
+        ignore: ['out/**', 'node_modules/**', 'test-results/**',
+            'package-lock.json'],
     });
     assert.ok(files.length > 1);
     for (const file of files) {

@@ -27,6 +27,7 @@ class DhtTransport {
         this.messageCallback = function() {};
         this.server = null;
         this.announced = Promise.resolve();
+        this.isAnnounced = false;
         this.senders = new Map(); // public key -> {swarm, conn, queue}
     }
 
@@ -79,14 +80,27 @@ class DhtTransport {
      */
     async start(publicKey) {
         await this.stop();
-        this.server = this.createSwarm();
-        const discovery = this.server.join(Buffer.from(publicKey, 'hex'),
+        this.isAnnounced = false;
+        const server = this.createSwarm();
+        this.server = server;
+        const discovery = server.join(Buffer.from(publicKey, 'hex'),
             {server: true, client: false});
         // Announcing on the public DHT can take seconds; do not hold up
         // login for it. Peers cannot find us until 'announced' resolves.
-        this.announced = discovery.flushed().then(
-            () => this.log('Subscribed to channel: ' + publicKey),
-            () => {});
+        this.announced = discovery.flushed().then(() => {
+            if (this.server === server) {
+                this.isAnnounced = true;
+                this.log('Subscribed to channel: ' + publicKey);
+            }
+        }, () => {});
+    }
+
+    /**
+     * @return {Object} {name, ready}; ready once peers can find us
+     */
+    status() {
+        return {name: this.name, ready: Boolean(this.server) &&
+            this.isAnnounced};
     }
 
     /**
