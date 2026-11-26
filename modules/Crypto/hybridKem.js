@@ -72,14 +72,40 @@ function importKemPublic(raw) {
  * drops them once they are no longer needed (forward secrecy).
  */
 class HybridKeyPair {
-    /** Generate a fresh key pair */
-    constructor() {
+    /**
+     * Generate a fresh key pair, or restore one from export()
+     * @param {Object} [saved] {ec, kem} private keys, base64
+     */
+    constructor(saved) {
         this.ecdh = crypto.createECDH('secp521r1');
-        this.ecdh.generateKeys();
-        const kem = crypto.generateKeyPairSync('ml-kem-1024');
-        this.kemPrivate = kem.privateKey;
+        let kemPublic;
+        if (saved) {
+            this.ecdh.setPrivateKey(Buffer.from(saved.ec, 'base64'));
+            this.kemPrivate = crypto.createPrivateKey({
+                key: Buffer.from(saved.kem, 'base64'), format: 'raw-seed',
+                asymmetricKeyType: 'ml-kem-1024'});
+            kemPublic = crypto.createPublicKey(this.kemPrivate);
+        } else {
+            this.ecdh.generateKeys();
+            const kem = crypto.generateKeyPairSync('ml-kem-1024');
+            this.kemPrivate = kem.privateKey;
+            kemPublic = kem.publicKey;
+        }
         this.publicKey = Buffer.concat([this.ecdh.getPublicKey(),
-            kem.publicKey.export({format: 'raw-public'})]);
+            kemPublic.export({format: 'raw-public'})]);
+    }
+
+    /**
+     * The private keys, for storage encrypted under the keyring
+     * @return {Object} {ec, kem}, base64
+     */
+    export() {
+        if (!this.kemPrivate) {
+            throw new CryptoError('BAD_STATE', 'This key pair was destroyed');
+        }
+        return {ec: this.ecdh.getPrivateKey().toString('base64'),
+            kem: this.kemPrivate.export({format: 'raw-seed'})
+                .toString('base64')};
     }
 
     /**
@@ -148,6 +174,6 @@ function encapsulate(publicKey) {
 }
 
 module.exports = {
-    HybridKeyPair, encapsulate, combine,
+    HybridKeyPair, encapsulate, combine, dh, importKemPublic,
     sizes: {ecBytes, kemBytes, publicKeyBytes, ciphertextBytes},
 };

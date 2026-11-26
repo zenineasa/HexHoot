@@ -106,6 +106,28 @@ Per message:
 - `key, nonce = HKDF(MK, salt = 0⁶⁴, info = "hexhoot/v2/msg", 44)`, a 32-byte key and a 12-byte nonce. Every message has its own key, so nonce reuse is impossible.
 - `ciphertext = AEAD(key, nonce, plaintext, ad = session_ad ‖ encode(header))`, where `session_ad = H(T3)` binds every message to the handshake.
 
+## As implemented (2026-11-26)
+
+`modules/Crypto/Ratchet.js`, tested in `test/crypto/ratchet.test.js`.
+
+```
+message = 0x01 ‖ header ‖ ciphertext ‖ tag (16)
+header  = dh (133) ‖ kem_pub (1568) ‖ kem_ct (1568) ‖ u32be pn ‖ u32be n        3277 B, so 3294 B + plaintext per message
+ad      = parts("hexhoot/v2/msg-ad", session_ad, 0x01 ‖ header)
+RK, CK  = HKDF(ikm = parts(DH, ss_k), salt = RK, info = "hexhoot/v2/rk", 128)
+```
+
+- **Start.** A (the initiator) treats `hk_pk_B` from the handshake as B's first ratchet key and makes its first sending turn at once. B keeps that key pair and **cannot send until A's first message arrives**, because only then does it have A's ratchet keys (as in Signal). Phase 4 must therefore have A send a message right after M3, even an empty one.
+- **The sending step runs as soon as a new turn is received**, as in Signal. The P-521 and ML-KEM-1024 keys for our next chain are made then.
+- **The whole header is in every message of a chain**, not only in the first. Any message of a chain can be the first to arrive, and it must be able to complete the turn. The cost is 3.3 KB per message rather than per turn ([ADR-003](/decisions/adr-003-hybrid-pq-algorithm-choice.md) counted it per turn; see [Q13](/plan/open-questions.md)).
+- **Decryption works on a draft.** Skipped keys, the new root and chain keys, and the new turn are committed only after the AEAD check passes, so a forged, corrupted or replayed message changes nothing. A new turn's `kem_pub` is validated before anything is stored.
+- **Skipped keys:** at most 2000 per chain (`TOO_MANY_SKIPPED` beyond that), at most 5000 in all (the oldest are dropped), and none older than 7 days.
+- **Replays** fail. A used key is deleted, numbers below `Nr` in the current chain are refused, and a message from an older chain falls through to a turn that cannot decrypt it. That last case costs one ML-KEM decapsulation and one ECDH (about 1 ms) before it is rejected.
+- **Healing, precisely.** A thief who copies A's state reads along until A makes new keys. That happens when A receives B's next turn: the thief can read that turn too, because it was encapsulated to keys from before the theft. A's next message is the first one the thief cannot read, and from then on nothing is readable. The test runs exactly this sequence. P-521 and ML-KEM-1024 both go into every root-key step, so a thief who could break one of them still lacks the other.
+- **Storage.** `serialize()` holds private keys (P-521 scalars, ML-KEM seeds), so it is stored only under the keyring's `secrets` key. The test round-trips it through a `RecordCipher`. It is about 15 KB per session, including the peer's bundle.
+- Zeroing is best effort, as in the [keyring](/design/keyring.md). Chain, root and message keys are wiped when they are replaced. P-521 and ML-KEM private keys live in BoringSSL and are released by dropping the references.
+- **Speed:** a round trip of two turns takes about 6 ms on Apple Silicon.
+
 ## Properties to prove in tests (L1/L2) and in the review
 
 | Property | How it comes about |
