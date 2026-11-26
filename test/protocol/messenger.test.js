@@ -39,6 +39,7 @@ async function peer(network, options = {}) {
     const messenger = new Messenger({identity, store,
         carriers: [network.carrier()], authorize: options.authorize,
         retryMs: options.retryMs ?? 200,
+        firstRetryMs: options.firstRetryMs,
         handshakeTimeoutMs: options.handshakeTimeoutMs ?? 1000});
     const received = [];
     const delivered = [];
@@ -98,6 +99,33 @@ test('Messages wait in the outbox until the contact is online',
         await waitFor(() => bob.texts().includes('are you there?'),
             'delivery after bob comes online');
         await waitFor(() => alice.messenger.outbox.size === 0, 'the receipt');
+    });
+
+test('Resends back off from firstRetryMs up to retryMs (Q15)', () => {
+    const messenger = new Messenger({identity: randomIdentity(),
+        carriers: []});
+    assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map((n) =>
+        messenger.retryDelay(n)), [3000, 6000, 12000, 24000, 48000, 60000,
+        60000]);
+});
+
+test('A contact coming online gets what waits at once, not after backoff',
+    async (t) => {
+        const network = new MemoryNetwork();
+        // No resend for a minute: only "a peer appeared" can deliver this
+        const alice = await peer(network, {retryMs: 60000,
+            firstRetryMs: 60000, handshakeTimeoutMs: 120000});
+        const bobIdentity = randomIdentity();
+        t.after(() => alice.messenger.stop());
+        await alice.messenger.send(bobIdentity.address, 'chat',
+            {text: 'back yet?'});
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const bob = await peer(network, {identity: bobIdentity});
+        t.after(() => bob.messenger.stop());
+        const started = Date.now();
+        await waitFor(() => bob.texts().includes('back yet?') &&
+            alice.messenger.outbox.size === 0, 'delivery', 5000);
+        assert.ok(Date.now() - started < 3000);
     });
 
 test('Lost, duplicated and reordered frames: each message arrives once',

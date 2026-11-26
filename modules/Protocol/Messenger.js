@@ -6,9 +6,11 @@
 // decides what to do with each message.
 //
 // Delivery: every message stays in the outbox until the recipient's receipt
-// arrives. Unacknowledged messages are sent again after retryMs, and on
-// every new session; the recipient drops duplicates by id. A peer that has
-// lost its session answers with RESET, and a new handshake follows.
+// arrives. Unacknowledged messages are sent again with backoff (after
+// firstRetryMs, doubling up to retryMs), at once when a carrier sees a peer
+// appear, and on every new session; the recipient drops duplicates by id.
+// A peer that has lost its session answers with RESET, and a new handshake
+// follows.
 //
 // Safety: a ratchet's new state is saved before anything encrypted with it
 // leaves the process, so a crash can never bring back a state that would
@@ -22,7 +24,11 @@ const wire = require('./wire');
 
 const appTypes = ['chat', 'friend_request', 'friend_accept', 'profile'];
 const defaults = Object.freeze({
-    retryMs: 30000, // resend unacknowledged messages after this
+    // Resend unacknowledged messages after firstRetryMs, then twice as
+    // long each time, up to retryMs (open question Q15)
+    firstRetryMs: 3000,
+    retryMs: 60000,
+    peerKickMs: 1000, // at most one "a peer appeared" resend per this
     handshakeTimeoutMs: 30000,
     simultaneousWindowMs: 60000, // see installSession
     maxPendingResponders: 64,
@@ -100,7 +106,9 @@ class Messenger {
         this.store = options.store || new MemoryMessengerStore();
         this.now = options.now || Date.now;
         this.log = options.log || function() {};
-        this.options = {...defaults, ...options};
+        // Options left undefined keep their default
+        this.options = {...defaults, ...Object.fromEntries(Object.entries(
+            options).filter(([, value]) => value !== undefined))};
         this.topic = this.identity.public.topic;
 
         this.sessions = new Map(); // address -> [entry]; [0] is current
@@ -130,17 +138,68 @@ class Messenger {
             this.setSessions(address, list);
         }
         for (const item of await this.store.loadOutbox()) {
-            this.outbox.set(item.id, {...item, sentAt: 0});
+            this.outbox.set(item.id, {...item, sentAt: 0, attempts: 0});
         }
         for (const carrier of this.carriers) {
             carrier.onFrame((envelope, link) => this.enqueue(link,
                 () => this.receive(envelope, link)));
+            carrier.onPeer?.(() => this.peerAppeared());
             await carrier.start(this.topic);
         }
         this.timer = setInterval(() => this.tick(),
-            Math.max(50, this.options.retryMs / 2));
+            Math.max(50, this.retryDelay(0) / 2));
         this.timer.unref?.();
         this.tick();
+    }
+
+    /**
+     * How long to wait before sending something again
+     * @param {number} attempts how often it was sent already
+     * @return {number} ms
+     */
+    retryDelay(attempts) {
+        const first = Math.min(this.options.firstRetryMs,
+            this.options.retryMs);
+        return Math.min(this.options.retryMs,
+            first * 2 ** Math.max(0, attempts - 1));
+    }
+
+    /**
+     * Send everything for a contact again at once, with the backoff reset
+     * @param {string} address the contact
+     */
+    rearm(address) {
+        for (const item of this.outbox.values()) {
+            if (item.address === address) {
+                item.sentAt = 0;
+                item.attempts = 0;
+            }
+        }
+    }
+
+    /**
+     * A carrier found a peer (a new connection, or a LAN instance saying
+     * hello): it may be a contact that was offline, so whatever waits is
+     * sent now rather than when its backoff ends
+     */
+    peerAppeared() {
+        const now = this.now();
+        if (now - (this.lastKick || 0) < this.options.peerKickMs) {
+            return;
+        }
+        this.lastKick = now;
+        const addresses = new Set([...this.outbox.values()]
+            .map((item) => item.address));
+        for (const address of addresses) {
+            this.rearm(address);
+            const pending = this.initiators.get(this.pendingTo.get(address));
+            if (pending) {
+                pending.sentAt = 0;
+                pending.attempts = 0;
+            }
+            this.withLock(address, () => this.flush(address)).catch((err) =>
+                this.log('Send failed:', err.message));
+        }
     }
 
     /** Stop the carriers and timers */
@@ -274,14 +333,17 @@ class Messenger {
         const entry = this.current(address);
         const due = [...this.outbox.values()].filter((item) =>
             item.address === address &&
-            now - item.sentAt >= this.options.retryMs);
+            now - item.sentAt >= this.retryDelay(item.attempts || 0));
         if (entry && entry.ratchet.canSend) {
             if (due.length > 0) {
                 const frames = due.map((item) => this.encryptFor(entry,
                     {id: item.id, ts: item.ts, type: item.type,
                         body: item.body}));
                 await this.saveSessions(address);
-                due.forEach((item) => item.sentAt = now);
+                due.forEach((item) => {
+                    item.sentAt = now;
+                    item.attempts = (item.attempts || 0) + 1;
+                });
                 this.transmit(address, frames, link);
             }
             return;
@@ -296,10 +358,12 @@ class Messenger {
         const pending = this.initiators.get(this.pendingTo.get(address));
         if (!pending) {
             this.startHandshake(address);
-        } else if (now - pending.sentAt >= this.options.retryMs) {
+        } else if (now - pending.sentAt >=
+            this.retryDelay(pending.attempts || 1)) {
             // HS1 may have been lost (or reached nobody yet): send the same
             // M1 again; a responder answers a repeat with the same M2
             pending.sentAt = now;
+            pending.attempts = (pending.attempts || 1) + 1;
             this.sendHs1(address, pending.envelope);
         }
     }
@@ -443,11 +507,7 @@ class Messenger {
             const hello = this.encryptFor(entry, {type: 'hello', body: {}});
             await this.saveSessions(pending.address);
             link.reply(hello);
-            for (const item of this.outbox.values()) {
-                if (item.address === pending.address) {
-                    item.sentAt = 0; // a new session: send everything again
-                }
-            }
+            this.rearm(pending.address); // a new session: send everything
             await this.flush(pending.address, link);
         });
     }
@@ -468,11 +528,7 @@ class Messenger {
         link.bind?.(this.topicOf(address));
         await this.withLock(address, async () => {
             await this.installSession(address, session, envelope.to);
-            for (const item of this.outbox.values()) {
-                if (item.address === address) {
-                    item.sentAt = 0;
-                }
-            }
+            this.rearm(address);
         });
     }
 
@@ -598,11 +654,7 @@ class Messenger {
             this.setSessions(known.address, [...(this.sessions.get(
                 known.address) || []).filter((e) => e !== entry), entry]);
             await this.saveSessions(known.address);
-            for (const item of this.outbox.values()) {
-                if (item.address === known.address) {
-                    item.sentAt = 0;
-                }
-            }
+            this.rearm(known.address);
             // A new session at once, even with nothing to send: receipts
             // for what arrives on the retired one need it
             if (!this.current(known.address) &&

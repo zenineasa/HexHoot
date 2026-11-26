@@ -75,11 +75,21 @@ class MemoryCarrier {
         this.handler = func;
     }
 
+    /** @param {function} func called when another node comes online */
+    onPeer(func) {
+        this.peerHandler = func;
+    }
+
     /** @param {Buffer} topic our topic */
     async start(topic) {
         this.topic = topic;
         this.topicKey = topic.toString('hex');
         this.network.nodes.set(this.topicKey, this);
+        for (const node of this.network.nodes.values()) {
+            if (node !== this) {
+                node.peerHandler?.();
+            }
+        }
     }
 
     /** Go offline */

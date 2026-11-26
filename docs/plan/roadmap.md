@@ -103,7 +103,9 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 
 # Phase 5: Release 2.0.0
 
-- Migration screen: export v1 chat history as plaintext JSON, then wipe the v1 data ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)).
+**Commit 1 done (2026-11-27):** resends back off from 3 s to 60 s and go out at once when a carrier sees a peer appear (Q15). Received messages keep arrival order (Q16). The v1 export screen is dropped, because v1 has no users ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)).
+
+- ~~Migration screen~~: dropped 2026-11-27, because v1 has no users ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)).
 - Update the README (the account model and the reworded "zero-knowledge" claim) and add a `SECURITY.md`.
 - L5: run the packaged-build smoke tests on every OS.
 - **External cryptographic review** of the handshake, ratchet, keyring, and wire protocol, against the frozen spec. This is required: HexHoot owns its protocol ([ADR-002](/decisions/adr-002-builtin-crypto-only.md)), so a 2.0.0 release waits on the review.

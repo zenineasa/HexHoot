@@ -20,6 +20,8 @@ The maintainer said on 2026-11-25: *"I don't care if it is not backwards compati
 - v1 identities are **not** carried over. A v1 key is weak (F1, F2), so keeping it would carry its weakness into v2.
 - Contacts have to be re-added with v2 addresses.
 
+**Amended 2026-11-27:** there is no export screen. The maintainer confirmed on 2026-11-26 that v1 has no users to protect ([Q3](/plan/open-questions.md)), so a screen for exporting v1 history would serve nobody. v2 neither reads nor deletes v1 data (the IndexedDB `HexhootDB` and the interim `HexHoot.sqlite`); it keeps its own files, `HexHoot2.sqlite` and `keyring.json`.
+
 # Consequences
 
 - Users have to re-add friends. Release notes must say this clearly.

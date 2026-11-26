@@ -84,8 +84,8 @@ module.exports = function testHooks(app) {
     if (env.HEXHOOT_TEST_FAULTS) {
         overrides.faults = parseFaults(env.HEXHOOT_TEST_FAULTS);
     }
-    // HEXHOOT_TEST_RETRY_MS: resend unacknowledged messages sooner than
-    // the 30 s default, so lossy runs (HEXHOOT_TEST_FAULTS) finish quickly
+    // HEXHOOT_TEST_RETRY_MS: cap the resend backoff (3 s up to 60 s), so
+    // lossy runs (HEXHOOT_TEST_FAULTS) finish quickly
     if (env.HEXHOOT_TEST_RETRY_MS) {
         const ms = Number(env.HEXHOOT_TEST_RETRY_MS);
         if (!Number.isInteger(ms) || ms < 100) {

@@ -41,6 +41,7 @@ class LanCarrier {
         this.staticPeers = options.peers || null;
         this.log = options.log || function() {};
         this.handler = function() {};
+        this.peerHandler = function() {};
         this.server = null;
         this.port = null;
         this.peers = new Map(); // "ip:port" -> link
@@ -50,6 +51,14 @@ class LanCarrier {
     /** @param {function} func (envelope, link) for each received frame */
     onFrame(func) {
         this.handler = func;
+    }
+
+    /**
+     * @param {function} func called when an instance appears: found by us,
+     * or saying hello (for example after a restart)
+     */
+    onPeer(func) {
+        this.peerHandler = func;
     }
 
     /** @param {Buffer} topic unused: LAN peers are not told our topic */
@@ -131,9 +140,10 @@ class LanCarrier {
         if (req.url === '/hello') {
             req.resume();
             res.end();
-            if (!this.stopped) {
+            if (!this.stopped &&
                 this.peerLink(this.normalizeIp(req.socket.remoteAddress),
-                    port);
+                    port)) {
+                this.peerHandler();
             }
             return;
         }
@@ -361,6 +371,7 @@ class LanCarrier {
                         !this.peers.has(id)) {
                         this.peerLink(host, port);
                         this.introduce(id);
+                        this.peerHandler();
                     }
                 } catch (err) {
                     // Not HexHoot

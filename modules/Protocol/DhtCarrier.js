@@ -41,6 +41,11 @@ class DhtCarrier {
         this.handler = func;
     }
 
+    /** @param {function} func called for each new connection */
+    onPeer(func) {
+        this.peerHandler = func;
+    }
+
     /** @param {Buffer} topic our topic, announced so others can find us */
     async start(topic) {
         await this.stop();
@@ -96,6 +101,7 @@ class DhtCarrier {
         for (const topic of info?.topics || []) {
             this.route(topic, link);
         }
+        this.peerHandler?.();
     }
 
     /**
