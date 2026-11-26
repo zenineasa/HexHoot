@@ -1,52 +1,85 @@
 ---
 type: Design
 title: Wire protocol v2
-description: Length-prefixed framing, outer envelope types, and the encrypted inner message schema shared by the Hyperswarm and LAN transports.
+description: Length-prefixed framing, a minimal outer envelope with no identities in it, Padmé-padded inner messages, and the Messenger session layer (handshakes, ratchets, outbox, receipts, reset) over the Hyperswarm and LAN carriers.
 tags: [design, protocol, hyperswarm, lan]
 status: draft
-generated: { by: claude-code/claude-opus-5-5, at: 2026-11-25T12:00:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-11-26T23:00:00Z }
 ---
+
+Implemented on 2026-11-26 in `modules/Protocol`: `wire.js`, `Messenger.js`, `DhtCarrier.js` and `LanCarrier.js`. Tested in `test/protocol` (`npm run test:protocol`). Core switches to it in the next commit; until then the app still runs v1.
 
 # Framing
 
-Hyperswarm streams carry a byte stream, not messages (T5). Both transports use `uint32_be length || frame`, with frames capped at 1 MiB. An alternative is `protomux` channels with `compact-encoding`, the Holepunch-native option (see [open questions](/plan/open-questions.md)).
+Hyperswarm streams carry bytes, not messages (T5). Frames are `u32be length ‖ envelope`, at most 1 MiB, and a larger frame closes the connection. The LAN carrier sends one envelope per HTTP request. A hand-rolled length prefix was chosen over `protomux`, because it is a few lines, has no dependency, and works on both carriers ([Q10](/plan/open-questions.md)).
 
-# Outer envelope (not encrypted end to end; inside Hyperswarm Noise on the internet)
+# Outer envelope
 
-| Field | Type | Notes |
-|---|---|---|
-| `v` | u8 | Always `2`. Any other value is dropped. |
-| `kind` | u8 | `1 HS1`, `2 HS2`, `3 HS3` (the SIGMA-I handshake), `4 MSG`, `5 ACK` |
-| `from` | 32 B | Sender fingerprint |
-| `to` | 32 B | Recipient fingerprint |
-| `body` | bytes | Depends on `kind`: handshake messages per the [spec](/design/session-and-ratchet.md), or for `MSG` a ratchet header plus AES-256-GCM ciphertext |
-
-During the handshake, `from` and `to` are **topic hashes**, not fingerprints. That keeps SIGMA-I's identity protection.
-
-The `MSG` ratchet header is `dh` (P-521, 133 B) ‖ `pn` (u32) ‖ `n` (u32), plus `kem_pub` (1568 B) and `kem_ct` (1568 B) on a turn's first message. The header is authenticated as AEAD associated data.
-
-The outer fields are parsed with strict length checks. Unknown `kind` values and oversized frames are dropped without a crash (T3).
-
-# Inner plaintext (inside the ratchet's AES-256-GCM)
-
-```json
-{
-  "id": "<128-bit random, base64url>",
-  "ts": 1764072000000,
-  "type": "chat | friend_request | friend_accept | profile | receipt",
-  "body": { },
-  "pad": "<random bytes up to the Padmé bucket size, minimum 1 KiB>"
-}
+```
+envelope = 0x02 (version) ‖ kind (1) ‖ to (32) ‖ body
 ```
 
-- The chat DB key becomes `[contactFp, id]`, **not** the timestamp (F6). `ts` is display-only.
-- The sender identity is taken from the *session* the message decrypted under, never from the body (S2).
-- Padding uses **Padmé** (the PURBs paper) with a 1 KiB minimum. Lengths leak at most O(log log n) bits, at most 12% overhead, and every short message looks the same.
-- Profile photos larger than about 256 KiB are sent in chunks.
+| kind | name | `to` | body |
+|---|---|---|---|
+| 1 | HS1 | the responder's **topic** | M1 |
+| 2 | HS2 | `sid_A` | M2 |
+| 3 | HS3 | `sid_A` | M3 |
+| 4 | MSG | the **session tag** = `SHA-512(parts("hexhoot/v2/session-tag", session_ad))[0..32]` | a ratchet message |
+| 5 | RESET | the tag of a session the sender does not have | empty |
 
-# LAN transport changes
+The [session spec](/design/session-and-ratchet.md) defines M1–M3 and the ratchet message.
 
-- `GET /` returns only `{application, protocol: 2}`. It no longer lists channels or peers (T2).
-- Peers announce **topics** (see [identity](/design/identity-and-addresses.md)), never fingerprints or keys.
-- Every message goes through the same v2 framing and envelopes. HTTP is only a carrier.
-- Fix T3 (parsing) and T4 (the `!ip in` bug) as part of the rewrite.
+**Changed from the draft:** the draft had `from` and `to` fingerprints on every message. Now **no identity or fingerprint appears outside the encryption**. `to` is a topic (only on HS1), a random handshake id, or a tag that looks random and cannot be linked to the identities. There is no `from`: the sender is whoever the session authenticated (S2). There is no ACK kind, because receipts are inner messages. A test checks that no fingerprint, address or identity key appears anywhere on the wire.
+
+Anything malformed (wrong version, unknown kind, too short, too long) is dropped without an exception (T3).
+
+# Inner message (inside the ratchet's AES-256-GCM)
+
+```
+inner = u32be length ‖ JSON {id, ts, type, body} ‖ zero padding
+```
+
+- **Padding** brings the whole to its Padmé size, with a 1 KiB minimum. Every short message is 1024 bytes, and longer ones leak at most O(log log n) bits with at most 12% overhead. A binary length prefix replaces the draft's `pad` field.
+- `id` is 128 random bits (base64url), `ts` is display-only, and `body` is an object.
+- `type` is one of `chat`, `friend_request`, `friend_accept` or `profile` (passed to the app), or `hello` and `receipt` (handled by the Messenger).
+- The chat key in storage is `[contact, id]`, not the timestamp (F6). Any invalid inner message is dropped.
+
+# Messenger: sessions and delivery
+
+- **Sending** puts a message in the outbox, which is stored. Without a session, a handshake starts: HS1 goes to the contact's topic on every carrier.
+- **After HS2,** the initiator sends HS3 and then, *on the same link*, a `hello` and anything waiting, so nothing overtakes HS3. The responder can send once that `hello` arrives (see the ratchet spec).
+- **Receipts.** Each received app message is acknowledged by its `id`, every copy of it, so the sender stops resending. It is delivered to the app once: ids are remembered per contact. Unacknowledged messages are sent again after `retryMs` (30 s), and on every new session.
+- **Crash safety.** The ratchet's new state is stored *before* anything encrypted with it is sent. Otherwise a crash could restore an older state and encrypt a different message under the same key and nonce, which is fatal for AES-GCM. A test checks, for every frame, that the stored state is already past it.
+- **Ordering.** Work for each contact runs one at a time, and frames from each link are handled in order.
+- **Unknown session.** A MSG for an unknown tag is parked for 2 s, because it may have overtaken the handshake that creates it (for example over the other carrier). It is retried when a session appears. If none does, the sender gets RESET. RESET drops only the named session; a new handshake follows, and the outbox is sent again. Frames that went to every LAN instance are never answered with RESET.
+- **Simultaneous starts** end with two sessions per side. Both sides send on the one whose `sid_A` is lower and keep the other for receiving (at most two per contact). Outside a 60 s window the newest session wins, which covers a contact who restored a backup.
+- **Authorization.** A handshake from someone the app refuses (`authorize` returns false) ends at M3, and nothing is delivered.
+
+# Hyperswarm carrier (`DhtCarrier`)
+
+- **One swarm per app.** It announces our topic, `SHA-512(parts("hexhoot/v2/topic", fp))[0..32]` (T1: not the key), and looks up the topics of people we write to.
+- **Connections are reused both ways.** A connection is bound to a contact's topic once a session on it is authenticated, so replies need no new lookup.
+- **Envelopes wait in a per-topic queue** (at most 1000) until a connection exists. The lookup is refreshed at most every 10 s while something waits.
+- Hyperswarm's own Noise layer is classical only (T6). Everything inside it is post-quantum end to end already.
+
+# LAN carrier (`LanCarrier`)
+
+- `GET /` answers `{application: "hexhoot", protocol: 2}` and nothing else: no keys, channels or peer lists (T2). There is no gossip; discovery is the ping and ARP sweep, or a static list.
+- `POST /hello` introduces an instance that has just found us, so discovery works both ways.
+- `POST /frame` carries one envelope. `x-hexhoot-port` gives the sender's port so the receiver can answer, and requests on one link are sent strictly in order.
+- **Peers do not reveal whom they serve.** An envelope for a topic nobody has been bound to (usually HS1) goes to every known instance, marked `x-hexhoot-broadcast`, and each drops what is not for it. Once a session exists, its frames go only to the contact's instance. The cost is that HS1 reaches every HexHoot on the LAN; it reveals only the topic, which anyone with the address can compute anyway.
+- **Limitation:** an instance that lost its session cannot RESET a broadcast frame. Over LAN alone, the contact recovers when either side next starts a handshake.
+
+# Tests
+
+`npm run test:protocol`:
+
+- **Framing:** any split or merge of the stream, oversized frames, malformed envelopes and inner messages, and Padmé.
+- **The Messenger on an in-memory network:**
+  - Friend request, receipts and chat both ways.
+  - The outbox while the contact is offline.
+  - 20% loss, 20% duplication and reordering, with each message delivered exactly once.
+  - RESET after a lost session, and a restart from the store with no new handshake.
+  - Simultaneous starts and a refused peer.
+  - No identity on the wire, and state stored before its ciphertext is sent.
+- **Real carriers:** LAN on 127.0.0.1, a Hyperswarm testnet, and both at once with duplicates dropped.

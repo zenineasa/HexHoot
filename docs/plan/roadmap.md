@@ -67,6 +67,8 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 
 # Phase 4: Transport and protocol v2
 
+**Commit 1 done (2026-11-26):** wire protocol, Messenger, and the DHT and LAN carriers, with L1/L2 tests (`npm run test:protocol`). Next: Core on `modules/Crypto` and `modules/Protocol`, then the UI, then the L3 scenario table and L4.
+
 - [Wire protocol v2](/design/wire-protocol-v2.md): framing, envelopes, the inner schema, and padding.
 - Hyperswarm: one long-lived swarm, `topic = SHA-512("hexhoot/v2/topic" ‖ fp)[0..32]`, and connection reuse keyed by fingerprint. Fix T5.
 - LAN: carrier only, no channel disclosure. Fix T2–T4.
