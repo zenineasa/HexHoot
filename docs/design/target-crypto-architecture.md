@@ -9,7 +9,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-11-25T12:00:00Z }
 
 # Goals
 
-1. **Hybrid post-quantum confidentiality.** Traffic stays secret if *either* the classical primitive (X25519) *or* the post-quantum primitive (ML-KEM) holds.
+1. **Hybrid post-quantum confidentiality.** Traffic stays secret if *either* the classical primitive (ECDH P-521) *or* the post-quantum primitive (ML-KEM-1024) holds.
 2. **Forward secrecy and post-compromise security** through ratcheting, against both classical and quantum attackers.
 3. **Keys never sit in plaintext on disk or in the renderer.** They are sealed by the OS keyring.
 4. **No compatibility with v1** ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)). All v2 components only need to work with each other.
@@ -50,7 +50,7 @@ This meets or exceeds NSA CNSA 2.0. The user asked for X25519MLKEM768 "or someth
 │ Keyring (safeStorage → vault key) ── Identity (P-521 + ML-DSA-87) ── Encrypted store         │
 │ Session engine (SIGMA-I + hybrid KEM, Double Ratchet + ML-KEM-1024) ── Contact/trust manager│
 │ Transports: Hyperswarm (internet) + LAN  ── Wire protocol v2 framing                         │
-│ Encrypted store (IndexedDB is replaced by a file/SQLite store in Core; see open questions)    │
+│ Encrypted store (node:sqlite in Core, every record AES-256-GCM)                               │
 └───────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
