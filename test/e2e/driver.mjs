@@ -125,7 +125,8 @@ export async function launchApp(options = {}) {
             await exited;
         }
         if (!options.userData) {
-            fs.rmSync(userData, {recursive: true, force: true});
+            fs.rmSync(userData, {recursive: true, force: true,
+                maxRetries: 10});
         }
     };
 

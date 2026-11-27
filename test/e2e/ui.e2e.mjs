@@ -54,7 +54,8 @@ before(async () => {
 
 after(async () => {
     await app?.close();
-    fs.rmSync(userData, {recursive: true, force: true});
+    fs.rmSync(userData, {recursive: true, force: true,
+        maxRetries: 10});
 });
 
 test('The renderer is locked down', async () => {

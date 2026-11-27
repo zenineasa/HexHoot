@@ -100,8 +100,12 @@ class Core {
         await this.openAccount();
     }
 
-    /** Stop messaging and close the database */
+    /** Stop messaging and close the database; again does nothing */
     async stop() {
+        if (this.stopped) {
+            return;
+        }
+        this.stopped = true;
         clearInterval(this.networkTimer);
         await this.messenger?.stop();
         this.keyring?.lock();

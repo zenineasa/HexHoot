@@ -7,6 +7,9 @@ const path = require('node:path');
 const Core = require('../../modules/Core');
 const EncryptedStore = require('../../modules/Core/EncryptedStore');
 
+// The Cores using each test folder, so cleanup can stop them all first
+const coresIn = new Map();
+
 // Logging in derives keys with scrypt; tests use a cheap setting
 const fastScrypt = {N: 2 ** 14, r: 8, p: 1};
 const password = 'correct horse battery staple';
@@ -48,8 +51,20 @@ function fakeSealer(strong = true) {
 async function makeCore(options = {}) {
     const dir = options.dir ||
         fs.mkdtempSync(path.join(os.tmpdir(), 'hexhoot-core-'));
+    if (!coresIn.has(dir)) {
+        coresIn.set(dir, []);
+    }
     if (!options.dir && options.t) {
-        options.t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
+        // after() hooks run in the order they were added, so this one runs
+        // before any core.stop() a test adds later. Windows cannot delete a
+        // database that is still open: stop every Core in the folder first.
+        options.t.after(async () => {
+            for (const core of coresIn.get(dir)) {
+                await core.stop().catch(() => {});
+            }
+            coresIn.delete(dir);
+            fs.rmSync(dir, {recursive: true, force: true, maxRetries: 10});
+        });
     }
     const sealer = options.sealer || fakeSealer();
     const core = new Core({
@@ -62,6 +77,7 @@ async function makeCore(options = {}) {
         log: function() {},
         carriers: () => options.network ? [options.network.carrier()] : [],
     });
+    coresIn.get(dir).push(core);
     await core.start();
     core.dir = dir;
     core.sealer = sealer;

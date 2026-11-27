@@ -233,7 +233,8 @@ const commands = {
     async stop() {
         await core?.stop();
         if (dir) {
-            fs.rmSync(dir, {recursive: true, force: true});
+            fs.rmSync(dir, {recursive: true, force: true,
+                maxRetries: 10});
         }
         setImmediate(() => process.exit(0));
     },

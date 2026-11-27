@@ -357,7 +357,8 @@ export async function launchNetwork(options) {
         await Promise.allSettled(Object.values(peers).map((p) => p.close()));
         await testnet?.destroy();
         for (const dir of profiles) {
-            fs.rmSync(dir, {recursive: true, force: true});
+            fs.rmSync(dir, {recursive: true, force: true,
+                maxRetries: 10});
         }
     };
     const lanPeers = (i) => ports.filter((_, j) => j !== i)
