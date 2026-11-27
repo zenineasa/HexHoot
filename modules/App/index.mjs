@@ -23,6 +23,10 @@ import {t, displayName} from '../UI/index.mjs';
 import {applyTheme, loadTheme} from './theme.mjs';
 import {html, loadStyle} from '../Html/index.mjs';
 
+// Where the user is, kept for the session (sessionStorage)
+const PLACE_KEY = 'hexhoot.place';
+// How long the "engine restarted" banner stays
+const RESTART_NOTICE_MS = 8000;
 // Routes that fill the right pane; Settings covers the window
 const PANE_ROUTES = new Set(['home', 'chat', 'request', 'requests']);
 
@@ -66,6 +70,22 @@ class App {
             </div>`.toString();
         this.updateBanner();
         await this.refresh();
+        // After Core restarted (the window reloaded), go back to where the
+        // user was
+        if (this.restartedAt && !this.restored) {
+            this.restored = true;
+            try {
+                const saved = JSON.parse(sessionStorage.getItem(PLACE_KEY));
+                if (PANE_ROUTES.has(saved?.route) ||
+                    saved?.route === 'settings') {
+                    Object.assign(this.state, {route: saved.route,
+                        id: saved.id ?? null, section: saved.section ||
+                            'profile'});
+                }
+            } catch (err) {
+                // Nothing saved
+            }
+        }
         await this.show();
     }
 
@@ -184,6 +204,8 @@ class App {
             return;
         }
         root.dataset.route = route;
+        sessionStorage.setItem(PLACE_KEY, JSON.stringify({route, id,
+            section: this.state.section}));
         const settings = document.getElementById('settings');
         const shell = document.getElementById('shell');
         settings.hidden = route !== 'settings';
@@ -378,14 +400,24 @@ class App {
         document.getElementById('find')?.focus();
     }
 
-    /** The offline banner */
+    /** The banner: offline, or for a moment after Core restarted */
     updateBanner() {
         const banner = document.getElementById('banner');
-        if (banner) {
-            banner.textContent = navigator.onLine ? '' : t('Hive.offline');
-            banner.hidden = navigator.onLine;
-            document.getElementById('app').dataset.offline =
-                String(!navigator.onLine);
+        if (!banner) {
+            return;
+        }
+        const restarted = this.restartedAt &&
+            Date.now() - this.restartedAt < RESTART_NOTICE_MS;
+        banner.textContent = !navigator.onLine ? t('Hive.offline') :
+            restarted ? t('Hive.engineRestarted') : '';
+        banner.hidden = navigator.onLine && !restarted;
+        banner.dataset.kind = navigator.onLine ? 'restarted' : 'offline';
+        document.getElementById('app').dataset.offline =
+            String(!navigator.onLine);
+        if (restarted) {
+            clearTimeout(this.bannerTimer);
+            this.bannerTimer = setTimeout(() => this.updateBanner(),
+                RESTART_NOTICE_MS - (Date.now() - this.restartedAt) + 50);
         }
     }
 }

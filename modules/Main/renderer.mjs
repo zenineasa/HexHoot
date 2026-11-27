@@ -47,6 +47,12 @@ window.reload = function() {
 // Removing the account (Settings) or restoring elsewhere changes the state
 dbMessenger.on('account', () => window.reload());
 
+// Main reloads the window this way when Core had to be restarted
+if (new URLSearchParams(location.search).has('restarted')) {
+    history.replaceState(null, '', location.pathname);
+    App.restartedAt = Date.now();
+}
+
 await i18n.selectLanguageFromPreferences();
 window.reload();
 // A check can fall due while the app stays open

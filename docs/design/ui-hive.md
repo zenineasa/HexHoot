@@ -32,7 +32,7 @@ The mockup is a private design canvas ([source](https://claude.ai/artifact/8TrbD
 | **Request** (right pane) | One person knocking: Let in / Not now | A knocking cell | Let in → their (empty) conversation. Not now → the next request, or Home |
 | **Requests** (right pane) | Everyone knocking | "N knocking" above the hive, "See all" on a request (only when more than one) | Back → where you were |
 | **Contact panel** (slides in on the right) | Photo, about, safety number, verify, address, remove/block | The name or ⓘ in a conversation header | Close or Esc → the conversation, unchanged |
-| **Add a friend** (dialog over anything) | Paste their address; copy yours, QR code | "+" in the header, the "+ Add" cell, Home, Ctrl/⌘+N | Knock → the new "waiting" cell is selected. Close, Esc or a click outside → where you were |
+| **Add a friend** (dialog over anything) | Paste their address; copy yours | "+" in the header, the "+ Add" cell, Home, Ctrl/⌘+N | Knock → the new "waiting" cell is selected. Close, Esc or a click outside → where you were |
 | **Settings** (whole window) | Profile, account and security, backup, appearance, language, about | The gear, your own cell (opens Profile), Ctrl/⌘+, | "← Back" (labelled with where it returns: "← Bobby", "← Home") or Esc → exactly where you were |
 | **Password check** (card, top right) | Non-blocking check (ADR-004) | When due, on any screen; Settings → "Check my password now" | Not now, Close |
 | **Welcome** | First run, restore, unlock | First start; after removing the account | Signing in → Home |
@@ -71,7 +71,7 @@ Status: **built** (in the app since UI commit 2), **designed** (in the mockup, n
 | New user with an empty hive: three steps to a first conversation | built |
 | Nobody selected: your status, your address, the password check | built |
 | Unread messages on a cell, and the Latest list | built (a mark, not a count) |
-| Many friends: smaller cells, search, Hive/List switch | built, except the List switch |
+| Many friends: smaller cells, search, Hive/List switch | built (the switch appears above 15 cells; the choice is kept) |
 | Search with no results | built |
 | Your computer offline: banner, dimmed hive, everything waits | built |
 | Desktop notifications while HexHoot is in the background; clicking opens the chat | built |
@@ -93,12 +93,12 @@ Status: **built** (in the app since UI commit 2), **designed** (in the mockup, n
 |---|---|
 | Just became friends: the start of the chain, suggested first lines | built, without suggested lines |
 | A message waiting days for an offline friend; "Don't send" | built |
-| Long messages collapse ("Show all"); emoji-only messages shown large | designed |
-| Links shown as links that open only after a confirmation showing the full address | designed |
-| Near the 64 KB limit: a counter | designed (the limit is enforced; the counter is not built) |
+| Long messages collapse ("Show all"); emoji-only messages shown large | built (over 1200 characters or 20 lines; up to 6 emoji) |
+| Links shown as links that open only after a confirmation showing the full address | built |
+| Near the 64 KB limit: a counter | built (from 2000 characters left) |
 | Events on the chain: verified, request accepted | built |
 | Events on the chain: a friend changed their name or photo | built |
-| Long history: "N new messages" jump | designed |
+| Long history: "N new messages" jump | built: while reading further up, "N new ↓" jumps to the end |
 | The link per friend (direct, internet, unreachable) | built |
 
 ## People, adding friends, settings and system
@@ -107,15 +107,15 @@ Status: **built** (in the app since UI commit 2), **designed** (in the mockup, n
 |---|---|
 | Safety number, mark verified, remove the mark (contact panel) | built |
 | Remove a friend; block someone (contact panel, with confirmation) | built |
-| Share your address (grouped, copy, QR code); paste theirs, checked as you type; your own address refused | built, except the QR code |
+| Share your address (grouped, copy); paste theirs, checked as you type; your own address refused | built |
 | Someone already a friend ("Open the chat") or already waiting ("Show") | built |
-| Scan a QR code with a camera | needs Core (and a camera permission) |
+| QR code of your address, and scanning one | dropped (see below) |
 | Settings: profile, backup, language, about, remove account (with confirmation) | built, with a Blocked section |
 | Appearance: night, day, follow the computer | built |
 | Password check: right, right after a miss, dismissed | built |
 | Password check answered wrongly: the reassuring message, then "You've got it now!" | built |
 | Photo too large: shrunk to fit, with a note | built (320 px JPEG) |
-| Core restarting: a banner; typed text kept; sending resumes | built, without the banner: the window reloads when Core restarts, and drafts are kept per contact |
+| Core restarting: a banner; typed text kept; sending resumes | built: the window reloads, says so for 8 s, and returns to the same place with the draft |
 | Long translations (Malayalam, German): buttons wrap, cards grow, cells use initials | built |
 | Reduced motion: the only animations (panel slide, progress) follow the system setting | built |
 | Backup: passphrase strength, saved confirmation | built (length) |
@@ -127,6 +127,8 @@ Status: **built** (in the app since UI commit 2), **designed** (in the mockup, n
 - **An event never navigates.** A background event (a request withdrawn, a profile changed) only adjusts the pane if the user has not moved since it arrived, and a request that was let in rather than withdrawn never sends the window Home.
 - **Problems are shown where they happen.** The welcome screen, Add a friend and backup show errors inline; the app opens no alert boxes.
 - **Fonts are bundled** (`modules/Fonts`, SIL Open Font License), so the CSP allows fonts and styles only from the app itself and nothing is fetched from Google.
+- **No QR code.** HexHoot runs on desktops: most have no camera, and holding a laptop up to another screen is awkward. Read with a phone, the address still has to reach the other computer, which is more work than copying it into a message. A QR encoder was built and then removed before committing. Reconsider only if there is a mobile client.
+- **Web links from messages can open in the browser.** Before, the main process opened only the social links. It now also opens plain http(s) links without credentials; the page calls it only after the user confirms a dialog that shows the full address and its host.
 - **On a narrow window, the hive is Home.** The address and shortcuts that Home shows on a wide window are in Add a friend and Settings.
 
 # Core additions the design asks for

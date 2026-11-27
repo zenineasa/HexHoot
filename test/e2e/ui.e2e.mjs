@@ -222,6 +222,21 @@ test('Keyboard: Ctrl+K, Ctrl+N, Ctrl+, and Esc one step back', async () => {
         document.getElementById('home')`);
 });
 
+test('The hive as a list', async () => {
+    // Few cells: no switch, unless the list was chosen before
+    assert.equal(await app.evaluate(`${q('#viewToggle')}.hidden`), true);
+    await app.core('setPreference', 'hiveView', 'list');
+    await app.evaluate('window.reload()');
+    await app.waitFor(`${q('#hive .cells')}?.classList.contains('list')`);
+    assert.equal(await app.evaluate(`${q('#viewToggle')}.hidden`), false);
+    assert.equal(await app.evaluate(
+        `${q('#hive .cell.line')}.dataset.kind`), 'add');
+    await app.click('#viewToggle');
+    await app.waitFor(`!${q('#hive .cells')}.classList.contains('list')`);
+    await app.waitFor(`window.hexhoot.core.call('getPreference',
+        ['hiveView']).then((p) => p.value === 'hive')`);
+});
+
 test('Editing the profile keeps the key (S4)', async () => {
     const before = await app.core('getMyAddress');
     await app.click('#me');

@@ -16,6 +16,13 @@
     color: var(--warn-text);
     font-weight: 500;
 }
+#banner[data-kind=restarted] {
+    background: var(--raised);
+    color: var(--text);
+}
+#banner[data-kind=restarted]::before {
+    background: var(--accent);
+}
 #banner::before {
     content: '';
     width: 12px;

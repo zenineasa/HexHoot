@@ -161,6 +161,59 @@
     pointer-events: none;
 }
 
+/* The list view, for big hives */
+.cells-head .hh-link + .hh-link {
+    margin-left: 12px;
+}
+#hive .cells.list {
+    max-height: none;
+    flex: 1;
+    min-height: 0;
+    padding: 0 10px;
+}
+.cell.line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 8px;
+    text-align: left;
+}
+.cell.line:hover, .cell.line[aria-current=true] {
+    background: var(--hover);
+}
+.cell.line:focus-visible {
+    outline: 2px solid var(--accent);
+}
+.cell.line .add-mark {
+    width: 28px;
+    height: 31px;
+    background: var(--faint);
+    color: var(--text);
+}
+.line-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+.line-kind {
+    font-size: 12px;
+    color: var(--muted);
+}
+.cell.line[data-kind=knocking] .line-kind {
+    color: var(--accent);
+    font-weight: 600;
+}
+.cell.line .dot {
+    width: 10px;
+    height: 11px;
+    background: var(--accent);
+}
+
 /* Latest */
 #hive .latest {
     flex: 1;

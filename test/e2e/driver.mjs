@@ -5,7 +5,7 @@
 // are on, so HEXHOOT_* variables configure Core; see Main/testHooks.js.
 // --use-mock-keychain keeps safeStorage away from the real OS keychain.
 
-import {spawn} from 'node:child_process';
+import {spawn, execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -227,6 +227,27 @@ export async function launchApp(options = {}) {
                 `window.hexhoot.core.call(${JSON.stringify(method)}, ` +
                 `${JSON.stringify(args)})`),
             screenshot,
+            /**
+             * Kill Core, as a crash would (macOS and Linux): its
+             * utilityProcess is the NodeService of this profile
+             * @return {boolean} whether it was found
+             */
+            killCore: () => {
+                if (process.platform === 'win32') {
+                    return false;
+                }
+                const pids = execFileSync('ps', ['-ax', '-o', 'pid=,command='])
+                    .toString().split('\n').filter((line) =>
+                        line.includes('node.mojom.NodeService') &&
+                        // The unique folder name: macOS shows the real
+                        // path (/private/var/…), not os.tmpdir()'s
+                        line.includes(path.basename(userData)))
+                    .map((line) => Number(line.trim().split(/\s+/)[0]));
+                for (const pid of pids) {
+                    process.kill(pid, 'SIGKILL');
+                }
+                return pids.length > 0;
+            },
             /**
              * Show the page at another size, like a smaller window
              * @param {number} width CSS pixels

@@ -60,6 +60,20 @@ async function serveAppFile(request) {
 }
 
 /**
+ * @param {string} url a link
+ * @return {boolean} whether it is a plain http(s) link, without credentials
+ */
+function isWebLink(url) {
+    try {
+        const parsed = new URL(url);
+        return (parsed.protocol === 'https:' || parsed.protocol === 'http:') &&
+            !parsed.username && !parsed.password;
+    } catch (err) {
+        return false;
+    }
+}
+
+/**
  * Start Core (storage, protocol and networking) in a utilityProcess. If it
  * exits unexpectedly, it is started again and the windows reload, which
  * makes them reconnect.
@@ -100,8 +114,9 @@ function startCore() {
         }
         console.error('Core exited with code ' + code + '; restarting');
         startCore();
+        // Reloading reconnects the windows; the page says what happened
         for (const win of BrowserWindow.getAllWindows()) {
-            win.webContents.reload();
+            win.loadURL(appOrigin + '/modules/Main/index.html?restarted=1');
         }
     });
 }
@@ -143,9 +158,11 @@ function createWindow() {
         },
     });
     // The app is a single page; never navigate away from it or open new
-    // windows. The listed external links open in the system browser.
+    // windows. Web links open in the system browser: the social links, and
+    // http(s) links from messages, which the page opens only after showing
+    // the full address and asking (Chain.confirmLink).
     win.webContents.setWindowOpenHandler(function({url}) {
-        if (externalLinks.has(url)) {
+        if (externalLinks.has(url) || isWebLink(url)) {
             shell.openExternal(url);
         }
         return {action: 'deny'};

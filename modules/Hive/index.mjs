@@ -6,6 +6,7 @@
 // the order by recency that a grid loses.
 
 import AddFriend from '../AddFriend/index.mjs';
+import dbMessenger from '../DBMessenger/index.mjs';
 import {t, logo, icon, avatar, displayName, firstName, initials, colourFor,
     shortTime} from '../UI/index.mjs';
 import {safePhoto} from '../Sanitize/index.mjs';
@@ -31,6 +32,8 @@ export default class Hive {
         }
         if (!el.dataset.built) {
             Hive.build(app, el);
+            Hive.view = (await dbMessenger.getPreference('hiveView'))
+                ?.value === 'list' ? 'list' : 'hive';
         }
         const focused = document.activeElement?.closest?.('#hive .cell')
             ?.dataset.key;
@@ -74,6 +77,8 @@ export default class Hive {
             <div class="cells-head">
                 <span class="label">${t('Hive.yourHive')}</span>
                 <button class="hh-link" id="knockingLink" hidden></button>
+                <button class="hh-link" id="viewToggle" hidden
+                    aria-pressed="false"></button>
             </div>
             <div class="no-match" hidden></div>
             <div class="cells" role="list"
@@ -93,6 +98,12 @@ export default class Hive {
             app.go('settings');
         el.querySelector('#knockingLink').onclick = () =>
             app.go('requests');
+        el.querySelector('#viewToggle').onclick = async () => {
+            Hive.view = Hive.view === 'list' ? 'hive' : 'list';
+            Hive.renderCells(app, el);
+            el.querySelector('#viewToggle').focus();
+            await dbMessenger.setPreference('hiveView', Hive.view);
+        };
         el.querySelector('#me').onclick = () =>
             app.go('settings', {section: 'profile'});
         const find = el.querySelector('#find');
@@ -171,17 +182,28 @@ export default class Hive {
         const query = el.querySelector('#find').value;
         const cells = Hive.cells(app, query);
         const many = cells.length > MANY;
-        const perRow = many ? [5, 4] : [4, 3];
-        const rows = [];
-        for (let i = 0, r = 0; i < cells.length; r++) {
-            rows.push(cells.slice(i, i + perRow[r % 2]));
-            i += perRow[r % 2];
-        }
+        const list = Hive.view === 'list';
+        const toggle = el.querySelector('#viewToggle');
+        toggle.hidden = !many && !list;
+        toggle.textContent = t(list ? 'Hive.showHive' : 'Hive.showList');
+        toggle.setAttribute('aria-pressed', String(list));
         const box = el.querySelector('.cells');
         box.classList.toggle('many', many);
-        box.innerHTML = html`${rows.map((row, r) => html`
-            <div class="row ${r % 2 ? 'odd' : ''}">${row.map((cell) =>
+        box.classList.toggle('list', list);
+        if (list) {
+            box.innerHTML = html`${cells.map((cell) =>
+                Hive.listItemHTML(cell))}`.toString();
+        } else {
+            const perRow = many ? [5, 4] : [4, 3];
+            const rows = [];
+            for (let i = 0, r = 0; i < cells.length; r++) {
+                rows.push(cells.slice(i, i + perRow[r % 2]));
+                i += perRow[r % 2];
+            }
+            box.innerHTML = html`${rows.map((row, r) => html`
+                <div class="row ${r % 2 ? 'odd' : ''}">${row.map((cell) =>
     Hive.cellHTML(cell))}</div>`)}`.toString();
+        }
         const byKey = new Map(cells.map((cell) => [cell.key, cell]));
         for (const button of box.querySelectorAll('.cell')) {
             button.onclick = () => byKey.get(button.dataset.key).select();
@@ -232,6 +254,31 @@ export default class Hive {
             ${cell.kind === 'knocking' || cell.unread ? html`<span
                 class="badge hx" aria-hidden="true">${cell.kind ===
                 'knocking' ? '!' : ''}</span>` : ''}
+        </div>`;
+    }
+
+    /**
+     * A cell as a line of the list view
+     * @param {Object} cell from cells()
+     * @return {SafeHTML} the line
+     */
+    static listItemHTML(cell) {
+        const profile = cell.profile;
+        return html`<div role="listitem" class="cell-wrap">
+            <button class="cell line" data-testid="cell"
+                data-kind="${cell.kind}" data-key="${cell.key}"
+                data-name="${profile ? displayName(profile) : ''}"
+                aria-label="${cell.label}" title="${cell.label}"
+                aria-current="${cell.current ? 'true' : 'false'}">
+                ${profile ? avatar(profile, 28) :
+        html`<span class="avatar add-mark">+</span>`}
+                <span class="line-name">${profile ? displayName(profile) :
+        cell.small}</span>
+                ${cell.kind === 'knocking' || cell.kind === 'waiting' ?
+        html`<span class="line-kind">${cell.small}</span>` : ''}
+                ${cell.unread ? html`<span class="dot hx"
+                    aria-hidden="true"></span>` : ''}
+            </button>
         </div>`;
     }
 

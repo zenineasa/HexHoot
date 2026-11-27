@@ -586,6 +586,27 @@
             "de": "vor {n} Std.",
             "fr": "il y a {n} h",
             "it": "{n} h fa"
+        },
+        "engineRestarted": {
+            "en": "HexHoot’s engine stopped and started again. Anything you were typing is kept, and sending resumes by itself.",
+            "ml": "HexHoot-ന്റെ എഞ്ചിൻ നിന്നു, വീണ്ടും തുടങ്ങി. നിങ്ങൾ ടൈപ്പ് ചെയ്തതെല്ലാം സൂക്ഷിച്ചിട്ടുണ്ട്, അയയ്ക്കൽ സ്വയം തുടരും.",
+            "de": "Der Kern von HexHoot wurde neu gestartet. Was Sie geschrieben haben, bleibt erhalten, und das Senden geht von selbst weiter.",
+            "fr": "Le moteur de HexHoot s’est arrêté puis a redémarré. Ce que vous tapiez est conservé, et l’envoi reprend tout seul.",
+            "it": "Il motore di HexHoot si è fermato ed è ripartito. Ciò che stavi scrivendo è conservato e l’invio riprende da solo."
+        },
+        "showList": {
+            "en": "List",
+            "ml": "പട്ടിക",
+            "de": "Liste",
+            "fr": "Liste",
+            "it": "Elenco"
+        },
+        "showHive": {
+            "en": "Hive",
+            "ml": "തേൻകൂട്",
+            "de": "Wabe",
+            "fr": "Ruche",
+            "it": "Alveare"
         }
     },
     "Home": {
@@ -970,6 +991,55 @@
             "de": "{name} hat ein neues Foto",
             "fr": "{name} a une nouvelle photo",
             "it": "{name} ha una nuova foto"
+        },
+        "showAll": {
+            "en": "Show all",
+            "ml": "എല്ലാം കാണിക്കുക",
+            "de": "Alles anzeigen",
+            "fr": "Tout afficher",
+            "it": "Mostra tutto"
+        },
+        "showLess": {
+            "en": "Show less",
+            "ml": "കുറച്ച് കാണിക്കുക",
+            "de": "Weniger anzeigen",
+            "fr": "Afficher moins",
+            "it": "Mostra meno"
+        },
+        "linkTitle": {
+            "en": "Open a link to {host}?",
+            "ml": "{host}-ലേക്കുള്ള ലിങ്ക് തുറക്കണോ?",
+            "de": "Link zu {host} öffnen?",
+            "fr": "Ouvrir un lien vers {host} ?",
+            "it": "Aprire un link a {host}?"
+        },
+        "linkText": {
+            "en": "It opens in your browser, outside HexHoot. Open it only if you expected this link from {name}.",
+            "ml": "ഇത് HexHoot-ന് പുറത്ത്, നിങ്ങളുടെ ബ്രൗസറിൽ തുറക്കും. {name}-ൽ നിന്ന് ഈ ലിങ്ക് പ്രതീക്ഷിച്ചിരുന്നെങ്കിൽ മാത്രം തുറക്കുക.",
+            "de": "Er öffnet sich in Ihrem Browser, außerhalb von HexHoot. Öffnen Sie ihn nur, wenn Sie diesen Link von {name} erwartet haben.",
+            "fr": "Il s’ouvre dans votre navigateur, hors de HexHoot. Ne l’ouvrez que si vous attendiez ce lien de {name}.",
+            "it": "Si apre nel browser, fuori da HexHoot. Aprilo solo se ti aspettavi questo link da {name}."
+        },
+        "linkOpen": {
+            "en": "Open in browser",
+            "ml": "ബ്രൗസറിൽ തുറക്കുക",
+            "de": "Im Browser öffnen",
+            "fr": "Ouvrir dans le navigateur",
+            "it": "Apri nel browser"
+        },
+        "newBelow": {
+            "en": "{n} new ↓",
+            "ml": "{n} പുതിയത് ↓",
+            "de": "{n} neu ↓",
+            "fr": "{n} nouveau(x) ↓",
+            "it": "{n} nuovi ↓"
+        },
+        "charsLeft": {
+            "en": "{n} characters left",
+            "ml": "{n} അക്ഷരങ്ങൾ ബാക്കി",
+            "de": "Noch {n} Zeichen",
+            "fr": "{n} caractères restants",
+            "it": "{n} caratteri rimasti"
         }
     },
     "Contact": {

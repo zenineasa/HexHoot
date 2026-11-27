@@ -7,6 +7,7 @@
 // the friend was last heard from.
 
 import dbMessenger from '../DBMessenger/index.mjs';
+import i18n from '../I18n/index.mjs';
 import {t, avatar, displayName, firstName, timeOfDay, dayLabel, ago, icon,
     toast} from '../UI/index.mjs';
 import {MAX_CHAT_MESSAGE_LENGTH} from '../Sanitize/index.mjs';
@@ -14,6 +15,14 @@ import {html, loadStyle} from '../Html/index.mjs';
 
 const styleLoaded = loadStyle(new URL('./style.css', import.meta.url));
 const draftKey = (key) => 'hexhoot.draft.' + key;
+// Folded with "Show all" beyond this many characters or lines
+const LONG_CHARS = 1200;
+const LONG_LINES = 20;
+// Shown large if the message is only this many emoji or fewer
+const EMOJI_ONLY = 6;
+// The counter appears when fewer characters than this are left
+const COUNT_FROM = 2000;
+const LINK = /\bhttps?:\/\/[^\s<>"]+/gi;
 
 /**
  * The conversation pane
@@ -43,6 +52,7 @@ export default class Chain {
                 <div class="rows" role="log"
                     aria-label="${t('Chain.messages')}"></div>
             </div>
+            <button id="newBelow" class="hh-btn hh-primary" hidden></button>
             <div id="composer">
                 <div class="field">
                     <label for="composerInput" class="sr-only">
@@ -52,6 +62,7 @@ export default class Chain {
                         placeholder="${waiting ? t('Chain.lockedPlaceholder',
         {name: firstName(contact)}) : t('Chain.placeholder')}"></textarea>
                 </div>
+                <span class="count" aria-live="polite" hidden></span>
                 <button class="send hx" aria-label="${t('Chain.send')}"
                     title="${t('Chain.send')}">${icon('send', 18)}</button>
             </div>
@@ -65,6 +76,7 @@ export default class Chain {
         Chain.wireComposer(app, pane, key, waiting);
         const body = pane.querySelector('#chainBody');
         body.scrollTop = body.scrollHeight;
+        Chain.wireBody(app, pane);
         // Tests wait for this: the chat is loaded and wired
         pane.querySelector('#chain').dataset.chat = key;
         if (contact.isRead === false) {
@@ -206,8 +218,7 @@ export default class Chain {
         const delivered = sent && (item.delivered ||
             Chain.deliveredEarly.has(item.id));
         const time = timeOfDay(item.ts);
-        const bubble = html`<div class="bubble"><div class="text"
-            >${item.text}</div></div>`;
+        const bubble = Chain.bubble(item.text);
         rows.insertAdjacentHTML('beforeend', html`<div
             class="msg ${sent ? 'sent' : 'received'}" data-id="${item.id}"
             data-delivered="${String(!sent || delivered)}">
@@ -223,10 +234,127 @@ export default class Chain {
             <div class="side mine">${sent ? bubble :
         html`<span class="time">${time}</span>`}</div>
         </div>`.toString());
-        const cancel = rows.lastElementChild.querySelector('.cancel');
+        const row = rows.lastElementChild;
+        for (const link of row.querySelectorAll('.text .link')) {
+            link.onclick = () => Chain.confirmLink(app, link.dataset.url);
+        }
+        const more = row.querySelector('.more');
+        if (more) {
+            more.onclick = () => {
+                const open = row.querySelector('.bubble').classList
+                    .toggle('open');
+                more.textContent = t(open ? 'Chain.showLess' :
+                    'Chain.showAll');
+                more.setAttribute('aria-expanded', String(open));
+            };
+        }
+        const cancel = row.querySelector('.cancel');
         if (cancel) {
             cancel.onclick = () => Chain.dontSend(app, item.id);
         }
+    }
+
+    /**
+     * A message's bubble. Links become buttons that ask before opening;
+     * a message of only a few emoji is shown large; a long one is folded.
+     * @param {string} text the message
+     * @return {SafeHTML} the bubble
+     */
+    static bubble(text) {
+        const graphemes = [...new Intl.Segmenter().segment(text.trim())];
+        const emoji = graphemes.length > 0 && graphemes.length <= EMOJI_ONLY &&
+            graphemes.every(({segment}) => /^\s*$/.test(segment) ||
+                /\p{Extended_Pictographic}|\p{Regional_Indicator}/u.test(
+                    segment)) && !/[\p{L}\p{N}]/u.test(text);
+        const long = text.length > LONG_CHARS ||
+            text.split('\n').length > LONG_LINES;
+        const parts = [];
+        let last = 0;
+        for (const match of text.matchAll(LINK)) {
+            const url = match[0].replace(/[.,;:!?)\]'"]+$/, '');
+            parts.push(text.slice(last, match.index));
+            parts.push(html`<button type="button" class="link"
+                data-url="${url}">${url}</button>`);
+            last = match.index + url.length;
+        }
+        parts.push(text.slice(last));
+        return html`<div class="bubble ${emoji ? 'emoji' : ''} ${long ?
+            'long' : ''}"><div class="text">${parts}</div>${long ?
+            html`<button class="hh-link more" aria-expanded="false">${
+                t('Chain.showAll')}</button>` : ''}</div>`;
+    }
+
+    /**
+     * Ask before opening a link from a message: show where it really goes
+     * @param {Object} app the App
+     * @param {string} url the link
+     */
+    static confirmLink(app, url) {
+        let host = '';
+        try {
+            host = new URL(url).host;
+        } catch (err) {
+            return;
+        }
+        const contact = app.contact(app.state.id);
+        const dialog = document.createElement('dialog');
+        dialog.id = 'linkDialog';
+        dialog.className = 'hh-dialog';
+        dialog.innerHTML = html`
+            <div class="head"><h2>${t('Chain.linkTitle', {host})}</h2></div>
+            <div class="body">
+                <div class="url mono">${url}</div>
+                <p class="muted">${t('Chain.linkText', {name: contact ?
+        firstName(contact) : ''})}</p>
+                <div class="hh-row end">
+                    <button class="hh-btn hh-secondary" name="cancel">
+                        ${t('Backup.cancel')}</button>
+                    <button class="hh-btn hh-primary" name="open">
+                        ${t('Chain.linkOpen')}</button>
+                </div>
+            </div>`.toString();
+        document.body.appendChild(dialog);
+        const close = () => {
+            dialog.close();
+            dialog.remove();
+        };
+        dialog.querySelector('[name=cancel]').onclick = close;
+        dialog.oncancel = (event) => {
+            event.preventDefault();
+            close();
+        };
+        dialog.querySelector('[name=open]').onclick = () => {
+            // Main opens http(s) links in the system browser
+            window.open(url);
+            close();
+        };
+        dialog.showModal();
+        dialog.querySelector('[name=cancel]').focus();
+    }
+
+    /**
+     * Scrolling: the "N new messages" button goes when the end is in view
+     * @param {Object} app the App
+     * @param {HTMLElement} pane the pane
+     */
+    static wireBody(app, pane) {
+        const body = pane.querySelector('#chainBody');
+        const below = pane.querySelector('#newBelow');
+        Chain.unseen = 0;
+        const atEnd = () => body.scrollHeight - body.scrollTop -
+            body.clientHeight < 80;
+        body.addEventListener('scroll', () => {
+            if (atEnd() && !below.hidden) {
+                Chain.unseen = 0;
+                below.hidden = true;
+            }
+        });
+        below.onclick = () => {
+            body.scrollTop = body.scrollHeight;
+            Chain.unseen = 0;
+            below.hidden = true;
+            document.getElementById('composerInput')?.focus();
+        };
     }
 
     /**
@@ -267,10 +395,25 @@ export default class Chain {
     static wireComposer(app, pane, key, waiting) {
         const input = pane.querySelector('#composerInput');
         const send = pane.querySelector('#composer .send');
+        const count = pane.querySelector('#composer .count');
         const grow = () => {
             input.style.height = 'auto';
             input.style.height = Math.min(input.scrollHeight, 160) + 'px';
             send.disabled = waiting || input.value.trim() === '';
+            const left = MAX_CHAT_MESSAGE_LENGTH - input.value.length;
+            count.hidden = left > COUNT_FROM;
+            count.textContent = t('Chain.charsLeft', {n:
+                left.toLocaleString(i18n.selectedLang)});
+            count.dataset.tone = left < COUNT_FROM / 10 ? 'warn' : '';
+            // The composer floats over the chain: keep the end visible
+            const body = pane.querySelector('#chainBody');
+            const atEnd = body.scrollHeight - body.scrollTop -
+                body.clientHeight < 80;
+            body.style.paddingBottom =
+                pane.querySelector('#composer').offsetHeight + 40 + 'px';
+            if (atEnd) {
+                body.scrollTop = body.scrollHeight;
+            }
         };
         input.disabled = waiting;
         input.value = waiting ? '' :
@@ -346,6 +489,12 @@ export default class Chain {
         Chain.renderStart(app, app.state.id);
         if (atEnd || item.kind === 'sent') {
             body.scrollTop = body.scrollHeight;
+        } else if (item.kind === 'received') {
+            // Reading further up: say that something came in below
+            const below = document.getElementById('newBelow');
+            Chain.unseen = (Chain.unseen || 0) + 1;
+            below.textContent = t('Chain.newBelow', {n: Chain.unseen});
+            below.hidden = false;
         }
     }
 
