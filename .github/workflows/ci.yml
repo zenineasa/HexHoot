@@ -59,10 +59,11 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             # An unlocked keyring in a D-Bus session; GNOME makes Electron
-            # use it (libsecret) for safeStorage
+            # use it (libsecret) for safeStorage. A full HD screen: Xvfb's
+            # 640x480 default gives the narrow layout the tests do not expect
             dbus-run-session -- bash -c '
               echo -n ci | gnome-keyring-daemon --unlock --components=secrets > /dev/null
-              XDG_CURRENT_DESKTOP=GNOME xvfb-run --auto-servernum npm run test:e2e'
+              XDG_CURRENT_DESKTOP=GNOME xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e'
           else
             npm run test:e2e
           fi

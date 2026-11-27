@@ -110,7 +110,7 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            xvfb-run --auto-servernum npm run test:packaged
+            xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:packaged
           else
             npm run test:packaged
           fi

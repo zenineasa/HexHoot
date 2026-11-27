@@ -11,10 +11,14 @@
 // Running animations are waited for first.
 
 const AUDIT = String.raw`(async () => {
-    // Measure the end state, not a panel halfway through sliding in
-    await Promise.all(document.getAnimations()
-        .filter((a) => a.effect?.getTiming().iterations !== Infinity)
-        .map((a) => a.finished.catch(() => {})));
+    // Measure the end state, not a panel halfway through sliding in.
+    // finish() jumps there; waiting would hang where no frames are drawn
+    // (a hidden or headless window).
+    for (const a of document.getAnimations()) {
+        if (a.effect?.getTiming().iterations !== Infinity) {
+            a.finish();
+        }
+    }
     const parse = (value) => {
         const m = value.match(/rgba?\(([^)]+)\)/);
         if (!m) {
