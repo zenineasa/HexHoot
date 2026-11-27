@@ -19,6 +19,31 @@ module.exports = {
         ],
     },
     rebuildConfig: {},
+    hooks: {
+        // Native modules (sodium-native, udx-native, bare-*) ship prebuilt
+        // binaries for every platform, Android and iOS included, and load
+        // only <platform>-<arch>. Keep that one (and its musl twin): the
+        // rest only add size, and rpm's strip fails on foreign binaries.
+        packageAfterPrune: async (config, buildPath, electronVersion,
+            platform, arch) => {
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const keep = [`${platform}-${arch}`, `${platform}-${arch}-musl`];
+            const modules = path.join(buildPath, 'node_modules');
+            for (const name of fs.readdirSync(modules)) {
+                const prebuilds = path.join(modules, name, 'prebuilds');
+                if (!fs.existsSync(prebuilds)) {
+                    continue;
+                }
+                for (const target of fs.readdirSync(prebuilds)) {
+                    if (!keep.includes(target)) {
+                        fs.rmSync(path.join(prebuilds, target),
+                            {recursive: true, force: true});
+                    }
+                }
+            }
+        },
+    },
     makers: [
         {
             // For windows:
