@@ -3,10 +3,13 @@
 // Two apps over the LAN carrier, through the Hive UI (docs/design/ui-hive.md):
 // long, emoji-only and link messages, the "N new" button, the length
 // counter, "Don't send", unread marks, Core restarting, and blocking.
+// Each screen is also audited for contrast and names, in both themes
+// (a11y.mjs).
 
 import {describe} from 'node:test';
 import assert from 'node:assert/strict';
-import {useNetwork, befriend} from './orchestrator.mjs';
+import {useNetwork} from './orchestrator.mjs';
+import {auditBothThemes} from './a11y.mjs';
 
 const LONG = Array.from({length: 40}, (_, i) => `line ${i + 1}`).join('\n');
 const LINK_MESSAGE = 'See https://example.com/path?q=1. Thanks';
@@ -16,6 +19,9 @@ describe('The Hive between alice and bob', () => {
     const network = useNetwork({transport: 'lan', peers: ['alice', 'bob']});
     const q = (selector) =>
         `document.querySelector(${JSON.stringify(selector)})`;
+    const failures = [];
+    const audit = async (app, where) =>
+        failures.push(...await auditBothThemes(app, where));
 
     network.test('They become friends and open the chat', async ({alice,
         bob}) => {
@@ -23,9 +29,18 @@ describe('The Hive between alice and bob', () => {
         await bob.login('Bobby Tables');
         await Promise.all([alice.waitForTransports(),
             bob.waitForTransports()]);
-        await befriend(alice, bob, 'Alice Liddell', 'Bobby Tables');
+        await alice.addFriend(bob.key);
+        await audit(alice, 'waiting for them');
+        await bob.waitForKnock(alice.key, 60000);
+        await bob.click(`.cell[data-key="${alice.key}"]`);
+        await bob.waitFor(q(`#request[data-key="${alice.key}"]`));
+        await audit(bob, 'a request');
+        await bob.click('#request [name=letIn]');
+        await alice.waitForFriend(bob.key, 'Bobby Tables', 60000);
+        await bob.waitForFriend(alice.key, 'Alice Liddell', 60000);
         await alice.openChat(bob.key);
         await bob.openChat(alice.key);
+        await audit(alice, 'an empty chat');
     });
 
     network.test('Long messages fold, emoji show large, links ask first',
@@ -47,9 +62,12 @@ describe('The Hive between alice and bob', () => {
             await bob.click('#chainBody .bubble.long .more');
             assert.equal(await bob.evaluate(`${q('#chainBody .bubble.long')}
                 .classList.contains('open')`), true);
+            await audit(alice, 'messages sent');
+            await audit(bob, 'messages received');
             // A link shows where it goes and opens nothing by itself
             await bob.click('#chainBody .text .link');
             await bob.waitFor(q('#linkDialog'));
+            await audit(bob, 'the link dialog');
             assert.equal(await bob.evaluate(
                 `${q('#linkDialog .url')}.textContent`),
             'https://example.com/path?q=1');
@@ -71,6 +89,7 @@ describe('The Hive between alice and bob', () => {
         await bob.waitFor(`!${q('#newBelow')}.hidden`);
         assert.match(await bob.evaluate(`${q('#newBelow')}.textContent`),
             /^1 /);
+        await audit(bob, '"1 new"');
         await bob.click('#newBelow');
         await bob.waitFor(`${q('#newBelow')}.hidden`);
         await bob.resize(1280, 800);
@@ -86,6 +105,10 @@ describe('The Hive between alice and bob', () => {
         await alice.type('#composerInput', 'x'.repeat(64000));
         assert.deepEqual(await count(), {hidden: false,
             text: '1,536 characters left'});
+        await alice.type('#composerInput', 'x'.repeat(65500));
+        assert.equal(await alice.evaluate(
+            `${q('#composer .count')}.dataset.tone`), 'warn');
+        await audit(alice, 'the counter, nearly out');
         await alice.type('#composerInput', '');
     });
 
@@ -95,6 +118,7 @@ describe('The Hive between alice and bob', () => {
                 await alice.send('never mind');
                 const row = '#chainBody .msg.sent[data-delivered=false]';
                 await alice.waitFor(q(row + ' .cancel'));
+                await audit(alice, 'a message waiting');
                 await alice.click(row + ' .cancel');
                 await alice.waitFor(`!${q(row)}`);
                 assert.ok(!(await alice.core('getConversation', bob.key))
@@ -120,6 +144,7 @@ describe('The Hive between alice and bob', () => {
             assert.equal(await alice.evaluate(`${q(
                 `.now[data-key="${bob.key}"] .who`)}.classList
                 .contains('unread')`), true);
+            await audit(alice, 'unread marks');
             await alice.openChat(bob.key);
             await alice.waitFor(`!${q(cell)}.parentElement
                 .querySelector('.badge')`);
@@ -135,6 +160,7 @@ describe('The Hive between alice and bob', () => {
             assert.equal(alice.killCore(), true);
             await alice.waitFor(`${q('#banner')}?.dataset.kind ===
                 'restarted' && !${q('#banner')}.hidden`, 30000);
+            await audit(alice, 'the restart banner');
             // Back in the same chat, with the draft
             await alice.waitFor(`${q('#chain')}?.dataset.chat ===
                 ${JSON.stringify(bob.key)}`);
@@ -151,7 +177,9 @@ describe('The Hive between alice and bob', () => {
         async ({alice, bob}) => {
             await alice.openChat(bob.key);
             await alice.openContact();
+            await audit(alice, 'the contact panel');
             await alice.click('#contact [name=block]');
+            await audit(alice, 'confirming a block');
             await alice.click('#contact .confirm [name=confirm]');
             await alice.waitFor(`document.getElementById('home') &&
                 !${q(`.cell[data-key="${bob.key}"]`)}`);
@@ -166,12 +194,17 @@ describe('The Hive between alice and bob', () => {
             await alice.press(',', {ctrlKey: true});
             await alice.click('.nav[data-section=blocked]');
             await alice.waitFor(q(`#settings-blocked [data-key="${bob.key}"]`));
+            await audit(alice, 'the blocked list');
             await alice.click(`#settings-blocked [data-key="${bob.key}"] ` +
                 '[name=unblock]');
             await alice.waitFor(`!${q(`#settings-blocked [data-key=` +
                 `"${bob.key}"]`)}`);
             assert.deepEqual(await alice.core('getBlocked'), []);
         });
+
+    network.test('Every screen is readable and every control named', () => {
+        assert.deepEqual(failures, []);
+    });
 
     network.test('No errors were logged', ({alice, bob}) => {
         assert.deepEqual(alice.errors, []);

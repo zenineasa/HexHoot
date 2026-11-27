@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {launchApp} from './driver.mjs';
+import {audit, auditBothThemes} from './a11y.mjs';
 
 let app;
 // Kept across a restart of the app
@@ -23,6 +24,10 @@ const STRANGER = 'hh21plj59s5zh6nwax5gvxmt3wv90ft2hq6k2g65whjef9xmw5m45' +
 const texts = JSON.parse(fs.readFileSync(new URL(
     '../../modules/I18n/lang.json', import.meta.url)));
 const q = (selector) => `document.querySelector(${JSON.stringify(selector)})`;
+// Contrast and names on each screen, in both themes (a11y.mjs)
+const failures = [];
+const check = async (where) =>
+    failures.push(...await auditBothThemes(app, where));
 
 /**
  * Press a key on the focused element
@@ -111,7 +116,25 @@ test('The welcome screen, with fonts from the app itself', async () => {
     assert.deepEqual(await app.evaluate(`[...document.styleSheets]
         .map((sheet) => sheet.href).filter((href) =>
             !href.startsWith('app://hexhoot/'))`), []);
+    await check('the welcome screen');
 });
+
+test('The audit itself catches poor contrast and a nameless button',
+    async () => {
+        await app.evaluate(`(() => {
+            const box = document.createElement('div');
+            box.id = 'auditProbe';
+            box.innerHTML = '<p style="color:#777;background:#888">grey</p>' +
+                '<button><svg width="8" height="8"></svg></button>';
+            document.body.append(box);
+        })()`);
+        const {contrast, unnamed, checked} = await audit(app);
+        await app.evaluate(`document.getElementById('auditProbe').remove()`);
+        assert.ok(checked > 10);
+        assert.deepEqual(contrast.filter((c) => c.text === 'grey')
+            .map((c) => c.ratio), [1.26]);
+        assert.ok(unnamed.some((path) => path.endsWith('button')));
+    });
 
 test('Password rules are checked as you type; Core\'s reason is shown',
     async () => {
@@ -138,6 +161,7 @@ test('Password rules are checked as you type; Core\'s reason is shown',
             texts.Login.passwordRepetitive.en);
         assert.equal(await app.core('getMyAddress'), undefined);
         assert.deepEqual(app.dialogs, []);
+        await check('the welcome screen, with an error');
     });
 
 test('Signing in shows the hive and Home', async () => {
@@ -157,6 +181,7 @@ test('Signing in shows the hive and Home', async () => {
         steps: document.querySelectorAll('#home .steps li').length,
     })`), {route: 'home', logo: 1, cells: ['add'], me: 'ZatMan',
         address: key, steps: 3});
+    await check('Home');
 });
 
 test('Add a friend: checked as you type; knocking selects the waiting cell',
@@ -167,8 +192,10 @@ test('Add a friend: checked as you type; knocking selects the waiting cell',
             knock: !document.getElementById('knockButton').disabled})`);
         await app.click('#addFriendButton');
         await app.waitFor(`document.getElementById('theirPublicKey')`);
+        await check('Add a friend');
         await app.type('#theirPublicKey', 'xyz');
         assert.deepEqual(await hint(), {tone: 'warn', knock: false});
+        await check('Add a friend, a warning');
         await app.type('#theirPublicKey', mine.replace(/(.{4})/g, '$1 '));
         assert.deepEqual(await hint(), {tone: 'warn', knock: false});
         assert.equal(await text('#addFriendHint'),
@@ -178,6 +205,7 @@ test('Add a friend: checked as you type; knocking selects the waiting cell',
             (STRANGER.endsWith('q') ? 'p' : 'q');
         await app.type('#theirPublicKey', typo);
         assert.deepEqual(await hint(), {tone: 'ok', knock: true});
+        await check('Add a friend, looks right');
         await app.click('#knockButton');
         await app.waitFor(`${q('#addFriendHint')}.textContent ===
             ${JSON.stringify(texts.AddFriend.typo.en)}`);
@@ -194,6 +222,7 @@ test('Add a friend: checked as you type; knocking selects the waiting cell',
             withdraw: Boolean(${q('#chainHeader [name=withdraw]')}),
         })`), {cell: 'waiting', current: 'true', composer: true,
             withdraw: true});
+        await check('waiting for them');
         // Adding them again says so, and offers to show them
         await app.click('#addFriendButton');
         await app.type('#theirPublicKey', STRANGER);
@@ -213,13 +242,20 @@ test('Keyboard: Ctrl+K, Ctrl+N, Ctrl+, and Esc one step back', async () => {
     assert.equal(await app.evaluate(`document.activeElement.id`), 'find');
     await press('n', {ctrlKey: true});
     await app.waitFor(`document.getElementById('addFriendDialog')`);
+    assert.equal(await app.evaluate(`document.activeElement.id`),
+        'theirPublicKey');
     await app.click('#addFriendDialog [name=close]');
+    // Focus goes back to where it was
+    assert.equal(await app.evaluate(`document.activeElement.id`), 'find');
     await press(',', {ctrlKey: true});
     await app.waitFor(`!document.getElementById('settings').hidden`);
     assert.match(await text('#settingsBack'), /Home/);
     await press('Escape');
     await app.waitFor(`document.getElementById('settings').hidden &&
         document.getElementById('home')`);
+    // A screen reader is told where it is now: focus is on the heading
+    assert.equal(await app.evaluate(
+        `document.activeElement.matches('#home h1')`), true);
 });
 
 test('The hive as a list', async () => {
@@ -235,6 +271,21 @@ test('The hive as a list', async () => {
     await app.waitFor(`!${q('#hive .cells')}.classList.contains('list')`);
     await app.waitFor(`window.hexhoot.core.call('getPreference',
         ['hiveView']).then((p) => p.value === 'hive')`);
+});
+
+test('Every Settings section', async () => {
+    await press(',', {ctrlKey: true});
+    await app.waitFor(`!document.getElementById('settings').hidden`);
+    const sections = await app.evaluate(`[...document.querySelectorAll(
+        '.nav[data-section]')].map((nav) => nav.dataset.section)`);
+    assert.ok(sections.length >= 5);
+    for (const section of sections) {
+        await app.click(`.nav[data-section=${section}]`);
+        await app.waitFor(`document.getElementById('settings-${section}')`);
+        await check('Settings: ' + section);
+    }
+    await press('Escape');
+    await app.waitFor(`document.getElementById('settings').hidden`);
 });
 
 test('Editing the profile keeps the key (S4)', async () => {
@@ -302,6 +353,7 @@ test('A narrow window shows one place at a time', async () => {
         pane: getComputedStyle(document.getElementById('pane')).display,
     })`);
     assert.deepEqual(await shown(), {hive: 'flex', pane: 'none'});
+    await check('a narrow window');
     await app.click('#settingsButton');
     await app.waitFor(`!document.getElementById('settings').hidden`);
     await press('Escape');
@@ -359,6 +411,7 @@ test('No password check before it is due', async () => {
 test('A due password check is a card that blocks nothing', async () => {
     await restartLater(4);
     await app.waitFor(`document.getElementById('passwordCheck')`);
+    await check('the password check card');
     // The app still works around it
     await app.click('#settingsButton');
     await app.waitFor(`!document.getElementById('settings').hidden`);
@@ -412,6 +465,10 @@ test('The same name and password give the same address elsewhere',
             await elsewhere.close();
         }
     });
+
+test('Every screen is readable and every control named', () => {
+    assert.deepEqual(failures, []);
+});
 
 test('No errors were logged', () => {
     assert.deepEqual(app.errors, []);

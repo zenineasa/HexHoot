@@ -214,19 +214,46 @@ class App {
         Hive.render(this);
         if (route === 'settings') {
             await Settings.render(this, settings);
+            this.placeFocus();
             return;
         }
         const pane = document.getElementById('pane');
         if (route === 'chat' && this.contact(id)) {
             await Chain.render(this, pane, id);
         } else if (route === 'request' && this.data.pending[id]) {
-            Requests.renderOne(this, pane, this.data.pending[id]);
+            await Requests.renderOne(this, pane, this.data.pending[id]);
         } else if (route === 'requests') {
-            Requests.renderList(this, pane);
+            await Requests.renderList(this, pane);
         } else {
             this.state.route = 'home';
             root.dataset.route = 'home';
-            Home.render(this, pane);
+            await Home.render(this, pane);
+        }
+        this.placeFocus();
+    }
+
+    /**
+     * After a redraw, focus that was lost goes to the new place's heading,
+     * so a screen reader says where we are; on a narrow Home, to the hive
+     */
+    placeFocus() {
+        const active = document.activeElement;
+        if (document.querySelector('dialog[open]') || active &&
+            active !== document.body && active.isConnected &&
+            active.getClientRects().length) {
+            return;
+        }
+        const shown = (el) => el?.getClientRects().length ? el : null;
+        const target = this.state.route === 'settings' ?
+            shown(document.querySelector('#settings h1')) :
+            shown(document.querySelector('#pane h1, #pane h2')) ||
+            shown(document.querySelector('#hive .cell[aria-current=true]')) ||
+            shown(document.querySelector('#hive .cell'));
+        if (target) {
+            if (/^H[12]$/.test(target.tagName)) {
+                target.tabIndex = -1;
+            }
+            target.focus({preventScroll: true});
         }
     }
 

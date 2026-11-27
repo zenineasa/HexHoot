@@ -119,7 +119,8 @@ Status: **built** (in the app since UI commit 2), **designed** (in the mockup, n
 | Long translations (Malayalam, German): buttons wrap, cards grow, cells use initials | built |
 | Reduced motion: the only animations (panel slide, progress) follow the system setting | built |
 | Backup: passphrase strength, saved confirmation | built (length) |
-| Contrast measured in both themes, and a screen-reader pass | to check while building |
+| Contrast measured in both themes, and a screen-reader pass | built: measured on every screen by the E2E audit (`test/e2e/a11y.mjs`); markup checked; a listen with VoiceOver is still to do |
+| Translations reviewed by native speakers (ml, de, fr, it) | to do |
 
 # Decisions made while building
 
@@ -129,6 +130,9 @@ Status: **built** (in the app since UI commit 2), **designed** (in the mockup, n
 - **Fonts are bundled** (`modules/Fonts`, SIL Open Font License), so the CSP allows fonts and styles only from the app itself and nothing is fetched from Google.
 - **No QR code.** HexHoot runs on desktops: most have no camera, and holding a laptop up to another screen is awkward. Read with a phone, the address still has to reach the other computer, which is more work than copying it into a message. A QR encoder was built and then removed before committing. Reconsider only if there is a mobile client.
 - **Web links from messages can open in the browser.** Before, the main process opened only the social links. It now also opens plain http(s) links without credentials; the page calls it only after the user confirms a dialog that shows the full address and its host.
+- **Accessibility is measured, not assumed.** `test/e2e/a11y.mjs` runs inside the window on each screen, in both themes. It composites every visible text, placeholder and icon colour over the background actually behind it and checks WCAG AA: 4.5:1 for text, 3:1 for large text and icons. It also fails any control or dialog a screen reader would announce without a name. Field edges use `--field-border`, at 3:1 on every surface (WCAG 1.4.11). The first run found the composer placeholder at 3.71:1 (Chromium's default grey), field borders at about 1.4:1, and the "Add" label at 4.13:1 in day theme.
+- **A message is read as one sentence.** Each row starts with a hidden lead, "Alice, 10:12:" or "You, 10:12, delivered:", and the bubble comes first in the page; CSS places the columns. The visible time, state and spine dot are hidden from screen readers so nothing is read twice; "Don't send" follows the text.
+- **Focus is never lost.** When a redraw removes the focused element (going Home, opening Settings or a request), focus moves to the new place's heading so a screen reader says where you are; on a narrow Home, to the hive. Dialogs return focus to where it was. The composer shows focus on its whole field.
 - **On a narrow window, the hive is Home.** The address and shortcuts that Home shows on a wide window are in Add a friend and Settings.
 
 # Core additions the design asks for

@@ -218,21 +218,30 @@ export default class Chain {
         const delivered = sent && (item.delivered ||
             Chain.deliveredEarly.has(item.id));
         const time = timeOfDay(item.ts);
-        const bubble = Chain.bubble(item.text);
+        const state = t(delivered ? 'Chain.delivered' : 'Chain.waiting');
+        const contact = app.contact(app.state.id);
+        // Read aloud as "Alice, 10:12: text" or "You, 10:12, waiting: text".
+        // The bubble comes first in the page; CSS puts it on its side. The
+        // visible time and state would only repeat the lead, so are hidden.
+        const lead = sent ? t('Chain.fromYou', {time, state}) :
+            t('Chain.fromThem', {time, name: contact ? firstName(contact) :
+                ''});
+        const bubbleSide = html`<div class="side ${sent ? 'mine' : 'theirs'}">
+            <span class="sr-only lead">${lead}</span>
+            ${Chain.bubble(item.text)}</div>`;
+        const otherSide = html`<div class="side ${sent ? 'theirs' : 'mine'}">
+            ${sent ? html`<div class="status"><span class="state"
+                aria-hidden="true">${time} · ${state}</span>
+                ${delivered ? '' : html`<button class="hh-link cancel">
+                    ${t('Chain.dontSend')}</button>`}</div>` :
+        html`<span class="time" aria-hidden="true">${time}</span>`}</div>`;
         rows.insertAdjacentHTML('beforeend', html`<div
             class="msg ${sent ? 'sent' : 'received'}" data-id="${item.id}"
             data-delivered="${String(!sent || delivered)}">
-            <div class="side theirs">${sent ? html`<div class="status">
-                <span class="state">${time} · ${delivered ?
-    t('Chain.delivered') : t('Chain.waiting')}</span>
-                ${delivered ? '' : html`<button class="hh-link cancel">
-                    ${t('Chain.dontSend')}</button>`}</div>` : bubble}</div>
-            <div class="node"><span class="outer hx" role="img"
-                aria-label="${sent ? delivered ? t('Chain.delivered') :
-        t('Chain.waiting') : t('Chain.received')}"><span
+            ${bubbleSide}
+            <div class="node" aria-hidden="true"><span class="outer hx"><span
                 class="inner hx"></span></span></div>
-            <div class="side mine">${sent ? bubble :
-        html`<span class="time">${time}</span>`}</div>
+            ${otherSide}
         </div>`.toString());
         const row = rows.lastElementChild;
         for (const link of row.querySelectorAll('.text .link')) {
@@ -300,12 +309,15 @@ export default class Chain {
         const dialog = document.createElement('dialog');
         dialog.id = 'linkDialog';
         dialog.className = 'hh-dialog';
+        dialog.setAttribute('aria-labelledby', 'linkTitle');
+        dialog.setAttribute('aria-describedby', 'linkText');
         dialog.innerHTML = html`
-            <div class="head"><h2>${t('Chain.linkTitle', {host})}</h2></div>
+            <div class="head"><h2 id="linkTitle">${t('Chain.linkTitle',
+        {host})}</h2></div>
             <div class="body">
                 <div class="url mono">${url}</div>
-                <p class="muted">${t('Chain.linkText', {name: contact ?
-        firstName(contact) : ''})}</p>
+                <p class="muted" id="linkText">${t('Chain.linkText',
+        {name: contact ? firstName(contact) : ''})}</p>
                 <div class="hh-row end">
                     <button class="hh-btn hh-secondary" name="cancel">
                         ${t('Backup.cancel')}</button>
@@ -547,11 +559,10 @@ export default class Chain {
         row.dataset.delivered = 'true';
         const status = row.querySelector('.status');
         status.querySelector('.cancel')?.remove();
-        const state = status.querySelector('.state');
-        state.textContent = state.textContent.replace(t('Chain.waiting'),
-            t('Chain.delivered'));
-        row.querySelector('.outer').setAttribute('aria-label',
-            t('Chain.delivered'));
+        for (const el of row.querySelectorAll('.state, .lead')) {
+            el.textContent = el.textContent.replace(t('Chain.waiting'),
+                t('Chain.delivered'));
+        }
     }
 
     /**

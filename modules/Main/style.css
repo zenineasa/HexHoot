@@ -16,6 +16,8 @@
     --raised: #1e2240;
     --hover: #1d2140;
     --border: #2b3054;
+    /* Edges of fields: 3:1 on every surface they sit on (WCAG 1.4.11) */
+    --field-border: #6b71a3;
     --text: #ecebf5;
     --muted: #a6a9c6;
     --accent: #ffb547;
@@ -44,6 +46,7 @@
     --raised: #ebe5d8;
     --hover: #e6dfd0;
     --border: #d8d0bf;
+    --field-border: #857c69;
     --text: #1b1a22;
     --muted: #5d5868;
     --accent: #9a5a00;
@@ -98,6 +101,9 @@ h1, h2, h3 {
 button, input, textarea, select {
     font: inherit;
     color: inherit;
+}
+input[type=checkbox], input[type=radio] {
+    accent-color: var(--accent);
 }
 [hidden] {
     display: none !important;
@@ -205,7 +211,7 @@ button, input, textarea, select {
     font-size: 14px;
     color: var(--text);
     background: var(--input-bg);
-    border: 1px solid var(--border);
+    border: 1px solid var(--field-border);
     border-radius: 10px;
     padding: 10px 12px;
     box-sizing: border-box;
@@ -253,6 +259,10 @@ button, input, textarea, select {
 }
 .hh-input:focus-visible {
     outline-offset: 0;
+}
+/* Headings take focus only to announce a new place; they are not controls */
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus {
+    outline: none;
 }
 
 /* A contact's hexagon: their photo, or their initials on their colour */

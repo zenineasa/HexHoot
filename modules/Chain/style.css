@@ -164,11 +164,15 @@
     align-items: start;
     margin: 5px 0;
 }
+/* The bubble comes first in the page (it is read first); the grid puts
+   each part in its column */
 #chainBody .side.theirs {
+    grid-area: 1 / 1;
     display: flex;
     justify-content: flex-end;
 }
 #chainBody .side.mine {
+    grid-area: 1 / 3;
     display: flex;
     justify-content: flex-start;
 }
@@ -194,6 +198,7 @@
     border-color: transparent;
 }
 #chainBody .node {
+    grid-area: 1 / 2;
     display: flex;
     justify-content: center;
     padding-top: 11px;
@@ -263,10 +268,15 @@
     display: flex;
     align-items: center;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid var(--field-border);
     border-radius: 16px;
     padding: 4px 6px 4px 14px;
     box-shadow: 0 10px 30px var(--shadow);
+}
+/* The textarea draws no outline; the whole field shows the focus */
+#composer .field:has(textarea:focus-visible) {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 10px 30px var(--shadow);
 }
 #composer textarea {
     flex: 1;
@@ -280,6 +290,9 @@
     outline: none;
     max-height: 160px;
     box-sizing: border-box;
+}
+#composer textarea::placeholder {
+    color: var(--muted);
 }
 #composer textarea:disabled {
     cursor: not-allowed;

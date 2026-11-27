@@ -48,6 +48,46 @@ test('Every text is translated into the same languages', () => {
     }
 });
 
+test('Every text the code asks for exists', () => {
+    const texts = JSON.parse(fs.readFileSync(
+        path.join(root, 'modules/I18n/lang.json'), 'utf8'));
+    const missing = [];
+    const modules = path.join(root, 'modules');
+    for (const dir of fs.readdirSync(modules)) {
+        for (const file of fs.readdirSync(path.join(modules, dir))) {
+            if (!/\.m?js$/.test(file)) {
+                continue;
+            }
+            const source = fs.readFileSync(path.join(modules, dir, file),
+                'utf8');
+            for (const [, module, name] of source.matchAll(
+                /\b(?:t|getText)\('([A-Za-z]+)\.([A-Za-z]+)'/g)) {
+                if (!texts[module]?.[name]) {
+                    missing.push(`${dir}/${file}: ${module}.${name}`);
+                }
+            }
+        }
+    }
+    assert.deepEqual(missing, []);
+});
+
+test('Translations keep the same {placeholders} as English', () => {
+    const texts = JSON.parse(fs.readFileSync(
+        path.join(root, 'modules/I18n/lang.json'), 'utf8'));
+    const holes = (text) => (text.match(/\{\w+\}/g) || []).sort();
+    for (const [module, entries] of Object.entries(texts)) {
+        if (module === 'coprightMessage') {
+            continue;
+        }
+        for (const [name, translations] of Object.entries(entries)) {
+            for (const [language, text] of Object.entries(translations)) {
+                assert.deepEqual(holes(text), holes(translations.en),
+                    `${module}.${name} (${language})`);
+            }
+        }
+    }
+});
+
 test('The version is newer than the latest GitHub release', async (t) => {
     const repo = packageJson.repository.url
         .split('git+https://github.com/')[1].split('.git')[0];

@@ -119,7 +119,6 @@
 .cell .small {
     font-size: 10px;
     font-weight: 600;
-    opacity: 0.85;
     max-width: 80%;
     white-space: nowrap;
     overflow: hidden;

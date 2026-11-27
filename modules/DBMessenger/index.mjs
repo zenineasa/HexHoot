@@ -84,8 +84,10 @@ class DBMessenger {
             const dialog = document.createElement('dialog');
             dialog.id = 'passphraseDialog';
             dialog.className = 'hh-dialog';
+            dialog.setAttribute('aria-labelledby', 'passphraseTitle');
             dialog.innerHTML = html`
-                <div class="head"><h2>${i18n.getText('Backup.title')}</h2></div>
+                <div class="head"><h2 id="passphraseTitle">
+                    ${i18n.getText('Backup.title')}</h2></div>
                 <div class="body">
                     <label class="hh-label" for="passphraseInput">
                         ${i18n.getText('Backup.passphrase')}</label>

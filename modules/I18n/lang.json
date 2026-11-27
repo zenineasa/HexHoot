@@ -908,13 +908,6 @@
             "fr": "en attente",
             "it": "in attesa"
         },
-        "received": {
-            "en": "received",
-            "ml": "ലഭിച്ചു",
-            "de": "empfangen",
-            "fr": "reçu",
-            "it": "ricevuto"
-        },
         "dontSend": {
             "en": "Don’t send",
             "ml": "അയയ്ക്കേണ്ട",
@@ -1033,6 +1026,20 @@
             "de": "{n} neu ↓",
             "fr": "{n} nouveau(x) ↓",
             "it": "{n} nuovi ↓"
+        },
+        "fromYou": {
+            "en": "You, {time}, {state}:",
+            "ml": "നിങ്ങൾ, {time}, {state}:",
+            "de": "Sie, {time}, {state}:",
+            "fr": "Vous, {time}, {state} :",
+            "it": "Tu, {time}, {state}:"
+        },
+        "fromThem": {
+            "en": "{name}, {time}:",
+            "ml": "{name}, {time}:",
+            "de": "{name}, {time}:",
+            "fr": "{name}, {time} :",
+            "it": "{name}, {time}:"
         },
         "charsLeft": {
             "en": "{n} characters left",
