@@ -253,9 +253,9 @@ test('Keyboard: Ctrl+K, Ctrl+N, Ctrl+, and Esc one step back', async () => {
     await press('Escape');
     await app.waitFor(`document.getElementById('settings').hidden &&
         document.getElementById('home')`);
-    // A screen reader is told where it is now: focus is on the heading
-    assert.equal(await app.evaluate(
-        `document.activeElement.matches('#home h1')`), true);
+    // A screen reader is told where it is now: focus moves to the heading
+    // once Home has drawn
+    await app.waitFor(`document.activeElement.matches('#home h1')`);
 });
 
 test('The hive as a list', async () => {

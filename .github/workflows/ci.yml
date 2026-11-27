@@ -47,11 +47,22 @@ jobs:
       - run: npm run test:crypto
       - run: npm run test:protocol
       - run: npm run test:core
+      - name: Give Linux an OS keyring
+        if: runner.os == 'Linux'
+        # A Linux desktop (GNOME, KDE) has a secret service that keeps the
+        # user signed in across restarts; a bare runner has none, and the
+        # app would ask for the password after every restart. The weak path
+        # has its own tests (test/crypto/keyring.test.js).
+        run: sudo apt-get update && sudo apt-get install -y gnome-keyring
       - name: E2E tests (Electron)
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            xvfb-run --auto-servernum npm run test:e2e
+            # An unlocked keyring in a D-Bus session; GNOME makes Electron
+            # use it (libsecret) for safeStorage
+            dbus-run-session -- bash -c '
+              echo -n ci | gnome-keyring-daemon --unlock --components=secrets > /dev/null
+              XDG_CURRENT_DESKTOP=GNOME xvfb-run --auto-servernum npm run test:e2e'
           else
             npm run test:e2e
           fi
