@@ -29,7 +29,7 @@ const root = path.resolve(import.meta.dirname, '../..');
  */
 function packagedApp() {
     const dir = process.env.HEXHOOT_PACKAGED_DIR || path.join(root, 'out',
-        `HexHoot-${process.platform}-${process.arch}`);
+        'package', `HexHoot-${process.platform}-${process.arch}`);
     if (process.platform === 'darwin') {
         const app = path.join(dir, 'HexHoot.app');
         return {app, executable: path.join(app, 'Contents', 'MacOS',
@@ -93,11 +93,26 @@ test('Only the app is shipped', () => {
     assert.ok(files.includes('/modules/Main/index.js'));
     assert.ok(files.includes('/modules/Crypto/Ratchet.js'));
     for (const banned of ['/test', '/test-results', '/docs', '/scripts',
-        '/.github', '/out', '/eslint.config.js', '/forge.config.js',
-        '/makefile']) {
+        '/packaging', '/.github', '/out', '/eslint.config.js', '/makefile',
+        '/package-lock.json']) {
         assert.ok(!files.some((file) => file === banned ||
             file.startsWith(banned + '/')), banned);
     }
+});
+
+test('Native modules carry only this platform\'s binaries', () => {
+    const unpacked = packaged.asar + '.unpacked';
+    const targets = new Set();
+    for (const file of fs.readdirSync(unpacked, {recursive: true})) {
+        const match = /prebuilds[\\/]([^\\/]+)$/.exec(file);
+        if (match) {
+            targets.add(match[1]);
+        }
+    }
+    assert.ok(targets.size > 0, 'no prebuilds were found');
+    const own = `${process.platform}-${process.arch}`;
+    assert.deepEqual([...targets].filter((target) => target !== own &&
+        target !== own + '-musl'), []);
 });
 
 test('Test hooks are inert: logging in costs the real scrypt', async () => {

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2026 Zenin Easa Panthakkalakath -->
+<!-- The <release> entry is rewritten with the version being packaged
+     (scripts/distribute.mjs); what is committed here is only a snapshot. -->
+<component type="desktop-application">
+  <id>io.github.zenineasa.HexHoot</id>
+  <name>HexHoot</name>
+  <summary>Peer-to-peer chat with no servers</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-only</project_license>
+  <developer id="io.github.zenineasa">
+    <name>Zenin Easa Panthakkalakath</name>
+  </developer>
+  <url type="homepage">https://github.com/zenineasa/HexHoot</url>
+  <url type="bugtracker">https://github.com/zenineasa/HexHoot/issues</url>
+  <launchable type="desktop-id">io.github.zenineasa.HexHoot.desktop</launchable>
+  <description>
+    <p>
+      HexHoot is a peer-to-peer messenger. Friends find each other over the
+      internet or the local network and talk directly, end-to-end encrypted,
+      with no server in between and no phone number or email address.
+    </p>
+  </description>
+  <categories>
+    <category>Network</category>
+    <category>InstantMessaging</category>
+  </categories>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+  </content_rating>
+  <releases>
+    <release version="2.0.0" date="2026-11-27" />
+  </releases>
+</component>

@@ -17,7 +17,7 @@ The latest versions were taken from the npm registry on 2026-11-25. "Phase" refe
 | Package | From | To | Phase | Notes |
 |---|---|---|---|---|
 | `hyperswarm` | ^4.7.14 | ^4.17.2 | 1 | Minor-version upgrade. Re-test `join`/`flush` behaviour. |
-| `electron-squirrel-startup` | ^1.0.0 | ^1.0.1 | 1 | |
+| `electron-squirrel-startup` | ^1.0.0 | **removed 2026-11-27** | 5 | Only Squirrel installers need it; Windows now uses NSIS |
 | `indexeddb-export-import` | ^2.1.5 | ^2.2.0, then **removed** | 1 → 2 | Removed 2026-11-26: Core exports the same JSON from `node:sqlite`. Phase 3 replaces it with the `.hexhoot2` encrypted backup |
 | `ping` | ^0.4.4 | ^1.0.0 | 1 | Major version. Needs Node ≥ 22. Check `promise.probe` options. |
 | `ip` | ^2.0.1 | **remove** | 1 | No fixed release. Use `os.networkInterfaces()`. |
@@ -31,9 +31,9 @@ The latest versions were taken from the npm registry on 2026-11-25. "Phase" refe
 | Package | From | To | Phase | Notes |
 |---|---|---|---|---|
 | `electron` | ^30.0.1 | ^45.5.0 | 1 | Fixes the high-severity advisories. Review the breaking changes for 31 through 45. |
-| `@electron-forge/cli` and makers | ^7.4.0 | ^8.0.1 | 1 | Fixes the critical `tar` advisory and others. Needs Node ≥ 22.13. It should also remove the git-URL `@electron/node-gyp` dependency that npm 12 refuses by default (check). |
-| `@electron-forge/plugin-fuses` + `@electron/fuses` | — | ^8 / ^2.1.3 | 1 | Hardening |
-| `appdmg` (optional) | ^0.6.6 | **remove** | 1 | `maker-dmg` covers it. Port the custom icon steps into the Forge config. |
+| `@electron-forge/cli` and makers | ^7.4.0 | ^8.0.1, then **removed 2026-11-27** | 1, 5 | Replaced by `@electron/packager` ^20.3 and HexHoot's own installer scripts, as in Konjugate. 8.0.1 had fixed the critical `tar` advisory and others. Needs Node ≥ 22.13. It should also remove the git-URL `@electron/node-gyp` dependency that npm 12 refuses by default (check). |
+| `@electron-forge/plugin-fuses` + `@electron/fuses` | — | ^8 / ^2.1.3 | 1 | Hardening. The plugin went with Forge; `scripts/package.mjs` flips the same fuses with `@electron/fuses` |
+| `appdmg` (optional) | ^0.6.6 | **removed** | 1 | The DMG is made with `create-dmg` (Homebrew) |
 | `eslint` | ^9.1.1 | ^10.15.0 | 1 | |
 | `eslint-config-google` | ^0.14.0 | replace if incompatible | 1 | Unmaintained. Copy its rule values into `eslint.config.js`. |
 | `glob` | ^10.3.12 | ^14.0.6 | 1 | Fixes the `minimatch` advisory |

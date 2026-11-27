@@ -1,0 +1,10 @@
+# Copyright (c) 2026 Zenin Easa Panthakkalakath
+[Desktop Entry]
+Name=HexHoot
+Comment=Peer-to-peer chat with no servers
+Exec=hexhoot %U
+Icon=io.github.zenineasa.HexHoot
+Type=Application
+Categories=Network;InstantMessaging;Chat;
+Terminal=false
+StartupWMClass=hexhoot

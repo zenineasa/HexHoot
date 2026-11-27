@@ -1,19 +1,16 @@
 ### Copyright (c) 2022-2026 Zenin Easa Panthakkalakath ###
 
-all:
-	make clean
-	make install
-	make lint
-	make build-mac-intel
-	make build-mac-m1
-	make build-windows
-	make build-linux
+# Shortcuts for the npm scripts. Installers are built on the platform they
+# are for (no cross-compiling); see scripts/distribute.mjs for the tools each
+# one needs, and .github/workflows/release.yml for all of them at once.
+
+.PHONY: install clean lint lintfix test package distribute
 
 install:
 	npm ci
 
 clean:
-	rm -rf node_modules bundle.js out
+	rm -rf node_modules out test-results
 
 lint:
 	npm run lint
@@ -22,14 +19,13 @@ lintfix:
 	npx eslint --config eslint.config.js --fix
 	npx copyright-header --fix --copyrightHolder "Zenin Easa Panthakkalakath"
 
-build-mac-intel:
-	npx electron-forge make --platform=darwin --arch=x64
+test:
+	npm test
 
-build-mac-m1:
-	npx electron-forge make --platform=darwin --arch=arm64
+# out/package/HexHoot-<platform>-<arch>
+package:
+	npm run package
 
-build-windows:
-	npx electron-forge make --platform=win32 --arch=x64
-
-build-linux:
-	npx electron-forge make --platform=linux --arch=x64
+# out/release: the installers for this machine
+distribute:
+	npm run distribute

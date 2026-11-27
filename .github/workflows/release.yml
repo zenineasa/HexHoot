@@ -38,40 +38,58 @@ jobs:
         with:
           node-version: lts/*
           cache: npm
+      - name: Install macOS packaging tools
+        if: runner.os == 'macOS'
+        run: brew install create-dmg
       - name: Install Linux packaging tools
         if: runner.os == 'Linux'
+        # zsync gives zsyncmake, for the .zsync file AppImageUpdate reads.
+        # appimagetool is itself an AppImage; APPIMAGE_EXTRACT_AND_RUN
+        # (below) lets it run without FUSE.
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm fakeroot dpkg
+          sudo apt-get install -y dpkg-dev zsync
+          sudo curl -fsSL -o /usr/local/bin/appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage"
+          sudo chmod +x /usr/local/bin/appimagetool
+      - name: Make sure NSIS is there
+        if: runner.os == 'Windows'
+        # GitHub's Windows images include NSIS; install it if one ever does not
+        shell: pwsh
+        run: |
+          if (-not (Get-Command makensis -ErrorAction SilentlyContinue) -and
+              -not (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe')) {
+            choco install nsis -y --no-progress
+          }
       - run: npm ci
       - name: Build the installers
-        run: npm run make
-      - name: Gather them into out/release
-        run: node scripts/collect-release.mjs
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: npm run distribute
 
-      - name: Check the Windows installer installs, makes a shortcut and uninstalls
+      - name: Check the Windows installer installs, makes shortcuts and uninstalls
         if: runner.os == 'Windows'
-        # Squirrel installs for the current user without asking, then starts
-        # the app (--squirrel-firstrun); that window is closed here.
+        # /S is the unattended path winget also uses. The runner's account
+        # is already elevated, so the installer's admin request does not
+        # stop to ask.
         shell: pwsh
         run: |
           $setup = Get-ChildItem out\release\*-setup.exe | Select-Object -First 1
-          $process = Start-Process -FilePath $setup.FullName -ArgumentList '--silent' -PassThru
+          $process = Start-Process -FilePath $setup.FullName -ArgumentList '/S' -PassThru
           $process.WaitForExit(180000) | Out-Null
           if (-not $process.HasExited) { Write-Error 'The installer did not finish within 3 minutes.'; exit 1 }
           if ($process.ExitCode -ne 0) { Write-Error "The installer exited with $($process.ExitCode)."; exit 1 }
-          Start-Sleep -Seconds 10
-          Get-Process hexhoot -ErrorAction SilentlyContinue | Stop-Process -Force
-          $installDir = Join-Path $env:LOCALAPPDATA 'hexhoot'
-          $exe = Get-ChildItem "$installDir\app-*\hexhoot.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $exe) { Write-Error "hexhoot.exe was not installed under $installDir."; exit 1 }
-          $programs = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
-          $shortcut = Get-ChildItem $programs -Recurse -Filter '*.lnk' | Where-Object { $_.Name -like '*HexHoot*' } | Select-Object -First 1
-          if (-not $shortcut) { Write-Error 'No Start menu shortcut was made.'; exit 1 }
-          Write-Host "Installed $($exe.FullName), shortcut $($shortcut.FullName)"
-          Start-Process -FilePath (Join-Path $installDir 'Update.exe') -ArgumentList '--uninstall', '-s' -Wait
-          Start-Sleep -Seconds 10
-          if (Test-Path $shortcut.FullName) { Write-Error 'Uninstalling left the Start menu shortcut.'; exit 1 }
+          $installDir = (Get-ItemProperty 'HKLM:\Software\io.github.zenineasa.HexHoot' -ErrorAction Stop).InstallDir
+          $exe = Join-Path $installDir 'hexhoot.exe'
+          if (-not (Test-Path $exe)) { Write-Error "hexhoot.exe is not in $installDir."; exit 1 }
+          $shortcut = Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs\HexHoot.lnk'
+          if (-not (Test-Path $shortcut)) { Write-Error 'No Start menu shortcut was made.'; exit 1 }
+          Write-Host "Installed $exe, shortcut $shortcut"
+          $uninstall = Start-Process -FilePath (Join-Path $installDir 'Uninstall.exe') -ArgumentList '/S' -PassThru
+          $uninstall.WaitForExit(120000) | Out-Null
+          # The uninstaller copies itself to TEMP and returns at once
+          for ($i = 0; $i -lt 60 -and (Test-Path $exe); $i++) { Start-Sleep -Seconds 2 }
+          if (Test-Path $exe) { Write-Error 'Uninstalling left the app behind.'; exit 1 }
+          if (Test-Path $shortcut) { Write-Error 'Uninstalling left the Start menu shortcut.'; exit 1 }
           Write-Host 'Uninstalled.'
 
       - uses: actions/upload-artifact@v7
@@ -130,8 +148,8 @@ jobs:
           > **Installing:** HexHoot is not code-signed yet, so your system may warn you the first time you open it. The download is not damaged.
           >
           > - **macOS:** if it says HexHoot "is damaged and can't be opened", move HexHoot to Applications, then run `xattr -cr /Applications/HexHoot.app` in Terminal. Or open System Settings → Privacy & Security → Open Anyway.
-          > - **Windows:** if a blue "Windows protected your PC" box appears, click **More info**, then **Run anyway**.
-          > - **Linux:** `sudo apt install ./hexhoot_*.deb` (Debian, Ubuntu) or `sudo dnf install ./hexhoot-*.rpm` (Fedora).
+          > - **Windows:** if a blue "Windows protected your PC" box appears, click **More info**, then **Run anyway**. The zip runs without installing.
+          > - **Linux:** make the AppImage executable (`chmod +x HexHoot-*.AppImage`) and run it, or `sudo apt install ./hexhoot_*.deb` on Debian and Ubuntu.
 
           EOF
             gh api "repos/$repository/releases/generate-notes" \
@@ -141,11 +159,12 @@ jobs:
             echo
             link '*-mac-arm64.dmg' 'macOS (Apple silicon)'
             link '*-mac-x64.dmg' 'macOS (Intel)'
-            link '*-windows-x64-setup.exe' 'Windows'
+            link '*-windows-x64-setup.exe' 'Windows (installer)'
+            link '*-windows-x64.zip' 'Windows (portable zip)'
+            link '*-x86_64.AppImage' 'Linux AppImage (x86-64)'
+            link '*-aarch64.AppImage' 'Linux AppImage (ARM64)'
             link '*_amd64.deb' 'Debian and Ubuntu (x86-64)'
             link '*_arm64.deb' 'Debian and Ubuntu (ARM64)'
-            link '*.x86_64.rpm' 'Fedora and openSUSE (x86-64)'
-            link '*.aarch64.rpm' 'Fedora and openSUSE (ARM64)'
           } > "$RUNNER_TEMP/notes.md"
           cat "$RUNNER_TEMP/notes.md"
       - uses: softprops/action-gh-release@v2

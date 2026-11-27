@@ -1,0 +1,18 @@
+#!/bin/sh
+# Copyright (c) 2026 Zenin Easa Panthakkalakath
+
+appDir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+
+# An AppImage cannot make Electron's chrome-sandbox helper setuid, so
+# Chromium's sandbox needs unprivileged user namespaces. Ubuntu 24.04 and
+# later restrict those with AppArmor, and Debian can switch them off; there
+# Electron would refuse to start, so only there the sandbox is turned off.
+# The .deb's launcher (scripts/distribute.mjs) makes the same check.
+restrictedByAppArmor="$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null)"
+disabledBySysctl="$(cat /proc/sys/kernel/unprivileged_userns_clone 2>/dev/null)"
+
+if [ "$restrictedByAppArmor" = "1" ] || [ "$disabledBySysctl" = "0" ]; then
+    set -- --no-sandbox "$@"
+fi
+
+exec "$appDir/usr/lib/hexhoot/hexhoot" "$@"
