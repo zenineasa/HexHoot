@@ -203,6 +203,7 @@ class LanCarrier {
             let chain = Promise.resolve();
             link = {
                 id,
+                via: 'lan',
                 broadcast: false,
                 // In order: each request waits for the one before it
                 reply: (envelope, broadcast = false) => {

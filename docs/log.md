@@ -2,6 +2,7 @@
 
 ## 2026-11-27
 
+* **Update**: UI revamp, commit 1: the Core additions the Hive design needs. Withdraw a request, remove or block a contact (blocked addresses cannot complete a handshake and are kept in backups), don't send a waiting message, how each friend was last heard from (local network or internet), and events in conversations ([The Hive UI](/design/ui-hive.md)).
 * **Decision**: The v2 interface is "The Hive": contacts as a honeycomb, each conversation as a chain whose hexagons fill when delivered, and a header that shows how you are connected. Its scenarios, navigation model and the Core additions it needs are in [The Hive UI](/design/ui-hive.md).
 * **Update**: Phase 5, commit 3: L5 packaged smoke tests (`npm run test:packaged`) and a workflow that runs them on release tags. Against a fresh macOS build: fuses set, no tests or docs in `app.asar`, every test hook ignored (the real-cost known-answer address came out), renderer locked down, restart signs in, no errors ([testing infrastructure](/design/testing-infrastructure.md)).
 * **Update**: Phase 5, commit 2. The README describes v2: the name-and-password account, addresses, friend requests, safety numbers, delivery without a server, and the algorithms. The "Zero-Knowledge-Proof based authentication" claim is replaced with what HexHoot actually does, and a status note says v2 is unreviewed. New `SECURITY.md` (reporting, what is and is not protected) and [external review package](/plan/external-review.md).

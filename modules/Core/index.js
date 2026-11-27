@@ -1,5 +1,6 @@
 /* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
+const crypto = require('node:crypto');
 const os = require('node:os');
 const sanitize = require('./../Sanitize/index.mjs');
 const {messageType} = require('./constants.mjs');
@@ -273,9 +274,10 @@ class Core {
             now: this.now,
             log: this.log,
             ...this.retryMs ? {retryMs: this.retryMs} : {},
-            // Anyone may complete a handshake, so friend requests can
-            // arrive; what strangers may send is decided per message
-            authorize: () => true,
+            // Anyone but a blocked address may complete a handshake, so
+            // friend requests can arrive; what strangers may send is
+            // decided per message
+            authorize: (peer) => !this.store.get('Blocked', peer.address),
             store: {
                 loadSessions: async () => store.all('Sessions'),
                 saveSessions: async (address, entries) => entries.length ?
@@ -290,6 +292,8 @@ class Core {
         this.messenger.onMessage((m) => this.receive(m).catch((err) =>
             this.log('A received message failed:', err)));
         this.messenger.onDelivered((d) => this.markDelivered(d));
+        this.messenger.onSeen(({address, via, at}) => this.emit({type: 'link',
+            senderPublicKey: address, via, at}));
         await this.messenger.start();
         if (this.watchNetwork && !this.networkTimer) {
             let interfaces = JSON.stringify(os.networkInterfaces());
@@ -448,6 +452,8 @@ class Core {
         if (contact?.status === 'pending-in') {
             return this.acceptFriendRequest(address);
         }
+        // Adding someone again is a clear wish to hear from them
+        this.store.delete('Blocked', address);
         if (contact?.status !== 'friend') {
             this.store.put('Contacts', address, {key: address,
                 status: 'pending-out', displayName: '', about: '', photo: '',
@@ -478,6 +484,7 @@ class Core {
         }
         this.store.put('Contacts', contact.key, {...contact,
             status: 'friend', lastMessageTimestamp: this.now()});
+        this.addEvent(contact.key, 'accepted', {by: 'me'});
         await this.messenger.send(contact.key, 'friend_accept',
             this.ownProfile());
     }
@@ -517,8 +524,124 @@ class Core {
         if (!contact) {
             throw failure('NOT_A_CONTACT', 'No such contact');
         }
+        if (Boolean(contact.verified) !== Boolean(verified)) {
+            this.addEvent(contact.key, verified ? 'verified' : 'unverified');
+        }
         this.store.put('Contacts', contact.key, {...contact,
             verified: Boolean(verified)});
+    }
+
+    /**
+     * Take back a friend request we sent. If it is still waiting, it is not
+     * sent; if it arrived, a withdrawal follows it.
+     * @param {string} address who we knocked on
+     */
+    async withdrawFriendRequest(address) {
+        this.assertReady();
+        const contact = this.store.get('Contacts', String(address));
+        if (contact?.status !== 'pending-out') {
+            throw failure('NOT_PENDING', 'No request of ours is waiting');
+        }
+        for (const item of [...this.messenger.outbox.values()]) {
+            if (item.address === contact.key &&
+                item.type === 'friend_request') {
+                await this.messenger.cancel(item.id);
+            }
+        }
+        this.store.delete('Contacts', contact.key);
+        this.store.deleteGroup('Chat', contact.key);
+        await this.messenger.send(contact.key, 'friend_withdraw', {});
+    }
+
+    /**
+     * Remove a contact from this computer: their profile, the conversation
+     * and the session. They are not told, and may send a request again.
+     * @param {string} address the contact
+     */
+    async removeContact(address) {
+        this.assertReady();
+        const key = String(address);
+        this.store.delete('Contacts', key);
+        this.store.deleteGroup('Chat', key);
+        await this.messenger.forget(key);
+    }
+
+    /**
+     * Remove a contact (or anyone) and drop everything they send from now
+     * on: handshakes, requests and messages. They are not told.
+     * @param {string} address the address to block
+     */
+    async blockAddress(address) {
+        this.assertReady();
+        const key = String(address).replace(/\s+/g, '').toLowerCase();
+        try {
+            addressing.addressToFingerprint(key);
+        } catch (err) {
+            throw failure('BAD_ADDRESS', err.message);
+        }
+        const contact = this.store.get('Contacts', key);
+        await this.removeContact(key);
+        this.store.put('Blocked', key, {address: key,
+            displayName: contact?.displayName || '', at: this.now()});
+    }
+
+    /** @param {string} address an address blocked earlier */
+    async unblockAddress(address) {
+        this.assertReady();
+        this.store.delete('Blocked', String(address));
+    }
+
+    /** @return {Array} [{address, displayName, at}] blocked addresses */
+    async getBlocked() {
+        this.assertReady();
+        return this.store.all('Blocked').sort((a, b) => b.at - a.at);
+    }
+
+    /**
+     * Don't send a message that has not been delivered yet. It leaves the
+     * outbox and the conversation; a copy already on its way may still
+     * arrive.
+     * @param {string} address the contact
+     * @param {string} id the message id
+     * @return {boolean} whether it was still waiting
+     */
+    async cancelUnsent(address, id) {
+        this.assertReady();
+        const key = chatKey(String(address), 'sent', String(id));
+        const message = this.store.get('Chat', key);
+        if (!message || message.delivered) {
+            return false;
+        }
+        await this.messenger.cancel(message.id);
+        this.store.delete('Chat', key);
+        return true;
+    }
+
+    /**
+     * How each contact was last heard from: over the local network or the
+     * internet, and when. Nothing is known about contacts not heard from
+     * since HexHoot started.
+     * @return {Object} {address: {via: 'lan'|'dht'|..., at}}
+     */
+    async getContactLinks() {
+        this.assertReady();
+        return Object.fromEntries(this.messenger.lastSeen);
+    }
+
+    /**
+     * Add an event to a conversation (let in, verified, renamed, ...)
+     * @param {string} address the contact
+     * @param {string} kind the event
+     * @param {Object} [data] details
+     */
+    addEvent(address, kind, data = {}) {
+        // Ordered within a millisecond, then unique
+        this.eventSeq = (this.eventSeq || 0) + 1;
+        const id = 'e' + String(this.eventSeq).padStart(9, '0') +
+            crypto.randomBytes(6).toString('base64url');
+        this.store.put('Chat', chatKey(address, 'event', id), {id,
+            ts: this.now(), type: 'event', event: {kind, ...data},
+            contact: address}, address);
     }
 
     // ---- Chat -----------------------------------------------------------
@@ -559,9 +682,26 @@ class Core {
     async getAllMessages(address) {
         this.assertReady();
         return this.store.group('Chat', String(address))
+            .filter((m) => m.type !== 'event')
             .sort((a, b) => a.ts - b.ts || (a.id < b.id ? -1 : 1))
             .map((m) => ({key: m.id, message: {timestamp: m.ts,
                 message: m.text, type: m.type, delivered: m.delivered}}));
+    }
+
+    /**
+     * A conversation with its events, oldest first
+     * @param {string} address a contact
+     * @return {Array} [{id, ts, kind: 'sent'|'received'|'event', text,
+     * delivered, event}]
+     */
+    async getConversation(address) {
+        this.assertReady();
+        return this.store.group('Chat', String(address))
+            .sort((a, b) => a.ts - b.ts || (a.id < b.id ? -1 : 1))
+            .map((m) => ({id: m.id, ts: m.ts, kind: m.type,
+                text: m.type === 'event' ? '' : m.text,
+                delivered: Boolean(m.delivered),
+                event: m.type === 'event' ? m.event : undefined}));
     }
 
     /** @param {string} address the contact whose chat was read */
@@ -595,6 +735,9 @@ class Core {
             return;
         }
         const address = from.address;
+        if (this.store.get('Blocked', address)) {
+            return;
+        }
         const contact = this.store.get('Contacts', address);
         const profile = () => {
             const clean = sanitize.sanitizeUserInfo(body, address);
@@ -612,6 +755,9 @@ class Core {
                 // They added us too, or lost us: we are friends
                 this.store.put('Contacts', address, {...contact, ...profile(),
                     status: 'friend'});
+                if (contact.status === 'pending-out') {
+                    this.addEvent(address, 'accepted', {by: 'both'});
+                }
                 await this.messenger.send(address, 'friend_accept',
                     this.ownProfile());
                 event(messageType.userInfoResponse, {});
@@ -625,9 +771,28 @@ class Core {
             if (contact?.status === 'friend' ||
                 (type === 'friend_accept' && contact?.status ===
                     'pending-out')) {
-                this.store.put('Contacts', address, {...contact, ...profile(),
+                const fresh = profile();
+                if (contact.status === 'pending-out') {
+                    this.addEvent(address, 'accepted', {by: 'them'});
+                } else {
+                    if (contact.displayName && fresh.displayName !==
+                        contact.displayName) {
+                        this.addEvent(address, 'renamed', {
+                            from: contact.displayName,
+                            to: fresh.displayName});
+                    }
+                    if (fresh.photo !== (contact.photo || '')) {
+                        this.addEvent(address, 'photo');
+                    }
+                }
+                this.store.put('Contacts', address, {...contact, ...fresh,
                     status: 'friend'});
                 event(messageType.userInfoResponse, {});
+            }
+        } else if (type === 'friend_withdraw') {
+            if (contact?.status === 'pending-in') {
+                this.store.delete('Contacts', address);
+                event(messageType.friendRequest, {withdrawn: true});
             }
         } else if (type === 'chat') {
             const text = body?.text;
@@ -685,7 +850,7 @@ class Core {
         this.assertReady();
         const tables = {};
         for (const name of ['Profile', 'Contacts', 'Chat', 'Preferences',
-            'PasswordCheck']) {
+            'PasswordCheck', 'Blocked']) {
             tables[name] = this.store.all(name);
         }
         return new Uint8Array(await backup.exportBackup(
@@ -713,6 +878,7 @@ class Core {
         this.saveIdentity(restored.identity);
         const keys = {Profile: () => 'me', PasswordCheck: () => 'state',
             Contacts: (r) => r.key, Preferences: (r) => r.key,
+            Blocked: (r) => r.address,
             Chat: (r) => r.contact && r.id && chatKey(r.contact, r.type, r.id)};
         for (const [name, keyOf] of Object.entries(keys)) {
             for (const row of Array.isArray(restored.tables[name]) ?

@@ -103,6 +103,8 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 
 # Phase 5: Release 2.0.0
 
+**UI revamp ("The Hive"), decided 2026-11-27** ([design](/design/ui-hive.md)), built in four commits: Core additions; the UI foundation and the hive; the screens; strings and tests. **UI commit 1 done (2026-11-27):** withdraw, remove, block, don't send, how friends were last heard from, and events in conversations, with L2 tests.
+
 **Commit 1 done (2026-11-27):** resends back off from 3 s to 60 s and go out at once when a carrier sees a peer appear (Q15). Received messages keep arrival order (Q16). The v1 export screen is dropped, because v1 has no users ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)).
 
 - ~~Migration screen~~: dropped 2026-11-27, because v1 has no users ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)).

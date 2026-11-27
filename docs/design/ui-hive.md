@@ -123,12 +123,15 @@ Status: **designed** (in the mockup), **to check** (during the build), or **need
 
 # Core additions the design asks for
 
-All five are designed into the screens on the assumption that 2.0 includes them; each is small, and dropping one only removes a button.
+All five are in Core since Phase 5's UI commit 1 (2026-11-27), with L2 tests in `test/core/people.test.js`.
 
-| Addition | Used by |
-|---|---|
-| `withdrawFriendRequest(address)` | Requests: Withdraw |
-| `removeContact(address)`, `blockAddress(address)` (drop their requests and messages) | Contact panel |
-| `cancelUnsent(messageId)`: drop an undelivered message from the outbox | Conversation: Don't send |
-| Per-contact link state (direct over LAN, internet, unreachable) | Conversation header, home status |
-| Profile-change events (name, photo) | Events on the chain |
+| Addition | Core API | Used by |
+|---|---|---|
+| Withdraw a request | `withdrawFriendRequest(address)`: a request still in the outbox is not sent; otherwise a `friend_withdraw` follows it | Requests, the waiting cell's conversation |
+| Remove a friend | `removeContact(address)`: profile, conversation and session go; they are not told and may knock again | Contact panel |
+| Block | `blockAddress(address)`, `unblockAddress`, `getBlocked`: removes them, refuses their handshakes, drops anything that still arrives; kept in backups | Contact panel, Settings |
+| Don't send | `cancelUnsent(address, id)`: an undelivered message leaves the outbox and the conversation (a copy already on its way may still arrive) | Waiting messages |
+| How a friend was last heard from | `getContactLinks()` → `{address: {via: 'lan' or 'dht', at}}`, and a `link` event when it changes or after 5 minutes of silence | Conversation header, Home |
+| Events in a conversation | `getConversation(address)`: messages and events (`accepted` by me, them or both; `verified`, `unverified`, `renamed` with from and to, `photo`) | The chain |
+
+HexHoot cannot know whether a friend is online right now without sending something, so the header describes the last time a friend was heard from ("direct, 2 minutes ago") rather than claiming presence.

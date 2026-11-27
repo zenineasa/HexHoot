@@ -22,13 +22,15 @@ const {CryptoError} = require('../Crypto/primitives');
 const addressing = require('../Crypto/address');
 const wire = require('./wire');
 
-const appTypes = ['chat', 'friend_request', 'friend_accept', 'profile'];
+const appTypes = ['chat', 'friend_request', 'friend_accept',
+    'friend_withdraw', 'profile'];
 const defaults = Object.freeze({
     // Resend unacknowledged messages after firstRetryMs, then twice as
     // long each time, up to retryMs (open question Q15)
     firstRetryMs: 3000,
     retryMs: 60000,
     peerKickMs: 1000, // at most one "a peer appeared" resend per this
+    seenQuietMs: 5 * 60000, // onSeen fires again after this much silence
     handshakeTimeoutMs: 30000,
     simultaneousWindowMs: 60000, // see installSession
     maxPendingResponders: 64,
@@ -123,6 +125,8 @@ class Messenger {
         this.locks = new Map(); // key -> Promise
         this.messageHandlers = [];
         this.deliveredHandlers = [];
+        this.seenHandlers = [];
+        this.lastSeen = new Map(); // address -> {via, at}
     }
 
     /** Load state, then start listening on our topic */
@@ -217,6 +221,68 @@ class Messenger {
     /** @param {function} func called with {to, id} when a receipt arrives */
     onDelivered(func) {
         this.deliveredHandlers.push(func);
+    }
+
+    /**
+     * @param {function} func called with {address, via, at} when we hear
+     * from a contact over a different carrier, or after a silence
+     */
+    onSeen(func) {
+        this.seenHandlers.push(func);
+    }
+
+    /**
+     * Remember that an authenticated frame from a contact arrived
+     * @param {string} address the contact
+     * @param {Object} link the link it came on
+     */
+    noteSeen(address, link) {
+        const now = this.now();
+        const via = link?.via || 'unknown';
+        const before = this.lastSeen.get(address);
+        this.lastSeen.set(address, {via, at: now});
+        if (!before || before.via !== via ||
+            now - before.at > this.options.seenQuietMs) {
+            this.emit(this.seenHandlers, {address, via, at: now});
+        }
+    }
+
+    /**
+     * Take a message out of the outbox, so it is not sent (again). A copy
+     * already sent may still arrive.
+     * @param {string} id the message id
+     * @return {boolean} whether it was still waiting
+     */
+    async cancel(id) {
+        if (!this.outbox.has(id)) {
+            return false;
+        }
+        this.outbox.delete(id);
+        await this.store.deleteOutboxItem(id);
+        return true;
+    }
+
+    /**
+     * Forget a contact: sessions, waiting messages and handshakes
+     * @param {string} address the contact
+     */
+    async forget(address) {
+        await this.withLock(address, async () => {
+            for (const item of [...this.outbox.values()]) {
+                if (item.address === address) {
+                    await this.cancel(item.id);
+                }
+            }
+            const key = this.pendingTo.get(address);
+            if (key) {
+                this.initiators.delete(key);
+                this.pendingTo.delete(address);
+            }
+            this.setSessions(address, []);
+            await this.saveSessions(address);
+            this.seen.delete(address);
+            this.lastSeen.delete(address);
+        });
     }
 
     /**
@@ -566,6 +632,7 @@ class Messenger {
                 return;
             }
             link.bind?.(this.topicOf(address));
+            this.noteSeen(address, link);
             await this.handleInner(address, entry, message);
             await this.flush(address);
         });

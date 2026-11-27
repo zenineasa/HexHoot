@@ -41,7 +41,7 @@ inner = u32be length ‖ JSON {id, ts, type, body} ‖ zero padding
 
 - **Padding** brings the whole to its Padmé size, with a 1 KiB minimum. Every short message is 1024 bytes, and longer ones leak at most O(log log n) bits with at most 12% overhead. A binary length prefix replaces the draft's `pad` field.
 - `id` is 128 random bits (base64url), `ts` is display-only, and `body` is an object.
-- `type` is one of `chat`, `friend_request`, `friend_accept` or `profile` (passed to the app), or `hello` and `receipt` (handled by the Messenger).
+- `type` is one of `chat`, `friend_request`, `friend_accept`, `friend_withdraw` or `profile` (passed to the app), or `hello` and `receipt` (handled by the Messenger). `friend_withdraw` (empty body) takes back a request; the receiver drops it only if that request is still waiting for an answer.
 - The chat key in storage is `[contact, id]`, not the timestamp (F6). Any invalid inner message is dropped.
 
 # Messenger: sessions and delivery

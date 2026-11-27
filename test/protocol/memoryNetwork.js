@@ -106,7 +106,7 @@ class MemoryCarrier {
      */
     linkTo(other) {
         if (!this.links.has(other)) {
-            this.links.set(other, {broadcast: false,
+            this.links.set(other, {via: 'memory', broadcast: false,
                 reply: (envelope) => this.network.deliver(this, other,
                     envelope)});
         }

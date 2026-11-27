@@ -25,7 +25,7 @@ const toBytes = 32;
 const maxFrameBytes = 1024 * 1024;
 const minPaddedBytes = 1024;
 const innerTypes = Object.freeze(['hello', 'receipt', 'chat',
-    'friend_request', 'friend_accept', 'profile']);
+    'friend_request', 'friend_accept', 'friend_withdraw', 'profile']);
 
 /**
  * @param {number} kind one of kinds

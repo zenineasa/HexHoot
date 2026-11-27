@@ -73,6 +73,7 @@ class DhtCarrier {
      */
     attach(conn, info) {
         const link = {
+            via: 'dht',
             broadcast: false,
             reply: (envelope) => {
                 if (!conn.destroyed) {
