@@ -1,0 +1,17 @@
+{
+    "coprightMessage": "Copyright © 2026 Zenin Easa Panthakkalakath",
+    "internal": [
+        "DBMessenger",
+        "Hive",
+        "Home",
+        "Chain",
+        "Requests",
+        "Contact",
+        "AddFriend",
+        "Settings",
+        "Sounds",
+        "UI",
+        "Html"
+    ],
+    "external": []
+}

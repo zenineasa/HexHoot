@@ -108,7 +108,7 @@ test('Test hooks are inert: logging in costs the real scrypt', async () => {
     const started = Date.now();
     await app.click('#loginButton');
     // Seconds on a fast machine, minutes on one short of memory
-    await app.waitFor(`document.getElementById('friendsList')`, 600000);
+    await app.waitFor(`document.getElementById('hive')`, 600000);
     // Only the real cost gives this address; a cheap scrypt would not
     assert.equal(await app.core('getMyAddress'), ADDRESS);
     assert.ok(Date.now() - started > 500);
@@ -136,14 +136,14 @@ test('A restart signs in again', async () => {
     await app.close();
     app = await launch();
     // Without a strong OS keyring (Linux CI) the password unlocks it
-    await app.waitFor(`document.getElementById('friendsList') ||
+    await app.waitFor(`document.getElementById('hive') ||
         document.getElementById('unlockButton')`, 60000);
     if (await app.evaluate(`Boolean(document.getElementById(
         'unlockButton'))`)) {
         await app.type('[name=password]', PASSWORD);
         await app.click('#unlockButton');
     }
-    await app.waitFor(`document.getElementById('friendsList')`, 600000);
+    await app.waitFor(`document.getElementById('hive')`, 600000);
     assert.equal(await app.core('getMyAddress'), ADDRESS);
 });
 

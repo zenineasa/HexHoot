@@ -22,6 +22,7 @@ const contentTypes = {
     '.json': 'application/json',
     '.svg': 'image/svg+xml',
     '.png': 'image/png',
+    '.woff2': 'font/woff2',
 };
 // Links the renderer may open in the system browser
 const externalLinks = new Set(socialLinks.map(([, url]) => url));
@@ -128,6 +129,10 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        minWidth: 640,
+        minHeight: 480,
+        // The night theme's background, so nothing flashes white
+        backgroundColor: '#0d0f1a',
         title: 'HexHoot',
         icon: imagePack.getPath('branding.favicon'),
         webPreferences: {

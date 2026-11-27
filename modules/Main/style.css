@@ -1,83 +1,367 @@
-/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
 
-textarea, input {
-    font-family: inherit;
-    color: inherit;
+/*
+    Design tokens and shared components of "The Hive" (docs/design/ui-hive.md).
+    Two palettes: night (ink-indigo, amber after the owl's eyes) and day (warm
+    paper). <html data-theme> holds the one in use; App sets it from the
+    preference, following the computer when asked to.
+*/
+
+:root, :root[data-theme=night] {
+    color-scheme: dark;
+    --outer: #07080f;
+    --app-bg: #0d0f1a;
+    --side: #11142a;
+    --surface: #171a30;
+    --raised: #1e2240;
+    --hover: #1d2140;
+    --border: #2b3054;
+    --text: #ecebf5;
+    --muted: #a6a9c6;
+    --accent: #ffb547;
+    --accent-text: #2a1700;
+    --recv-bg: #1e2240;
+    --sent-bg: #3d2c10;
+    --sent-text: #fff1db;
+    --success: #4fd18b;
+    --input-bg: #0f1224;
+    --faint: #3a3f66;
+    --warn: #ffcf85;
+    --warn-soft: #3d2c10;
+    --warn-text: #ffd79a;
+    --danger: #ff8f8f;
+    --danger-soft: #3a1720;
+    --danger-text: #2a0505;
+    --shadow: rgba(0, 0, 0, 0.45);
+    --scrim: rgba(0, 0, 0, 0.5);
+}
+:root[data-theme=day] {
+    color-scheme: light;
+    --outer: #ddd6c8;
+    --app-bg: #f6f3ec;
+    --side: #efeadf;
+    --surface: #fffdf8;
+    --raised: #ebe5d8;
+    --hover: #e6dfd0;
+    --border: #d8d0bf;
+    --text: #1b1a22;
+    --muted: #5d5868;
+    --accent: #9a5a00;
+    --accent-text: #ffffff;
+    --recv-bg: #ebe5d8;
+    --sent-bg: #ffe5bb;
+    --sent-text: #3a2200;
+    --success: #1f7f47;
+    --input-bg: #fffdf8;
+    --faint: #cfc6b3;
+    --warn: #8a4f00;
+    --warn-soft: #ffe5bb;
+    --warn-text: #4a2b00;
+    --danger: #b3261e;
+    --danger-soft: #fde3e6;
+    --danger-text: #ffffff;
+    --shadow: rgba(60, 40, 10, 0.18);
+    --scrim: rgba(40, 30, 10, 0.35);
+}
+:root {
+    --font-body: Inter, 'Noto Sans Malayalam', system-ui, sans-serif;
+    --font-head: 'Space Grotesk', Inter, 'Noto Sans Malayalam', system-ui,
+        sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-mark: 'Noto Sans JP', Inter, sans-serif;
+    --hex: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+html, body {
+    height: 100%;
 }
 body {
-    font-family: 'Noto Sans JP', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #2b2e2f;
-    color: #fff;
-    width: 100%;
-    height: 100%;
-    user-select: none;
     margin: 0;
+    background: var(--app-bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.45;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+:lang(ml) {
+    line-height: 1.7;
 }
 #container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80%;
-    height: 80%;
-    text-align: center;
+    height: 100%;
+}
+h1, h2, h3 {
+    font-family: var(--font-head);
+    margin: 0;
+}
+button, input, textarea, select {
+    font: inherit;
+    color: inherit;
+}
+[hidden] {
+    display: none !important;
 }
 
-/** For scrollbar **/
-
-::-webkit-scrollbar {
-    width: 0.5em;
-    height: 0.5em;
+/* Visually hidden, still read by screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
-::-webkit-scrollbar-track {
+
+.hx {
+    clip-path: var(--hex);
+}
+.muted {
+    color: var(--muted);
+}
+.mono {
+    font-family: var(--font-mono);
+}
+
+/* Buttons */
+.hh-btn {
+    font-weight: 600;
+    font-size: 14px;
     border-radius: 10px;
+    padding: 7px 14px;
+    min-height: 38px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    line-height: 1.3;
+    text-align: center;
+    background: transparent;
+}
+.hh-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+.hh-primary {
+    background: var(--accent);
+    color: var(--accent-text);
+}
+.hh-secondary {
+    color: var(--text);
+    border-color: var(--border);
+}
+.hh-secondary:hover:not(:disabled), .hh-quiet:hover:not(:disabled) {
+    background: var(--hover);
+    color: var(--text);
+}
+.hh-quiet {
+    color: var(--muted);
+}
+.hh-danger {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+.hh-danger:hover:not(:disabled) {
+    background: var(--danger-soft);
+}
+.hh-danger-solid {
+    background: var(--danger);
+    color: var(--danger-text);
+}
+.hh-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.hh-icon:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+.hh-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+    text-align: inherit;
+}
+.hh-link:hover {
+    text-decoration: underline;
+}
+
+/* Fields */
+.hh-input {
+    font-size: 14px;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    width: 100%;
+}
+.hh-input::placeholder {
+    color: var(--muted);
+}
+.hh-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.hh-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+}
+.hh-hint[data-tone=warn] {
+    color: var(--warn);
+}
+.hh-hint[data-tone=ok] {
+    color: var(--success);
+}
+
+.hh-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+}
+.hh-kbd {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1px 5px;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+.hh-input:focus-visible {
+    outline-offset: 0;
+}
+
+/* A contact's hexagon: their photo, or their initials on their colour */
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    clip-path: var(--hex);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+/* Toasts confirm what an action did */
+#toast {
+    position: fixed;
+    left: 50%;
+    bottom: 84px;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 12px 32px var(--shadow);
+    z-index: 30;
+    max-width: 80%;
+}
+#toast::before {
+    content: '';
+    width: 12px;
+    height: 13px;
+    background: var(--accent);
+    clip-path: var(--hex);
+    flex-shrink: 0;
+}
+
+/* Dialogs (add a friend, the backup passphrase) */
+dialog.hh-dialog {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 24px 64px var(--shadow);
+    padding: 0;
+    width: min(520px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+}
+dialog.hh-dialog::backdrop {
+    background: var(--scrim);
+}
+.hh-dialog .head {
+    display: flex;
+    align-items: center;
+    padding: 16px 12px 4px 22px;
+}
+.hh-dialog .head h2 {
+    flex: 1;
+    font-size: 18px;
+}
+.hh-dialog .body {
+    padding: 8px 22px 18px;
+}
+.hh-dialog .foot {
+    border-top: 1px solid var(--border);
+    background: var(--raised);
+    padding: 16px 22px 20px;
+}
+.hh-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.hh-row.end {
+    justify-content: flex-end;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 180, 255, 0.5);
-    border-radius: 0.5em;
+    background: var(--border);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 180, 255, 0.8);
+    background: var(--faint);
+    background-clip: padding-box;
 }
 
-/** For Button **/
-
-.HexHoot_Button {
-    background: rgba(0, 180, 255, 0.8);
-    padding: 0.5em 1em;
-    width: 90%;
-    border-radius: 0.2em;
-    color: inherit;
-    border: none;
-    font: inherit;
-    margin: 1em;
+@media (prefers-reduced-motion: no-preference) {
+    .slide-in {
+        animation: hh-slide 0.18s ease-out;
+    }
 }
-.HexHoot_Button:hover {
-    opacity: 0.5;
-}
-
-/** For Input **/
-
-.HexHoot_Input {
-    border: 0;
-    border-bottom: 1px solid #ccc;
-    background: none;
-    border-radius: 0;
-    width: calc(100% - 1em);
-    padding: 0.5em;
-    margin: 0.5em auto;
-    display: block;
-    color: inherit;
-    text-overflow: ellipsis;
-}
-.HexHoot_Input_label {
-    font-size: 0.75em;
-    text-align: left;
-    padding-left: 2em;
-    padding-top: 2em;
-}
-.HexHoot_Input_label span {
-    color: #ff0000;
+@keyframes hh-slide {
+    from {
+        transform: translateX(24px);
+        opacity: 0;
+    }
+    to {
+        transform: none;
+        opacity: 1;
+    }
 }

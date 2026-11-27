@@ -54,16 +54,10 @@ describe('An adversarial peer (L4)', () => {
             about: '<script>window.__hexhootPwned=true</script>',
             photo: 'javascript:alert(1)'});
         await evil.call('core', 'addFriend', alice.key);
-        const request = `[data-testid="pending-request"]` +
-            `[data-key="${evil.key}"]`;
-        await alice.waitFor(`document.querySelector(
-            ${JSON.stringify(request)})`, 30000);
-        assert.deepEqual(await alice.evaluate(`(() => {
-            const li = document.querySelector(${JSON.stringify(request)});
-            return {name: li.querySelector('.name').textContent,
-                images: li.getElementsByTagName('img').length,
-                scripts: document.getElementsByTagName('script').length};
-        })()`), {name: XSS, images: 0, scripts: 1});
+        assert.deepEqual(await alice.waitForKnock(evil.key),
+            {name: XSS, images: 0});
+        assert.equal(await alice.evaluate(
+            `document.getElementsByTagName('script').length`), 1);
         assert.equal((await alice.core('getUserInfo', evil.key)).photo, '');
 
         // A chat from someone who is not a friend is dropped

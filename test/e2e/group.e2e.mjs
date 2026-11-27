@@ -6,7 +6,7 @@
 
 import {describe} from 'node:test';
 import assert from 'node:assert/strict';
-import {useNetwork, befriend} from './orchestrator.mjs';
+import {useNetwork} from './orchestrator.mjs';
 
 const names = {alice: 'Alice Liddell', bob: 'Bobby Tables',
     carol: 'Carol Singer'};
@@ -22,12 +22,16 @@ for (const transport of ['lan', 'dht']) {
                 peers[peer].login(name)));
             await Promise.all([alice, bob, carol].map((app) =>
                 app.waitForTransports()));
-            // Three requests in flight at once
-            await Promise.all([
-                befriend(alice, bob, names.alice, names.bob),
-                befriend(bob, carol, names.bob, names.carol),
-                befriend(carol, alice, names.carol, names.alice),
-            ]);
+            // Three requests in flight at once; each window does one thing
+            // at a time, as a person would
+            const pairs = [[alice, bob, 'bob'], [bob, carol, 'carol'],
+                [carol, alice, 'alice']];
+            await Promise.all(pairs.map(([from, to]) =>
+                from.addFriend(to.key)));
+            await Promise.all(pairs.map(([from, to]) =>
+                to.acceptFriendRequest(from.key, 60000)));
+            await Promise.all(pairs.map(([from, to, name]) =>
+                from.waitForFriend(to.key, names[name], 60000)));
         });
 
         network.test('Three conversations at once, no cross-talk',

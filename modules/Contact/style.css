@@ -1,0 +1,111 @@
+/* Copyright (c) 2026 Zenin Easa Panthakkalakath */
+
+#contact .head {
+    display: flex;
+    align-items: center;
+    padding: 12px 12px 0 20px;
+}
+#contact .head h2 {
+    font-size: 15px;
+    flex: 1;
+}
+#contact .body {
+    padding: 10px 20px 24px;
+}
+#contact .who {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 18px;
+}
+#contact .who .avatar {
+    margin-bottom: 10px;
+}
+#contact .who .name {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 19px;
+    overflow-wrap: anywhere;
+}
+#contact .who .about {
+    font-size: 13px;
+    margin-top: 2px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    user-select: text;
+}
+#contact h3 {
+    font-family: var(--font-body);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+#contact .help {
+    font-size: 12px;
+    line-height: 1.45;
+    margin-bottom: 8px;
+}
+#safetyNumber {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px 8px;
+    font-size: 14px;
+    text-align: center;
+    background: var(--raised);
+    border-radius: 10px;
+    padding: 12px 8px;
+    user-select: all;
+}
+#verification {
+    margin: 10px 0 20px;
+}
+#verification .verified {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+#verification .dot {
+    width: 12px;
+    height: 13px;
+    background: var(--success);
+}
+#verification .label {
+    color: var(--success);
+    font-weight: 600;
+    flex: 1;
+}
+#verification .hh-link {
+    font-size: 13px;
+    color: var(--muted);
+}
+.hh-btn.wide {
+    width: 100%;
+}
+#contact .address {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 8px;
+    user-select: all;
+}
+#contact .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 24px;
+}
+#contact .confirm {
+    background: var(--raised);
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 24px;
+}
+#contact .confirm .title {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+#contact .confirm .text {
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 12px;
+}

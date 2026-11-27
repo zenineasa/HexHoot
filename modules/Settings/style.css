@@ -1,0 +1,238 @@
+/* Copyright (c) 2026 Zenin Easa Panthakkalakath */
+
+.settings-nav {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--side);
+    border-right: 1px solid var(--border);
+    padding: 14px 12px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+.settings-nav #settingsBack {
+    margin-bottom: 8px;
+    max-width: 100%;
+}
+.settings-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 18px;
+    padding: 4px 12px 10px;
+}
+.settings-nav .nav {
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+}
+.settings-nav .nav:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+.settings-nav .nav[aria-current=page] {
+    background: var(--raised);
+    color: var(--text);
+    font-weight: 600;
+}
+.settings-body {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 30px 36px 40px;
+}
+.settings-content {
+    max-width: 560px;
+}
+.settings-content h1 {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+.settings-content .intro {
+    margin: 0 0 22px;
+    line-height: 1.5;
+}
+.settings-content h2 {
+    font-size: 16px;
+    margin: 28px 0 6px;
+}
+.settings-content h3 {
+    font-family: var(--font-body);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+.settings-content .small {
+    font-size: 13px;
+    line-height: 1.45;
+}
+.settings-content .hh-label {
+    margin-top: 14px;
+}
+.settings-content .buttons {
+    margin-top: 16px;
+}
+.settings-content textarea {
+    resize: vertical;
+}
+.photo-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.photo-row label.hh-btn {
+    position: relative;
+}
+.photo-row label.hh-btn:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+.settings-content .address {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+    user-select: all;
+}
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.hh-card.split {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+.hh-card.split > div {
+    flex: 1;
+    min-width: 0;
+}
+.hh-card .name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.danger-zone {
+    border: 1px solid var(--danger);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 10px;
+}
+.danger-zone h3 {
+    color: var(--danger);
+}
+.remove-step {
+    margin-top: 12px;
+}
+.ack {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    line-height: 1.45;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+.ack input {
+    margin-top: 3px;
+    width: 16px;
+    height: 16px;
+}
+.theme[aria-pressed=true] {
+    border-color: var(--accent);
+    background: var(--raised);
+}
+.languages {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.language {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+}
+.language:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--raised);
+}
+.language input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+.hh-card.table {
+    padding: 6px 18px;
+}
+.hh-card.table .line {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 11px 0;
+    flex-wrap: wrap;
+}
+.hh-card.table .line + .line {
+    border-top: 1px solid var(--border);
+}
+.hh-card.table .line > span:first-child {
+    flex: 1;
+}
+#social {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.social {
+    border: 0;
+    background: transparent;
+    padding: 4px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.social:hover {
+    background: var(--hover);
+}
+.social img {
+    width: 22px;
+    height: 22px;
+    display: block;
+}
+:root[data-theme=night] .social img[alt=github] {
+    filter: invert(1);
+}
+@media (max-width: 959px) {
+    #settings {
+        flex-direction: column;
+    }
+    .settings-nav {
+        width: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+    }
+    .settings-nav .nav {
+        width: auto;
+    }
+    .settings-title {
+        display: none;
+    }
+    .settings-body {
+        padding: 20px;
+    }
+}

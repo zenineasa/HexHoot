@@ -1,46 +1,19 @@
-/* Copyright (c) 2022-2023 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2026 Zenin Easa Panthakkalakath */
 
-#mainContent #title {
-    height: 2.5em;
-    padding: 1em;
+#addFriendDialog .their {
     display: flex;
+    gap: 8px;
 }
-#mainContent #tabs {
-    height: calc(100% - 2em - 5em);
-    overflow-y: scroll;
-    display: flex;
-    flex-direction: column-reverse;
+#addFriendDialog .their .hh-input {
+    font-size: 13px;
 }
-#mainContent .tabContainer {
-    width: 100%;
-    display: flex;
+#addFriendDialog .mine {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+    user-select: all;
 }
-#mainContent .tab {
-    width: 100%;
-    padding: 0.5em;
-    text-transform: uppercase;
-}
-#mainContent .tab:hover {
-    background:rgba(255, 255, 255, 0.1);
-}
-#mainContent .tabContentContainer {
-    width: 100%;
-    height: 100%;
-}
-#mainContent .tabContent {
-    background:rgba(255, 255, 255, 0.1);
-    width: 100%;
-    height: 100%;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-#mainContent .tab.active {
-    background: rgba(255, 255, 255, 0.1);
-}
-#mainContent .tabContent .hint {
-    width: 80%;
-    font-size: 0.85em;
-    opacity: 0.8;
+#addFriendDialog .hh-hint .hh-link {
+    font-size: 12px;
 }

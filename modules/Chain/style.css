@@ -1,0 +1,314 @@
+/* Copyright (c) 2026 Zenin Easa Panthakkalakath */
+
+#chain {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+#chainHeader {
+    flex-shrink: 0;
+    padding: 12px 16px 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+#chainHeader .figure {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+#chainHeader .line {
+    width: 48px;
+    height: 0;
+    margin: 0 6px;
+    border-top: 2px dotted var(--faint);
+}
+#chainHeader .line[data-link=direct] {
+    border-top: 2px solid var(--success);
+}
+#chainHeader .line[data-link=internet] {
+    border-top: 2px dashed var(--accent);
+}
+#chainHeader .who {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+}
+#chainHeader .who:disabled {
+    cursor: default;
+}
+#chainHeader .name {
+    display: block;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 19px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#chainHeader .verified {
+    color: var(--success);
+    margin-left: 8px;
+    font-size: 15px;
+}
+#chainHeader .link-text {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#chainHeader .link-text[data-link=direct] {
+    color: var(--success);
+}
+
+#chainBody {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+    padding: 10px 24px 100px;
+    outline: none;
+}
+#chainBody .spine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--border);
+    min-height: 100%;
+}
+#chainBody .start {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-top: 40px;
+}
+#chainBody .intro {
+    background: var(--app-bg);
+    padding: 10px 0;
+    text-align: center;
+    max-width: 360px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+#chainBody .intro h2 {
+    color: var(--text);
+    font-size: 17px;
+    margin-bottom: 4px;
+}
+#chainBody .day, #chainBody .event {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+#chainBody .day {
+    margin: 16px 0 8px;
+}
+#chainBody .day span {
+    background: var(--app-bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+#chainBody .event {
+    margin: 8px 0;
+}
+#chainBody .event > span {
+    background: var(--app-bg);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 3px 10px;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    max-width: 80%;
+    overflow-wrap: anywhere;
+}
+#chainBody .event .dot {
+    width: 11px;
+    height: 12px;
+    background: var(--accent);
+    flex-shrink: 0;
+}
+#chainBody .event[data-kind=verified] .dot {
+    background: var(--success);
+}
+#chainBody .event[data-kind=unverified] .dot,
+#chainBody .event[data-kind=renamed] .dot,
+#chainBody .event[data-kind=photo] .dot {
+    background: var(--muted);
+}
+
+/* A message: their side | the node on the spine | your side */
+#chainBody .msg {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+    align-items: start;
+    margin: 5px 0;
+}
+#chainBody .side.theirs {
+    display: flex;
+    justify-content: flex-end;
+}
+#chainBody .side.mine {
+    display: flex;
+    justify-content: flex-start;
+}
+#chainBody .bubble {
+    max-width: 420px;
+    padding: 9px 13px;
+    line-height: 1.5;
+    user-select: text;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+#chainBody .received .bubble {
+    background: var(--recv-bg);
+    border-radius: 14px 4px 14px 14px;
+}
+#chainBody .sent .bubble {
+    border-radius: 4px 14px 14px 14px;
+    border: 1px dashed var(--accent);
+}
+#chainBody .sent[data-delivered=true] .bubble {
+    background: var(--sent-bg);
+    color: var(--sent-text);
+    border-color: transparent;
+}
+#chainBody .node {
+    display: flex;
+    justify-content: center;
+    padding-top: 11px;
+}
+#chainBody .node .outer {
+    width: 14px;
+    height: 16px;
+    padding: 3px;
+    box-sizing: border-box;
+    display: block;
+    background: var(--muted);
+}
+#chainBody .node .inner {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: var(--muted);
+}
+#chainBody .sent .node .outer {
+    background: var(--accent);
+}
+#chainBody .sent .node .inner {
+    background: var(--app-bg);
+}
+#chainBody .sent[data-delivered=true] .node .inner {
+    background: var(--accent);
+}
+#chainBody .status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 9px 4px 0;
+}
+#chainBody .status .state, #chainBody .time {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--muted);
+}
+#chainBody .sent[data-delivered=false] .state {
+    color: var(--warn);
+}
+#chainBody .time {
+    padding: 11px 4px 0;
+}
+#chainBody .status .cancel {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+/* The composer floats over the end of the chain */
+#composer {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    max-width: 760px;
+    margin: 0 auto;
+}
+#composer .field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 4px 6px 4px 14px;
+    box-shadow: 0 10px 30px var(--shadow);
+}
+#composer textarea {
+    flex: 1;
+    resize: none;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.45;
+    padding: 9px 0;
+    outline: none;
+    max-height: 160px;
+    box-sizing: border-box;
+}
+#composer textarea:disabled {
+    cursor: not-allowed;
+}
+#composer .send {
+    width: 48px;
+    height: 52px;
+    border: 0;
+    background: var(--accent);
+    color: var(--accent-text);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+#composer .send:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+#composer .send:focus-visible {
+    outline: none;
+    background: var(--text);
+}
+@media (max-width: 959px) {
+    #chainBody {
+        padding: 10px 12px 100px;
+    }
+    #chainBody .msg {
+        grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+    }
+}

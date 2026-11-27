@@ -3,6 +3,7 @@
 import {tableNames, messageType, rendererMethods}
     from '../Core/constants.mjs';
 import i18n from '../I18n/index.mjs';
+import {html} from '../Html/index.mjs';
 
 /**
  * The code Core gave an error; preload.js puts it in front of the message
@@ -26,7 +27,7 @@ class DBMessenger {
     constructor() {
         this.tableNames = tableNames;
         this.messageType = messageType;
-        this.listOfMessageReceiveCallbackFunctions = [];
+        this.listeners = [];
         window.hexhoot.core.onEvent(this.handleEvent.bind(this));
     }
 
@@ -44,26 +45,25 @@ class DBMessenger {
      * @param {Object} event an event from Core
      */
     handleEvent(event) {
-        if (event.type !== 'message') {
-            return;
-        }
-        for (const func of this.listOfMessageReceiveCallbackFunctions) {
-            try {
-                func(event);
-            } catch (err) {
-                console.log('Error in message callback:', err);
+        for (const {type, func} of this.listeners) {
+            if (type === event?.type) {
+                try {
+                    func(event);
+                } catch (err) {
+                    console.error('Error in a Core event handler:', err);
+                }
             }
         }
     }
 
     /**
-     * Add functions from other modules which get triggered when new messages
-     * arrive
-     * @param {function} func callback function that gets invoked with
-     * {senderPublicKey, message, isFromFriend}
+     * Listen to Core events of one type: 'message' (chats, requests and
+     * profiles), 'delivered', 'link' or 'account'
+     * @param {string} type the event type
+     * @param {function} func called with the event
      */
-    addMessageReceiveCallbackFunction(func) {
-        this.listOfMessageReceiveCallbackFunctions.push(func);
+    on(type, func) {
+        this.listeners.push({type, func});
     }
 
     /**
@@ -83,28 +83,37 @@ class DBMessenger {
         return new Promise((resolve) => {
             const dialog = document.createElement('dialog');
             dialog.id = 'passphraseDialog';
-            const label = document.createElement('div');
-            label.textContent = i18n.getText('Backup.passphrase');
-            const input = document.createElement('input');
-            input.type = 'password';
-            input.className = 'HexHoot_Input';
-            input.name = 'passphrase';
-            const ok = document.createElement('button');
-            ok.className = 'HexHoot_Button';
-            ok.id = 'passphraseOk';
-            ok.textContent = i18n.getText('Backup.ok');
-            const cancel = document.createElement('button');
-            cancel.className = 'HexHoot_Button';
-            cancel.textContent = i18n.getText('Backup.cancel');
-            dialog.append(label, input, ok, cancel);
+            dialog.className = 'hh-dialog';
+            dialog.innerHTML = html`
+                <div class="head"><h2>${i18n.getText('Backup.title')}</h2></div>
+                <div class="body">
+                    <label class="hh-label" for="passphraseInput">
+                        ${i18n.getText('Backup.passphrase')}</label>
+                    <input class="hh-input" id="passphraseInput"
+                        name="passphrase" type="password" autocomplete="off">
+                    <div class="hh-row end" style="margin-top: 14px">
+                        <button class="hh-btn hh-secondary" name="cancel">
+                            ${i18n.getText('Backup.cancel')}</button>
+                        <button class="hh-btn hh-primary" id="passphraseOk">
+                            ${i18n.getText('Backup.ok')}</button>
+                    </div>
+                </div>`.toString();
             document.body.appendChild(dialog);
+            const input = dialog.querySelector('input');
             const finish = (value) => {
                 dialog.close();
                 dialog.remove();
                 resolve(value);
             };
-            ok.onclick = () => finish(input.value);
-            cancel.onclick = () => finish(null);
+            dialog.querySelector('#passphraseOk').onclick = () =>
+                finish(input.value);
+            dialog.querySelector('[name=cancel]').onclick = () =>
+                finish(null);
+            input.onkeydown = (event) => {
+                if (event.key === 'Enter') {
+                    finish(input.value);
+                }
+            };
             dialog.oncancel = () => finish(null);
             dialog.showModal();
             input.focus();
@@ -112,32 +121,25 @@ class DBMessenger {
     }
 
     /**
-     * Download an encrypted backup (.hexhoot2)
+     * Encrypt a backup and save it as a file (.hexhoot2)
+     * @param {string} passphrase at least 16 characters
+     * @return {Promise<number>} the size of the file in bytes
      */
-    async downloadBackup() {
-        const passphrase = await this.askPassphrase();
-        if (passphrase === null) {
-            return;
-        }
-        let file;
-        try {
-            file = await this.call('exportBackup', [passphrase]);
-        } catch (err) {
-            alert(i18n.getText(errorCode(err).code === 'WEAK_CREDENTIALS' ?
-                'Login.passwordLength' : 'Backup.wrongPassphrase'));
-            return;
-        }
+    async saveBackup(passphrase) {
+        const file = await this.call('exportBackup', [passphrase]);
         const element = document.createElement('a');
         element.href = URL.createObjectURL(
             new Blob([file], {type: 'application/octet-stream'}));
         element.download = 'hexhoot_backup.hexhoot2';
         element.click();
         setTimeout(() => URL.revokeObjectURL(element.href), 1000);
+        return file.length;
     }
 
     /**
      * Let the user pick a backup file and restore it
-     * @return {Promise<boolean>} whether a backup was restored
+     * @return {Promise<Object>} {restored, error}: error is the key of a
+     * text to show, or null
      */
     uploadBackup() {
         return new Promise((resolve) => {
@@ -149,17 +151,16 @@ class DBMessenger {
                     await event.target.files[0].arrayBuffer());
                 const passphrase = await this.askPassphrase();
                 if (passphrase === null) {
-                    resolve(false);
+                    resolve({restored: false, error: null});
                     return;
                 }
                 try {
                     await this.call('importBackup', [bytes, passphrase]);
-                    resolve(true);
+                    resolve({restored: true, error: null});
                 } catch (err) {
-                    alert(i18n.getText(errorCode(err).code ===
+                    resolve({restored: false, error: errorCode(err).code ===
                         'NOT_A_BACKUP' ? 'Backup.notABackup' :
-                        'Backup.wrongPassphrase'));
-                    resolve(false);
+                        'Backup.wrongPassphrase'});
                 }
             };
             element.click();

@@ -2,7 +2,6 @@
 
 import texts from './lang.json' with {type: 'json'};
 import dbMessenger from '../DBMessenger/index.mjs';
-import {html, loadStyle} from '../Html/index.mjs';
 
 /**
  * This class helps in implementing support for multiple languages.
@@ -23,56 +22,48 @@ class I18n {
             langPref.value)) {
             this.selectedLang = langPref.value;
         }
+        document.documentElement.lang = this.selectedLang;
+    }
+
+    /** @return {Object} {code: name in its own language} */
+    languages() {
+        return this.texts.I18n.language;
     }
 
     /**
-     * This function renders the dropdown for choosing a language
+     * Switch language and redraw the window
+     * @param {string} chosenLanguage a code from languages()
      */
-    async render() {
-        await loadStyle(new URL('./style.css', import.meta.url));
-        const languages = this.texts.I18n.language;
-        const elem = document.createElement('div');
-        elem.innerHTML = html`<div id="i18n">
-            ${this.getText('I18n.chooseLanguage')}:
-            <select name="languages" id="languages">
-                ${Object.keys(languages).map((key) => html`
-                    <option value="${key}">${languages[key]}</option>`)}
-            </select>
-        </div>`;
-
-        // If div already exists, remove it.
-        document.getElementById('i18n')?.parentElement.remove();
-        document.body.appendChild(elem);
-
-        // Language selection dropdown
-        const languageSelector = document.getElementById('languages');
-        languageSelector.value = this.selectedLang;
-        languageSelector.onchange = () => {
-            this.languageSelectionCallback(languageSelector.value);
-        };
-    }
-
-    /**
-     * Language selection dropdown callback
-     * @param {string} chosenLanguage the language chosen in the UI
-     */
-    languageSelectionCallback(chosenLanguage) {
+    async setLanguage(chosenLanguage) {
+        if (!Object.hasOwn(this.languages(), chosenLanguage)) {
+            return;
+        }
         this.selectedLang = chosenLanguage;
-        dbMessenger.setPreference('language', chosenLanguage);
+        document.documentElement.lang = chosenLanguage;
+        await dbMessenger.setPreference('language', chosenLanguage);
         window.reload();
     }
 
     /**
      * Get text in selected language
      * @param {String} hierarchy path to the message in lang.json
+     * @param {Object} [values] replacements for {name} placeholders
      * @return {string} the requested text in the selected language
      */
-    getText(hierarchy) {
+    getText(hierarchy, values) {
         let value = this.texts;
         for (const name of hierarchy.split('.')) {
-            value = value[name];
+            value = value?.[name];
         }
-        return value[this.selectedLang];
+        let text = value?.[this.selectedLang] ?? value?.en;
+        if (typeof text !== 'string') {
+            throw new Error('Unknown text: ' + hierarchy);
+        }
+        if (values) {
+            text = text.replace(/\{(\w+)\}/g, (match, key) =>
+                Object.hasOwn(values, key) ? String(values[key]) : match);
+        }
+        return text;
     }
 }
 

@@ -65,6 +65,7 @@ async function init(config) {
         sealer,
         scryptParams: config.scryptParams,
         retryMs: config.retryMs,
+        version: config.version,
         now: config.clockOffsetMs ?
             () => Date.now() + config.clockOffsetMs : undefined,
         watchNetwork: true,

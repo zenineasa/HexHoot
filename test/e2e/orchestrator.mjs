@@ -58,25 +58,33 @@ function slug(name) {
  * @return {Object} the same handle
  */
 function addActions(app, otherPeers) {
-    const sidebarItem = (key) => `#sidebar_li_${key}`;
-    const pendingItem = (key) =>
-        `[data-testid="pending-request"][data-key="${key}"]`;
+    const cell = (key, kind) => `.cell[data-key="${key}"]` +
+        (kind ? `[data-kind="${kind}"]` : '');
+    const q = (selector) =>
+        `document.querySelector(${JSON.stringify(selector)})`;
 
     return Object.assign(app, {
         /**
-         * Create an account through the login form
-         * @param {string} displayName longer than four characters
-         * @param {string} [password] longer than eight characters
+         * Create an account on the welcome screen
+         * @param {string} displayName at least five characters
+         * @param {string} [password] at least sixteen characters
          * @return {string} the new public key
          */
         async login(displayName, password = 'ThisIsProbablyAGoodPassword') {
             await app.waitFor(`document.getElementById('loginButton')`);
             await app.type('[name=displayName]', displayName);
             await app.type('[name=password]', password);
+            await app.waitFor(`!document.getElementById('loginButton')
+                .disabled`);
             await app.click('#loginButton');
-            await app.waitFor(`document.getElementById('friendsList')`);
+            await app.waitFor(`document.getElementById('hive')`);
             app.key = await app.core('getMyAddress');
             return app.key;
+        },
+
+        /** Wait until the signed-in app (the hive) is shown */
+        async ready() {
+            await app.waitFor(`document.querySelector('#hive .cells')`);
         },
 
         /**
@@ -92,41 +100,60 @@ function addActions(app, otherPeers) {
         },
 
         /**
-         * Send a friend request through the Add Friend screen
+         * Knock on someone: the Add a friend dialog
          * @param {string} key their public key
          */
         async addFriend(key) {
             await app.click('#addFriendButton');
             await app.waitFor(`document.getElementById('theirPublicKey')`);
             await app.type('#theirPublicKey', key);
-            await app.click('#mainContent #addFriendButton');
-            // The sidebar stays visible; wait for the form to close
-            await app.waitFor(`!document.getElementById('theirPublicKey')`);
+            await app.waitFor(`!document.getElementById('knockButton')
+                .disabled`);
+            await app.click('#knockButton');
+            // The dialog closes and their "waiting" cell is selected
+            await app.waitFor(`!document.getElementById('addFriendDialog') &&
+                ${q(cell(key))}`);
         },
 
         /**
-         * Wait for a friend request in the sidebar and accept it
+         * Wait until someone knocks
+         * @param {string} key their public key
+         * @param {number} [timeout] milliseconds
+         * @return {Object} {name, images} of their cell
+         */
+        async waitForKnock(key, timeout = 30000) {
+            await app.waitFor(q(cell(key, 'knocking')), timeout);
+            return app.evaluate(`(() => {
+                const el = ${q(cell(key, 'knocking'))};
+                return {name: el.dataset.name,
+                    images: el.getElementsByTagName('img').length};
+            })()`);
+        },
+
+        /**
+         * Wait for a friend request and let them in
          * @param {string} key the sender's public key
          * @param {number} [timeout] milliseconds
          */
         async acceptFriendRequest(key, timeout = 30000) {
-            await app.waitFor(`document.querySelector(
-                ${JSON.stringify(pendingItem(key))})`, timeout);
-            await app.click(pendingItem(key) + ' .acceptRequest');
-            await app.waitFor(`document.querySelector(
-                ${JSON.stringify(sidebarItem(key))})`);
+            await app.waitForKnock(key, timeout);
+            await app.click(cell(key, 'knocking'));
+            await app.waitFor(q(`#request[data-key="${key}"]`));
+            await app.click('#request [name=letIn]');
+            // Their (empty) chain opens
+            await app.waitFor(`${q('#chain')}?.dataset.chat ===
+                ${JSON.stringify(key)} && ${q(cell(key, 'friend'))}`);
         },
 
         /**
-         * Wait until a friend is listed with the given name
+         * Wait until a friend is in the hive with the given name
          * @param {string} key their public key
          * @param {string} displayName their name
          * @param {number} [timeout] milliseconds
          */
         async waitForFriend(key, displayName, timeout = 30000) {
-            await app.waitFor(`document.querySelector(
-                ${JSON.stringify(sidebarItem(key) + ' .name')})
-                ?.textContent === ${JSON.stringify(displayName)}`, timeout);
+            await app.waitFor(`${q(cell(key, 'friend'))}?.dataset.name ===
+                ${JSON.stringify(displayName)}`, timeout);
         },
 
         /**
@@ -134,11 +161,14 @@ function addActions(app, otherPeers) {
          * @param {string} key their public key
          */
         async openChat(key) {
-            await app.click(sidebarItem(key));
-            // The composer is always in the page; data-chat is set once the
-            // chat has loaded and the send button is wired to this friend
-            await app.waitFor(`document.getElementById('messageComposer')
-                ?.dataset.chat === ${JSON.stringify(key)}`);
+            const open = `${q('#chain')}?.dataset.chat ===
+                ${JSON.stringify(key)}`;
+            if (!await app.evaluate(open)) {
+                // Clicking the open chat's cell would go Home instead
+                await app.click(cell(key));
+            }
+            // data-chat is set once the chat has loaded and is wired
+            await app.waitFor(open);
         },
 
         /**
@@ -146,8 +176,8 @@ function addActions(app, otherPeers) {
          * @param {string} text the message
          */
         async send(text) {
-            await app.type('#messageComposer textarea', text);
-            await app.click('#messageComposer .send');
+            await app.type('#composerInput', text);
+            await app.click('#composer .send');
         },
 
         /**
@@ -156,10 +186,10 @@ function addActions(app, otherPeers) {
          */
         async messages() {
             return app.evaluate(`[...document.querySelectorAll(
-                '#messageReader > div')].reverse().map((div) => ({
-                    type: div.className === 'sentMessage' ? 'sent' :
+                '#chainBody .msg')].map((row) => ({
+                    type: row.classList.contains('sent') ? 'sent' :
                         'received',
-                    text: div.firstChild.textContent,
+                    text: row.querySelector('.text').textContent,
                 }))`);
         },
 
@@ -170,9 +200,33 @@ function addActions(app, otherPeers) {
          */
         async waitForMessage(text, timeout = 30000) {
             await app.waitFor(`[...document.querySelectorAll(
-                '#messageReader .receivedMessage')].some((div) =>
-                div.firstChild.textContent === ${JSON.stringify(text)})`,
-            timeout);
+                '#chainBody .msg.received .text')].some((el) =>
+                el.textContent === ${JSON.stringify(text)})`, timeout);
+        },
+
+        /** Open the contact panel of the open chat */
+        async openContact() {
+            await app.click('#chainHeader .who');
+            await app.waitFor(`document.getElementById('safetyNumber')`);
+        },
+
+        /** Mark the open contact verified (the numbers match) */
+        async verify() {
+            await app.click('#verification [name=verify]');
+            await app.waitFor(`document.getElementById('verification')
+                ?.dataset.verified === 'true'`);
+        },
+
+        /**
+         * Press a key on the focused element
+         * @param {string} key for example 'Escape'
+         * @param {Object} [modifiers] {ctrlKey, metaKey, shiftKey}
+         */
+        async press(key, modifiers = {}) {
+            await app.evaluate(`(document.activeElement || document.body)
+                .dispatchEvent(new KeyboardEvent('keydown', Object.assign(
+                    {key: ${JSON.stringify(key)}, bubbles: true},
+                    ${JSON.stringify(modifiers)})))`);
         },
     });
 }

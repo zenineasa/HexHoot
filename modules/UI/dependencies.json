@@ -1,0 +1,9 @@
+{
+    "coprightMessage": "Copyright © 2026 Zenin Easa Panthakkalakath",
+    "internal": [
+        "I18n",
+        "Sanitize",
+        "Html"
+    ],
+    "external": []
+}

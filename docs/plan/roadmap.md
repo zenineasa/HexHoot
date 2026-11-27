@@ -103,7 +103,7 @@ Write the spec's test vectors first, then the code. Cross-check ML-KEM and ML-DS
 
 # Phase 5: Release 2.0.0
 
-**UI revamp ("The Hive"), decided 2026-11-27** ([design](/design/ui-hive.md)), built in four commits: Core additions; the UI foundation and the hive; the screens; strings and tests. **UI commit 1 done (2026-11-27):** withdraw, remove, block, don't send, how friends were last heard from, and events in conversations, with L2 tests.
+**UI revamp ("The Hive"), decided 2026-11-27** ([design](/design/ui-hive.md)), built in four commits: Core additions; the UI foundation and the hive; the screens; strings and tests. **UI commit 1 done (2026-11-27):** withdraw, remove, block, don't send, how friends were last heard from, and events in conversations, with L2 tests. **UI commit 2 done (2026-11-27):** the whole interface in the new design, so that every commit leaves a working app and green tests: tokens (night, day, follow the computer), bundled fonts, the shell and navigation, the hive, Home, the chain, requests, the contact panel, Add a friend, Settings, the welcome screen, the password check card, notifications, the offline banner and the narrow layout, with strings in all five languages and the E2E suite rewritten for it. Next, UI commit 3: the remaining polish (QR code, long messages, links, the 64 KB counter, "N new messages", a list view for big hives), then a translation review and the screen-reader and contrast pass.
 
 **Commit 1 done (2026-11-27):** resends back off from 3 s to 60 s and go out at once when a carrier sees a peer appear (Q15). Received messages keep arrival order (Q16). The v1 export screen is dropped, because v1 has no users ([ADR-001](/decisions/adr-001-no-backward-compatibility.md)).
 

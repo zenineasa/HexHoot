@@ -1,47 +1,41 @@
 /* Copyright (c) 2026 Zenin Easa Panthakkalakath */
 
+/* A card in the top right corner: it never blocks anything (ADR-004) */
 #passwordCheck {
     position: fixed;
-    right: 1em;
-    bottom: 3em;
-    width: 20em;
-    padding: 1em;
-    border-radius: 0.2em;
-    background: rgba(0, 0, 0, 0.9);
-    border-left: 0.3em solid rgba(0, 180, 255, 0.8);
-    font-size: 0.85em;
-    text-align: left;
-    z-index: 10;
+    right: 18px;
+    top: 16px;
+    width: 310px;
+    max-width: calc(100vw - 36px);
+    box-sizing: border-box;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 16px 40px var(--shadow);
+    z-index: 20;
     user-select: text;
 }
 #passwordCheck .title {
-    font-weight: bold;
-    margin-bottom: 0.5em;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+#passwordCheck[data-state=wrong] .title {
+    color: var(--warn);
+}
+#passwordCheck[data-state=right] .title {
+    color: var(--success);
+}
+#passwordCheck .text {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 10px;
 }
 #passwordCheck .buttons {
     display: flex;
-}
-#passwordCheck .HexHoot_Button {
-    margin: 0.5em 0.25em 0;
-}
-#passwordCheck[data-state="checking"] .text::after {
-    content: '';
-    display: block;
-    height: 0.2em;
-    margin-top: 0.5em;
-    background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.8),
-        transparent);
-    background-size: 50% 100%;
-    background-repeat: no-repeat;
-    animation: passwordCheckWorking 1.2s linear infinite;
-}
-#passwordCheck[data-state="right"] {
-    border-left-color: #3fb950;
-}
-#passwordCheck[data-state="wrong"] {
-    border-left-color: #d29922;
-}
-@keyframes passwordCheckWorking {
-    from { background-position: -100% 0; }
-    to { background-position: 200% 0; }
+    gap: 6px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-top: 10px;
 }

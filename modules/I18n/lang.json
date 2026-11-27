@@ -1,6 +1,5 @@
 {
-    "coprightMessage": "Copyright © 2022-2024 Zenin Easa Panthakkalakath",
-
+    "coprightMessage": "Copyright © 2022-2026 Zenin Easa Panthakkalakath",
     "I18n": {
         "language": {
             "en": "English",
@@ -17,80 +16,13 @@
             "it": "Seleziona la lingua"
         }
     },
-
-    "Logo": {
-        "hexhoot": {
-            "en": "HexHoot",
-            "ml": "ഹെക്സ്ഹൂട്ട്",
-            "de": "HexHoot",
-            "fr": "HexHoot",
-            "it": "HexHoot"
-        },
-        "alpha": {
-            "en": "ALPHA",
-            "ml": "ആൽഫ",
-            "de": "ALPHA",
-            "fr": "ALPHA",
-            "it": "ALPHA"
-        }
-    },
-
     "AddFriend": {
-        "invalidKey": {
-            "en": "That does not look like a valid HexHoot address.",
-            "ml": "അത് സാധുവായ ഒരു HexHoot വിലാസമായി തോന്നുന്നില്ല.",
-            "de": "Das sieht nicht nach einer gültigen HexHoot-Adresse aus.",
-            "fr": "Cela ne ressemble pas à une adresse HexHoot valide.",
-            "it": "Non sembra un indirizzo HexHoot valido."
-        },
-        "addFriend": {
-            "en": "Add friend",
-            "ml": "സുഹൃത്തിനെ ചേർക്കുക",
-            "de": "Freund hinzufügen",
-            "fr": "Ajouter un ami",
-            "it": "Aggiungi un amico"
-        },
         "copyToClipboard": {
-            "en": "Copy to clipboard",
-            "ml": "ക്ലിപ്പ്ബോർഡിലേയ്ക്ക് കോപ്പി ചെയ്യുക",
-            "de": "In die Zwischenablage kopieren",
+            "en": "Copy",
+            "ml": "കോപ്പി ചെയ്യുക",
+            "de": "Kopieren",
             "fr": "Copier",
-            "it": "Copia negli appunti"
-        },
-        "publicKey": {
-            "en": "Their address (starts with hh21)",
-            "ml": "അവരുടെ വിലാസം (hh21 എന്നതിൽ ആരംഭിക്കുന്നു)",
-            "de": "Adresse der Person (beginnt mit hh21)",
-            "fr": "Son adresse (commence par hh21)",
-            "it": "Il suo indirizzo (inizia con hh21)"
-        },
-        "add": {
-            "en": "Add",
-            "ml": "ചേർക്കുക",
-            "de": "Hinzufügen",
-            "fr": "Ajouter",
-            "it": "Aggiungere"
-        },
-        "myCode": {
-            "en": "My code",
-            "ml": "എന്റെ കോഡ്",
-            "de": "Mein Code",
-            "fr": "Mon code",
-            "it": "Il mio codice"
-        },
-        "theirCode": {
-            "en": "Their code",
-            "ml": "അവരുടെ കോഡ്",
-            "de": "Ihr Code",
-            "fr": "Leur code",
-            "it": "Il suo codice"
-        },
-        "back": {
-            "en": "Back",
-            "ml": "ബാക്ക്",
-            "de": "Zurück",
-            "fr": "Retour",
-            "it": "Indietro"
+            "it": "Copia"
         },
         "copied": {
             "en": "Copied",
@@ -100,95 +32,126 @@
             "it": "Copiato"
         },
         "myHint": {
-            "en": "Send this address to a friend. When they add it, their request appears in your list of friends.",
-            "ml": "ഈ വിലാസം ഒരു സുഹൃത്തിന് അയയ്ക്കുക. അവർ ഇത് ചേർക്കുമ്പോൾ, അവരുടെ അഭ്യർത്ഥന നിങ്ങളുടെ സുഹൃത്തുക്കളുടെ പട്ടികയിൽ കാണാം.",
-            "de": "Senden Sie diese Adresse an einen Freund. Sobald er sie hinzufügt, erscheint seine Anfrage in Ihrer Freundesliste.",
-            "fr": "Envoyez cette adresse à un ami. Quand il l’ajoutera, sa demande apparaîtra dans votre liste d’amis.",
-            "it": "Invia questo indirizzo a un amico. Quando lo aggiungerà, la sua richiesta comparirà nel tuo elenco di amici."
+            "en": "Send this to a friend. When they add it, they knock at your hive.",
+            "ml": "ഇത് ഒരു സുഹൃത്തിന് അയയ്ക്കുക. അവർ ഇത് ചേർക്കുമ്പോൾ, നിങ്ങളുടെ തേൻകൂട്ടിൽ മുട്ടും.",
+            "de": "Senden Sie diese an einen Freund. Wenn er sie hinzufügt, klopft er an Ihrer Wabe an.",
+            "fr": "Envoyez-la à un ami. Quand il l’ajoutera, il frappera à votre ruche.",
+            "it": "Invialo a un amico. Quando lo aggiungerà, busserà al tuo alveare."
         },
-        "theirHint": {
-            "en": "Paste your friend's address. They get a friend request and can accept it.",
-            "ml": "നിങ്ങളുടെ സുഹൃത്തിന്റെ വിലാസം ഇവിടെ പേസ്റ്റ് ചെയ്യുക. അവർക്ക് ഒരു സൗഹൃദ അഭ്യർത്ഥന ലഭിക്കും, അവർക്ക് അത് സ്വീകരിക്കാം.",
-            "de": "Fügen Sie die Adresse Ihres Freundes ein. Er erhält eine Freundschaftsanfrage und kann sie annehmen.",
-            "fr": "Collez l’adresse de votre ami. Il recevra une demande d’ami et pourra l’accepter.",
-            "it": "Incolla l’indirizzo del tuo amico. Riceverà una richiesta di amicizia e potrà accettarla."
+        "theirAddress": {
+            "en": "Their address",
+            "ml": "അവരുടെ വിലാസം",
+            "de": "Adresse der Person",
+            "fr": "Son adresse",
+            "it": "Il suo indirizzo"
+        },
+        "knock": {
+            "en": "Knock",
+            "ml": "മുട്ടുക",
+            "de": "Anklopfen",
+            "fr": "Frapper",
+            "it": "Bussa"
+        },
+        "spaces": {
+            "en": "Spaces and line breaks are ignored.",
+            "ml": "സ്പേസുകളും വരി മാറ്റങ്ങളും അവഗണിക്കും.",
+            "de": "Leerzeichen und Zeilenumbrüche werden ignoriert.",
+            "fr": "Les espaces et retours à la ligne sont ignorés.",
+            "it": "Spazi e a capo vengono ignorati."
+        },
+        "prefix": {
+            "en": "HexHoot addresses start with hh21.",
+            "ml": "HexHoot വിലാസങ്ങൾ hh21 എന്നതിൽ തുടങ്ങുന്നു.",
+            "de": "HexHoot-Adressen beginnen mit hh21.",
+            "fr": "Les adresses HexHoot commencent par hh21.",
+            "it": "Gli indirizzi HexHoot iniziano con hh21."
+        },
+        "ownAddress": {
+            "en": "That is your own address. Send it to your friend instead.",
+            "ml": "അത് നിങ്ങളുടെ സ്വന്തം വിലാസമാണ്. പകരം അത് സുഹൃത്തിന് അയയ്ക്കുക.",
+            "de": "Das ist Ihre eigene Adresse. Senden Sie sie stattdessen Ihrem Freund.",
+            "fr": "C’est votre propre adresse. Envoyez-la plutôt à votre ami.",
+            "it": "Questo è il tuo indirizzo. Invialo invece al tuo amico."
+        },
+        "alreadyFriend": {
+            "en": "{name} is already in your hive.",
+            "ml": "{name} ഇതിനകം നിങ്ങളുടെ തേൻകൂട്ടിലുണ്ട്.",
+            "de": "{name} ist bereits in Ihrer Wabe.",
+            "fr": "{name} est déjà dans votre ruche.",
+            "it": "{name} è già nel tuo alveare."
+        },
+        "alreadyWaiting": {
+            "en": "You already knocked on {name}.",
+            "ml": "നിങ്ങൾ ഇതിനകം {name}-ന്റെ വാതിലിൽ മുട്ടി.",
+            "de": "Sie haben bei {name} bereits angeklopft.",
+            "fr": "Vous avez déjà frappé chez {name}.",
+            "it": "Hai già bussato a {name}."
+        },
+        "openChat": {
+            "en": "Open the chat",
+            "ml": "ചാറ്റ് തുറക്കുക",
+            "de": "Unterhaltung öffnen",
+            "fr": "Ouvrir la discussion",
+            "it": "Apri la chat"
+        },
+        "show": {
+            "en": "Show",
+            "ml": "കാണിക്കുക",
+            "de": "Anzeigen",
+            "fr": "Afficher",
+            "it": "Mostra"
+        },
+        "theyKnocked": {
+            "en": "They are already knocking: this lets them in.",
+            "ml": "അവർ ഇതിനകം മുട്ടുന്നുണ്ട്: ഇത് അവരെ അകത്തേക്ക് വിടും.",
+            "de": "Die Person klopft bereits an: So lassen Sie sie herein.",
+            "fr": "Cette personne frappe déjà : ceci la fait entrer.",
+            "it": "Sta già bussando: così la fai entrare."
+        },
+        "looksRight": {
+            "en": "Looks right.",
+            "ml": "ശരിയാണെന്ന് തോന്നുന്നു.",
+            "de": "Sieht richtig aus.",
+            "fr": "Cela semble correct.",
+            "it": "Sembra corretto."
+        },
+        "tooLong": {
+            "en": "That is longer than an address. Check what you pasted.",
+            "ml": "അത് ഒരു വിലാസത്തേക്കാൾ നീളമുള്ളതാണ്. ഒട്ടിച്ചത് പരിശോധിക്കുക.",
+            "de": "Das ist länger als eine Adresse. Prüfen Sie, was Sie eingefügt haben.",
+            "fr": "C’est plus long qu’une adresse. Vérifiez ce que vous avez collé.",
+            "it": "È più lungo di un indirizzo. Controlla cosa hai incollato."
+        },
+        "typo": {
+            "en": "That address has a typo: its last characters do not match the rest.",
+            "ml": "ആ വിലാസത്തിൽ അക്ഷരത്തെറ്റുണ്ട്: അവസാന അക്ഷരങ്ങൾ ബാക്കിയുമായി പൊരുത്തപ്പെടുന്നില്ല.",
+            "de": "Die Adresse enthält einen Tippfehler: Die letzten Zeichen passen nicht zum Rest.",
+            "fr": "Cette adresse contient une faute de frappe : ses derniers caractères ne correspondent pas au reste.",
+            "it": "Quell’indirizzo contiene un errore: gli ultimi caratteri non corrispondono al resto."
+        },
+        "knocked": {
+            "en": "Knocked. They see your request the next time you are both online.",
+            "ml": "മുട്ടി. നിങ്ങൾ ഇരുവരും അടുത്ത തവണ ഓൺലൈനാകുമ്പോൾ അവർ അഭ്യർത്ഥന കാണും.",
+            "de": "Angeklopft. Die Person sieht Ihre Anfrage, sobald Sie beide online sind.",
+            "fr": "Vous avez frappé. Votre demande lui parviendra quand vous serez tous deux en ligne.",
+            "it": "Hai bussato. Vedrà la tua richiesta quando sarete entrambi online."
+        },
+        "letInToo": {
+            "en": "You let them in. Say hello!",
+            "ml": "നിങ്ങൾ അവരെ അകത്തേക്ക് വിട്ടു. ഹലോ പറയൂ!",
+            "de": "Sie haben die Person hereingelassen. Sagen Sie Hallo!",
+            "fr": "Vous l’avez fait entrer. Dites bonjour !",
+            "it": "L’hai fatta entrare. Saluta!"
+        },
+        "yourAddress": {
+            "en": "Your address",
+            "ml": "നിങ്ങളുടെ വിലാസം",
+            "de": "Ihre Adresse",
+            "fr": "Votre adresse",
+            "it": "Il tuo indirizzo"
         }
     },
-
-    "Chat": {
-        "friendRequest": {
-            "en": "Friend request",
-            "ml": "സൗഹൃദ അഭ്യർത്ഥന",
-            "de": "Freundschaftsanfrage",
-            "fr": "Demande d'ami",
-            "it": "Richiesta di amicizia"
-        },
-        "acceptRequest": {
-            "en": "Accept",
-            "ml": "സ്വീകരിക്കുക",
-            "de": "Annehmen",
-            "fr": "Accepter",
-            "it": "Accetta"
-        },
-        "declineRequest": {
-            "en": "Decline",
-            "ml": "നിരസിക്കുക",
-            "de": "Ablehnen",
-            "fr": "Refuser",
-            "it": "Rifiuta"
-        },
-        "at": {
-            "en": "at",
-            "ml": "സമയം",
-            "de": "um",
-            "fr": "À",
-            "it": "A"
-        },
-        "addFriend": {
-            "en": "Add friend",
-            "ml": "സുഹൃത്തിനെ ചേർക്കുക",
-            "de": "Freund hinzufügen",
-            "fr": "Ajouter un ami",
-            "it": "Aggiungi un amico"
-        },
-        "search": {
-            "en": "Search",
-            "ml": "തിരയുക",
-            "de": "Suchen",
-            "fr": "Chercher",
-            "it": "Cercare"
-        },
-        "typeInYourMessage": {
-            "en": "Type in you message here...",
-            "ml": "താങ്കളുടെ സന്ദേശം ഇവിടെ എഴുതുക...",
-            "de": "Deine Nachricht hier eintippen...",
-            "fr": "Tapez votre message ici...",
-            "it": "Digita qui il tuo messaggio..."
-        },
-        "notFriendYet": {
-            "en": "They have not accepted your friend request yet.",
-            "ml": "അവർ ഇതുവരെ നിങ്ങളുടെ സൗഹൃദ അഭ്യർത്ഥന സ്വീകരിച്ചിട്ടില്ല.",
-            "de": "Die Person hat Ihre Freundschaftsanfrage noch nicht angenommen.",
-            "fr": "Cette personne n'a pas encore accepté votre demande d'ami.",
-            "it": "Questa persona non ha ancora accettato la tua richiesta di amicizia."
-        }
-    },
-
     "EditProfile": {
-        "editProfile": {
-            "en": "Edit profile",
-            "ml": "വ്യക്തിവിവരങ്ങൾ എഡിറ്റ് ചെയ്യുവാൻ",
-            "de": "Profil anpassen",
-            "fr": "Editer le profil",
-            "it": "Modifica Profilo"
-        },
-        "logoutConfirmation": {
-            "en": "Logging out will delete all the data in your system. We recommend that you backup the same.",
-            "ml": "ലോഗ് ഔട്ട് ചെയ്താൽ നിങ്ങളുടെ സിസ്റ്റത്തിലെ എല്ലാ ഡാറ്റയും ഡിലീറ്റ് ചെയ്യപ്പെടും. ആയതിനാൽ ലോഗൗട്ട് ചെയ്യുന്നതിന് മുന്നോടിയായി ഇതെല്ലാം ബാക്കപ്പ് ചെയ്യാൻ ഞങ്ങൾ ശുപാർശ ചെയ്യുന്നു.",
-            "de": "Durch das Abmelden werden alle Daten in Ihrem System gelöscht. Wir empfehlen, einen backup zu kreieren.",
-            "fr": "La déconnexion supprimera toutes les données de votre système. Nous vous recommandons de sauvegarder le même.",
-            "it": "La disconnessione eliminerà tutti i dati nel sistema. Ti consigliamo di eseguire il backup dello stesso."
-        },
         "displayName": {
             "en": "Display name",
             "ml": "പ്രദർശന നാമം",
@@ -202,44 +165,8 @@
             "de": "Über dich",
             "fr": "Mes infos",
             "it": "Una tua descrizione"
-        },
-        "photo": {
-            "en": "Photo",
-            "ml": "ഫോട്ടോ",
-            "de": "Foto",
-            "fr": "Photo",
-            "it": "Foto"
-        },
-        "applyEdit": {
-            "en": "Apply edit",
-            "ml": "എഡിറ്റ് ചെയ്യുക",
-            "de": "Änderungen anwenden",
-            "fr": "Appliquer la modification",
-            "it": "Applica modifiche"
-        },
-        "downloadProfile": {
-            "en": "Download profile backup",
-            "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക",
-            "de": "Profilsicherung herunterladen",
-            "fr": "Télécharger la sauvegarde du profil",
-            "it": "Scarica il file di backup del profilo"
-        },
-        "logout": {
-            "en": "Logout",
-            "ml": "ലോഗ്ഔട്ട് ചെയ്യുക",
-            "de": "Ausloggen",
-            "fr": "Déconnecter",
-            "it": "Disconnettersi"
-        },
-        "back": {
-            "en": "Back",
-            "ml": "ബാക്ക്",
-            "de": "Zurück",
-            "fr": "Retour",
-            "it": "Indietro"
         }
     },
-
     "Login": {
         "minimumCharacters": {
             "en": "Your name needs at least 5 characters.",
@@ -249,11 +176,11 @@
             "it": "Il tuo nome deve avere almeno 5 caratteri."
         },
         "password": {
-            "en": "Password (at least 16 characters)",
-            "ml": "പാസ്‌വേഡ് (കുറഞ്ഞത് 16 അക്ഷരങ്ങൾ)",
-            "de": "Passwort (mindestens 16 Zeichen)",
-            "fr": "Mot de passe (au moins 16 caractères)",
-            "it": "Password (almeno 16 caratteri)"
+            "en": "Password",
+            "ml": "പാസ്‌വേഡ്",
+            "de": "Passwort",
+            "fr": "Mot de passe",
+            "it": "Password"
         },
         "passwordLength": {
             "en": "The password needs at least 16 characters.",
@@ -263,39 +190,25 @@
             "it": "La password deve avere almeno 16 caratteri."
         },
         "displayName": {
-            "en": "Your name (at least 5 characters)",
-            "ml": "നിങ്ങളുടെ പേര് (കുറഞ്ഞത് 5 അക്ഷരങ്ങൾ)",
-            "de": "Ihr Name (mindestens 5 Zeichen)",
-            "fr": "Votre nom (au moins 5 caractères)",
-            "it": "Il tuo nome (almeno 5 caratteri)"
-        },
-        "aboutYou": {
-            "en": "About you",
-            "ml": "നിങ്ങളെ കുറിച്ച്",
-            "de": "Über dich",
-            "fr": "Au propos de vous",
-            "it": "Una tua descrizione"
-        },
-        "login": {
-            "en": "Login",
-            "ml": "ലോഗിൻ ചെയ്യുക",
-            "de": "Anmelden",
-            "fr": "Me connecter",
-            "it": "Accedi"
+            "en": "Your name",
+            "ml": "നിങ്ങളുടെ പേര്",
+            "de": "Ihr Name",
+            "fr": "Votre nom",
+            "it": "Il tuo nome"
         },
         "or": {
-            "en": "OR",
+            "en": "or",
             "ml": "അല്ലെങ്കിൽ",
-            "de": "ODER",
-            "fr": "OU",
-            "it": "OPPURE"
+            "de": "oder",
+            "fr": "ou",
+            "it": "oppure"
         },
         "loginUsingBackup": {
-            "en": "Login using profile backup",
-            "ml": "പ്രൊഫൈൽ ബാക്കപ്പ് ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യുക",
-            "de": "Anmeldung mit Profilsicherung",
-            "fr": "Connectez-vous en utilisant la sauvegarde du profil",
-            "it": "Accedi utilizzando il file di backup del profilo"
+            "en": "Restore a backup",
+            "ml": "ഒരു ബാക്കപ്പ് പുനഃസ്ഥാപിക്കുക",
+            "de": "Sicherung wiederherstellen",
+            "fr": "Restaurer une sauvegarde",
+            "it": "Ripristina un backup"
         },
         "passwordContainsName": {
             "en": "The password must not contain your name.",
@@ -354,87 +267,6 @@
             "it": "Quella password non è corretta."
         }
     },
-
-    "ViewProfile": {
-        "viewProfile": {
-            "en": "View profile",
-            "ml": "വ്യക്തിവിവരങ്ങൾ",
-            "de": "Profil anzeigen",
-            "fr": "Voir le profil",
-            "it": "Vedi profilo"
-        },
-        "publicKey": {
-            "en": "Address",
-            "ml": "വിലാസം",
-            "de": "Adresse",
-            "fr": "Adresse",
-            "it": "Indirizzo"
-        },
-        "displayName": {
-            "en": "Display name",
-            "ml": "പ്രദർശന നാമം",
-            "de": "Anzeigename",
-            "fr": "Afficher un nom",
-            "it": "Nome pubblico"
-        },
-        "aboutPerson": {
-            "en": "About the person",
-            "ml": "വ്യക്തിയെക്കുറിച്ച്",
-            "de": "Über die Person",
-            "fr": "Infos de la personne",
-            "it": "La tua descrizione"
-        },
-        "photo": {
-            "en": "Photo",
-            "ml": "ഫോട്ടോ",
-            "de": "Foto",
-            "fr": "Photo",
-            "it": "Foto"
-        },
-        "back": {
-            "en": "Back",
-            "ml": "ബാക്ക്",
-            "de": "Zurück",
-            "fr": "Retour",
-            "it": "Indietro"
-        },
-        "safetyNumber": {
-            "en": "Safety number (compare it with them in person or on a call)",
-            "ml": "സുരക്ഷാ നമ്പർ (നേരിട്ടോ ഫോൺ വിളിയിലോ അവരുമായി ഒത്തുനോക്കുക)",
-            "de": "Sicherheitsnummer (vergleichen Sie sie persönlich oder in einem Anruf)",
-            "fr": "Numéro de sécurité (comparez-le en personne ou lors d’un appel)",
-            "it": "Numero di sicurezza (confrontalo di persona o durante una chiamata)"
-        },
-        "safetyNumberHelp": {
-            "en": "If you both see the same number, your messages go only to each other.",
-            "ml": "നിങ്ങൾ ഇരുവരും ഒരേ നമ്പർ കാണുന്നുവെങ്കിൽ, നിങ്ങളുടെ സന്ദേശങ്ങൾ നിങ്ങൾക്കിടയിൽ മാത്രമേ പോകൂ.",
-            "de": "Wenn Sie beide dieselbe Nummer sehen, gehen Ihre Nachrichten nur an Sie beide.",
-            "fr": "Si vous voyez tous les deux le même numéro, vos messages ne vont qu’à vous deux.",
-            "it": "Se vedete entrambi lo stesso numero, i vostri messaggi arrivano solo a voi due."
-        },
-        "markVerified": {
-            "en": "The numbers match",
-            "ml": "നമ്പറുകൾ ഒന്നുതന്നെ",
-            "de": "Die Nummern stimmen überein",
-            "fr": "Les numéros correspondent",
-            "it": "I numeri corrispondono"
-        },
-        "verified": {
-            "en": "✓ Verified: you compared safety numbers.",
-            "ml": "✓ പരിശോധിച്ചു: നിങ്ങൾ സുരക്ഷാ നമ്പറുകൾ ഒത്തുനോക്കി.",
-            "de": "✓ Verifiziert: Sie haben die Sicherheitsnummern verglichen.",
-            "fr": "✓ Vérifié : vous avez comparé les numéros de sécurité.",
-            "it": "✓ Verificato: avete confrontato i numeri di sicurezza."
-        },
-        "unmarkVerified": {
-            "en": "Remove the mark",
-            "ml": "അടയാളം നീക്കുക",
-            "de": "Markierung entfernen",
-            "fr": "Retirer la marque",
-            "it": "Rimuovi il segno"
-        }
-    },
-
     "Backup": {
         "passphrase": {
             "en": "Backup passphrase (at least 16 characters)",
@@ -470,9 +302,15 @@
             "de": "Das ist keine HexHoot-Sicherungsdatei.",
             "fr": "Ce n'est pas un fichier de sauvegarde HexHoot.",
             "it": "Questo non è un file di backup di HexHoot."
+        },
+        "title": {
+            "en": "Backup passphrase",
+            "ml": "ബാക്കപ്പ് പാസ്‌ഫ്രേസ്",
+            "de": "Backup-Passphrase",
+            "fr": "Phrase secrète de la sauvegarde",
+            "it": "Passphrase del backup"
         }
     },
-
     "PasswordCheck": {
         "title": {
             "en": "Do you still remember your password?",
@@ -536,6 +374,1161 @@
             "de": "Schließen",
             "fr": "Fermer",
             "it": "Chiudi"
+        },
+        "rightTitle": {
+            "en": "You’ve got it",
+            "ml": "നിങ്ങൾക്ക് ഓർമ്മയുണ്ട്",
+            "de": "Sie haben es",
+            "fr": "C’est bien ça",
+            "it": "Ce l’hai"
+        },
+        "wrongTitle": {
+            "en": "Not quite",
+            "ml": "അത് ശരിയല്ല",
+            "de": "Nicht ganz",
+            "fr": "Pas tout à fait",
+            "it": "Non proprio"
+        }
+    },
+    "Hive": {
+        "yourHive": {
+            "en": "Your hive",
+            "ml": "നിങ്ങളുടെ തേൻകൂട്",
+            "de": "Ihre Wabe",
+            "fr": "Votre ruche",
+            "it": "Il tuo alveare"
+        },
+        "hive": {
+            "en": "Hive",
+            "ml": "തേൻകൂട്",
+            "de": "Wabe",
+            "fr": "Ruche",
+            "it": "Alveare"
+        },
+        "home": {
+            "en": "Home",
+            "ml": "ഹോം",
+            "de": "Start",
+            "fr": "Accueil",
+            "it": "Home"
+        },
+        "addFriend": {
+            "en": "Add a friend",
+            "ml": "ഒരു സുഹൃത്തിനെ ചേർക്കുക",
+            "de": "Freund hinzufügen",
+            "fr": "Ajouter un ami",
+            "it": "Aggiungi un amico"
+        },
+        "add": {
+            "en": "Add",
+            "ml": "ചേർക്കുക",
+            "de": "Hinzufügen",
+            "fr": "Ajouter",
+            "it": "Aggiungi"
+        },
+        "find": {
+            "en": "Find a friend",
+            "ml": "സുഹൃത്തിനെ കണ്ടെത്തുക",
+            "de": "Freund suchen",
+            "fr": "Trouver un ami",
+            "it": "Trova un amico"
+        },
+        "cellsLabel": {
+            "en": "Your friends. Use the arrow keys to move between cells.",
+            "ml": "നിങ്ങളുടെ സുഹൃത്തുക്കൾ. കളങ്ങൾക്കിടയിൽ നീങ്ങാൻ ആരോ കീകൾ ഉപയോഗിക്കുക.",
+            "de": "Ihre Freunde. Mit den Pfeiltasten wechseln Sie zwischen den Zellen.",
+            "fr": "Vos amis. Utilisez les flèches pour passer d’une cellule à l’autre.",
+            "it": "I tuoi amici. Usa i tasti freccia per spostarti tra le celle."
+        },
+        "knocking": {
+            "en": "Knocking",
+            "ml": "മുട്ടുന്നു",
+            "de": "Klopft an",
+            "fr": "Frappe",
+            "it": "Bussa"
+        },
+        "isKnocking": {
+            "en": "{name} is knocking",
+            "ml": "{name} വാതിലിൽ മുട്ടുന്നു",
+            "de": "{name} klopft an",
+            "fr": "{name} frappe à votre porte",
+            "it": "{name} sta bussando"
+        },
+        "nKnocking": {
+            "en": "{n} knocking",
+            "ml": "{n} പേർ മുട്ടുന്നു",
+            "de": "{n} klopfen an",
+            "fr": "{n} frappent",
+            "it": "{n} bussano"
+        },
+        "waiting": {
+            "en": "Waiting",
+            "ml": "കാത്തിരിക്കുന്നു",
+            "de": "Wartet",
+            "fr": "En attente",
+            "it": "In attesa"
+        },
+        "waitingFor": {
+            "en": "Waiting for {name} to let you in",
+            "ml": "{name} നിങ്ങളെ അകത്തേക്ക് വിടുന്നതിനായി കാത്തിരിക്കുന്നു",
+            "de": "Warten, bis {name} Sie hereinlässt",
+            "fr": "En attendant que {name} vous fasse entrer",
+            "it": "In attesa che {name} ti faccia entrare"
+        },
+        "unread": {
+            "en": "new messages",
+            "ml": "പുതിയ സന്ദേശങ്ങൾ",
+            "de": "neue Nachrichten",
+            "fr": "nouveaux messages",
+            "it": "nuovi messaggi"
+        },
+        "noMatch": {
+            "en": "Nobody called “{query}”. To add someone new,",
+            "ml": "“{query}” എന്ന പേരിൽ ആരുമില്ല. പുതിയ ഒരാളെ ചേർക്കാൻ,",
+            "de": "Niemand heißt „{query}“. Um jemand Neues hinzuzufügen,",
+            "fr": "Personne ne s’appelle « {query} ». Pour ajouter quelqu’un,",
+            "it": "Nessuno si chiama “{query}”. Per aggiungere qualcuno,"
+        },
+        "useAddress": {
+            "en": "use their address",
+            "ml": "അവരുടെ വിലാസം ഉപയോഗിക്കുക",
+            "de": "verwenden Sie die Adresse",
+            "fr": "utilisez son adresse",
+            "it": "usa il suo indirizzo"
+        },
+        "latest": {
+            "en": "Latest",
+            "ml": "ഏറ്റവും പുതിയത്",
+            "de": "Neueste",
+            "fr": "Récents",
+            "it": "Recenti"
+        },
+        "you": {
+            "en": "You:",
+            "ml": "നിങ്ങൾ:",
+            "de": "Sie:",
+            "fr": "Vous :",
+            "it": "Tu:"
+        },
+        "sayHello": {
+            "en": "Say hello",
+            "ml": "ഹലോ പറയൂ",
+            "de": "Sagen Sie Hallo",
+            "fr": "Dites bonjour",
+            "it": "Saluta"
+        },
+        "meTitle": {
+            "en": "Your profile and settings",
+            "ml": "നിങ്ങളുടെ പ്രൊഫൈലും ക്രമീകരണങ്ങളും",
+            "de": "Ihr Profil und Ihre Einstellungen",
+            "fr": "Votre profil et vos réglages",
+            "it": "Il tuo profilo e le impostazioni"
+        },
+        "edit": {
+            "en": "Edit",
+            "ml": "തിരുത്തുക",
+            "de": "Bearbeiten",
+            "fr": "Modifier",
+            "it": "Modifica"
+        },
+        "reachable": {
+            "en": "Reachable",
+            "ml": "ലഭ്യമാണ്",
+            "de": "Erreichbar",
+            "fr": "Joignable",
+            "it": "Raggiungibile"
+        },
+        "offlineShort": {
+            "en": "Offline",
+            "ml": "ഓഫ്‌ലൈൻ",
+            "de": "Offline",
+            "fr": "Hors ligne",
+            "it": "Offline"
+        },
+        "offline": {
+            "en": "You are offline. What you write waits here and goes out when you are back online.",
+            "ml": "നിങ്ങൾ ഓഫ്‌ലൈനാണ്. നിങ്ങൾ എഴുതുന്നത് ഇവിടെ കാത്തിരിക്കും, വീണ്ടും ഓൺലൈനാകുമ്പോൾ അയയ്ക്കും.",
+            "de": "Sie sind offline. Was Sie schreiben, wartet hier und wird gesendet, sobald Sie wieder online sind.",
+            "fr": "Vous êtes hors ligne. Ce que vous écrivez attend ici et partira dès votre retour en ligne.",
+            "it": "Sei offline. Ciò che scrivi resta qui e parte quando torni online."
+        },
+        "today": {
+            "en": "Today",
+            "ml": "ഇന്ന്",
+            "de": "Heute",
+            "fr": "Aujourd’hui",
+            "it": "Oggi"
+        },
+        "yesterday": {
+            "en": "Yesterday",
+            "ml": "ഇന്നലെ",
+            "de": "Gestern",
+            "fr": "Hier",
+            "it": "Ieri"
+        },
+        "justNow": {
+            "en": "just now",
+            "ml": "ഇപ്പോൾ",
+            "de": "gerade eben",
+            "fr": "à l’instant",
+            "it": "proprio ora"
+        },
+        "minutesAgo": {
+            "en": "{n} min ago",
+            "ml": "{n} മിനിറ്റ് മുമ്പ്",
+            "de": "vor {n} Min.",
+            "fr": "il y a {n} min",
+            "it": "{n} min fa"
+        },
+        "hoursAgo": {
+            "en": "{n} h ago",
+            "ml": "{n} മണിക്കൂർ മുമ്പ്",
+            "de": "vor {n} Std.",
+            "fr": "il y a {n} h",
+            "it": "{n} h fa"
+        }
+    },
+    "Home": {
+        "title": {
+            "en": "You are reachable",
+            "ml": "നിങ്ങൾ ലഭ്യമാണ്",
+            "de": "Sie sind erreichbar",
+            "fr": "Vous êtes joignable",
+            "it": "Sei raggiungibile"
+        },
+        "text": {
+            "en": "Pick someone in your hive to talk, or add a friend with their address.",
+            "ml": "സംസാരിക്കാൻ തേൻകൂട്ടിൽ നിന്ന് ഒരാളെ തിരഞ്ഞെടുക്കുക, അല്ലെങ്കിൽ വിലാസം ഉപയോഗിച്ച് ഒരു സുഹൃത്തിനെ ചേർക്കുക.",
+            "de": "Wählen Sie jemanden in Ihrer Wabe, um zu schreiben, oder fügen Sie einen Freund über seine Adresse hinzu.",
+            "fr": "Choisissez quelqu’un dans votre ruche pour discuter, ou ajoutez un ami avec son adresse.",
+            "it": "Scegli qualcuno nel tuo alveare per parlare, oppure aggiungi un amico con il suo indirizzo."
+        },
+        "emptyTitle": {
+            "en": "Your hive is empty, for now",
+            "ml": "നിങ്ങളുടെ തേൻകൂട് ഇപ്പോൾ ശൂന്യമാണ്",
+            "de": "Ihre Wabe ist noch leer",
+            "fr": "Votre ruche est vide, pour l’instant",
+            "it": "Il tuo alveare è vuoto, per ora"
+        },
+        "emptyText": {
+            "en": "HexHoot has no directory: friends find each other by address.",
+            "ml": "HexHoot-ൽ ഒരു ഡയറക്ടറിയില്ല: സുഹൃത്തുക്കൾ വിലാസം വഴി പരസ്പരം കണ്ടെത്തുന്നു.",
+            "de": "HexHoot hat kein Verzeichnis: Freunde finden sich über ihre Adressen.",
+            "fr": "HexHoot n’a pas d’annuaire : les amis se trouvent par leur adresse.",
+            "it": "HexHoot non ha una rubrica: gli amici si trovano tramite indirizzo."
+        },
+        "step1": {
+            "en": "Send your address (below) to a friend, any way you like.",
+            "ml": "നിങ്ങളുടെ വിലാസം (താഴെ) ഇഷ്ടമുള്ള വഴിയിൽ ഒരു സുഹൃത്തിന് അയയ്ക്കുക.",
+            "de": "Senden Sie Ihre Adresse (unten) auf beliebigem Weg an einen Freund.",
+            "fr": "Envoyez votre adresse (ci-dessous) à un ami, par le moyen de votre choix.",
+            "it": "Invia il tuo indirizzo (qui sotto) a un amico, come preferisci."
+        },
+        "step2": {
+            "en": "They add it, or you add theirs: that person knocks.",
+            "ml": "അവർ അത് ചേർക്കുന്നു, അല്ലെങ്കിൽ നിങ്ങൾ അവരുടേത് ചേർക്കുന്നു: ആ വ്യക്തി വാതിലിൽ മുട്ടുന്നു.",
+            "de": "Er fügt sie hinzu, oder Sie fügen seine hinzu: Diese Person klopft an.",
+            "fr": "Il l’ajoute, ou vous ajoutez la sienne : cette personne frappe.",
+            "it": "Lui aggiunge il tuo, o tu il suo: quella persona bussa."
+        },
+        "step3": {
+            "en": "The other one lets them in, and you can talk.",
+            "ml": "മറ്റേയാൾ അവരെ അകത്തേക്ക് വിടുന്നു, നിങ്ങൾക്ക് സംസാരിക്കാം.",
+            "de": "Der andere lässt sie herein, und Sie können schreiben.",
+            "fr": "L’autre la fait entrer, et vous pouvez discuter.",
+            "it": "L’altro la fa entrare, e potete parlare."
+        },
+        "offlineTitle": {
+            "en": "You are offline",
+            "ml": "നിങ്ങൾ ഓഫ്‌ലൈനാണ്",
+            "de": "Sie sind offline",
+            "fr": "Vous êtes hors ligne",
+            "it": "Sei offline"
+        },
+        "offlineText": {
+            "en": "Messages wait on this computer and go out when you are back online.",
+            "ml": "സന്ദേശങ്ങൾ ഈ കമ്പ്യൂട്ടറിൽ കാത്തിരിക്കും, വീണ്ടും ഓൺലൈനാകുമ്പോൾ അയയ്ക്കും.",
+            "de": "Nachrichten warten auf diesem Computer und werden gesendet, sobald Sie wieder online sind.",
+            "fr": "Les messages attendent sur cet ordinateur et partiront dès votre retour en ligne.",
+            "it": "I messaggi aspettano su questo computer e partono quando torni online."
+        },
+        "copyMine": {
+            "en": "Copy my address",
+            "ml": "എന്റെ വിലാസം കോപ്പി ചെയ്യുക",
+            "de": "Meine Adresse kopieren",
+            "fr": "Copier mon adresse",
+            "it": "Copia il mio indirizzo"
+        },
+        "keyFind": {
+            "en": "find",
+            "ml": "കണ്ടെത്തുക",
+            "de": "suchen",
+            "fr": "trouver",
+            "it": "trova"
+        },
+        "keyAdd": {
+            "en": "add",
+            "ml": "ചേർക്കുക",
+            "de": "hinzufügen",
+            "fr": "ajouter",
+            "it": "aggiungi"
+        },
+        "keySettings": {
+            "en": "settings",
+            "ml": "ക്രമീകരണങ്ങൾ",
+            "de": "Einstellungen",
+            "fr": "réglages",
+            "it": "impostazioni"
+        },
+        "keyMove": {
+            "en": "move in the hive",
+            "ml": "തേൻകൂട്ടിൽ നീങ്ങുക",
+            "de": "in der Wabe bewegen",
+            "fr": "se déplacer dans la ruche",
+            "it": "muoversi nell’alveare"
+        },
+        "keyBack": {
+            "en": "back",
+            "ml": "തിരികെ",
+            "de": "zurück",
+            "fr": "retour",
+            "it": "indietro"
+        }
+    },
+    "Requests": {
+        "title": {
+            "en": "Knocking at your hive",
+            "ml": "നിങ്ങളുടെ തേൻകൂട്ടിൽ മുട്ടുന്നവർ",
+            "de": "Klopft an Ihrer Wabe",
+            "fr": "Ils frappent à votre ruche",
+            "it": "Bussano al tuo alveare"
+        },
+        "explain": {
+            "en": "If you let them in, they get your name, photo and about text, and you can talk. If you say not now, they are not told.",
+            "ml": "നിങ്ങൾ അവരെ അകത്തേക്ക് വിട്ടാൽ, അവർക്ക് നിങ്ങളുടെ പേരും ഫോട്ടോയും വിവരണവും ലഭിക്കും, നിങ്ങൾക്ക് സംസാരിക്കാം. ഇപ്പോൾ വേണ്ട എന്ന് പറഞ്ഞാൽ, അവരെ അറിയിക്കില്ല.",
+            "de": "Wenn Sie die Person hereinlassen, erhält sie Ihren Namen, Ihr Foto und Ihren Infotext, und Sie können schreiben. Wenn Sie „Nicht jetzt“ wählen, erfährt sie nichts davon.",
+            "fr": "Si vous la faites entrer, elle reçoit votre nom, votre photo et votre présentation, et vous pouvez discuter. Si vous dites pas maintenant, elle n’en saura rien.",
+            "it": "Se la fai entrare, riceve il tuo nome, la foto e la presentazione, e potete parlare. Se dici non ora, non le viene detto nulla."
+        },
+        "letIn": {
+            "en": "Let in",
+            "ml": "അകത്തേക്ക് വിടുക",
+            "de": "Hereinlassen",
+            "fr": "Faire entrer",
+            "it": "Fai entrare"
+        },
+        "notNow": {
+            "en": "Not now",
+            "ml": "ഇപ്പോൾ വേണ്ട",
+            "de": "Nicht jetzt",
+            "fr": "Pas maintenant",
+            "it": "Non ora"
+        },
+        "more": {
+            "en": "{n} more knocking.",
+            "ml": "{n} പേർ കൂടി മുട്ടുന്നു.",
+            "de": "{n} weitere klopfen an.",
+            "fr": "{n} autres frappent.",
+            "it": "Altri {n} bussano."
+        },
+        "seeAll": {
+            "en": "See all",
+            "ml": "എല്ലാം കാണുക",
+            "de": "Alle ansehen",
+            "fr": "Tout voir",
+            "it": "Vedi tutti"
+        },
+        "none": {
+            "en": "Nobody is knocking.",
+            "ml": "ആരും മുട്ടുന്നില്ല.",
+            "de": "Niemand klopft an.",
+            "fr": "Personne ne frappe.",
+            "it": "Nessuno bussa."
+        },
+        "letInDone": {
+            "en": "{name} is in your hive. Say hello!",
+            "ml": "{name} നിങ്ങളുടെ തേൻകൂട്ടിലുണ്ട്. ഹലോ പറയൂ!",
+            "de": "{name} ist in Ihrer Wabe. Sagen Sie Hallo!",
+            "fr": "{name} est dans votre ruche. Dites bonjour !",
+            "it": "{name} è nel tuo alveare. Saluta!"
+        },
+        "notNowDone": {
+            "en": "Not now. {name} is not told.",
+            "ml": "ഇപ്പോൾ വേണ്ട. {name}-നെ അറിയിക്കില്ല.",
+            "de": "Nicht jetzt. {name} erfährt nichts davon.",
+            "fr": "Pas maintenant. {name} n’en saura rien.",
+            "it": "Non ora. {name} non lo saprà."
+        }
+    },
+    "Chain": {
+        "messages": {
+            "en": "Messages",
+            "ml": "സന്ദേശങ്ങൾ",
+            "de": "Nachrichten",
+            "fr": "Messages",
+            "it": "Messaggi"
+        },
+        "message": {
+            "en": "Message",
+            "ml": "സന്ദേശം",
+            "de": "Nachricht",
+            "fr": "Message",
+            "it": "Messaggio"
+        },
+        "placeholder": {
+            "en": "Write a message",
+            "ml": "ഒരു സന്ദേശം എഴുതുക",
+            "de": "Nachricht schreiben",
+            "fr": "Écrire un message",
+            "it": "Scrivi un messaggio"
+        },
+        "lockedPlaceholder": {
+            "en": "You can write once {name} lets you in",
+            "ml": "{name} അകത്തേക്ക് വിട്ടാൽ നിങ്ങൾക്ക് എഴുതാം",
+            "de": "Sie können schreiben, sobald {name} Sie hereinlässt",
+            "fr": "Vous pourrez écrire dès que {name} vous fera entrer",
+            "it": "Potrai scrivere quando {name} ti farà entrare"
+        },
+        "send": {
+            "en": "Send (Enter)",
+            "ml": "അയയ്ക്കുക (Enter)",
+            "de": "Senden (Eingabetaste)",
+            "fr": "Envoyer (Entrée)",
+            "it": "Invia (Invio)"
+        },
+        "withdraw": {
+            "en": "Withdraw request",
+            "ml": "അഭ്യർത്ഥന പിൻവലിക്കുക",
+            "de": "Anfrage zurückziehen",
+            "fr": "Retirer la demande",
+            "it": "Ritira la richiesta"
+        },
+        "withdrawn": {
+            "en": "Request withdrawn.",
+            "ml": "അഭ്യർത്ഥന പിൻവലിച്ചു.",
+            "de": "Anfrage zurückgezogen.",
+            "fr": "Demande retirée.",
+            "it": "Richiesta ritirata."
+        },
+        "linkWaiting": {
+            "en": "Waiting for them to let you in",
+            "ml": "അവർ നിങ്ങളെ അകത്തേക്ക് വിടുന്നതിനായി കാത്തിരിക്കുന്നു",
+            "de": "Wartet darauf, hereingelassen zu werden",
+            "fr": "En attendant qu’on vous fasse entrer",
+            "it": "In attesa di essere fatto entrare"
+        },
+        "linkOffline": {
+            "en": "You are offline; messages wait",
+            "ml": "നിങ്ങൾ ഓഫ്‌ലൈനാണ്; സന്ദേശങ്ങൾ കാത്തിരിക്കും",
+            "de": "Sie sind offline; Nachrichten warten",
+            "fr": "Vous êtes hors ligne ; les messages attendent",
+            "it": "Sei offline; i messaggi aspettano"
+        },
+        "linkNone": {
+            "en": "Not heard from since HexHoot started; messages wait until they are online",
+            "ml": "HexHoot തുടങ്ങിയതിനു ശേഷം വിവരമില്ല; അവർ ഓൺലൈനാകുന്നതുവരെ സന്ദേശങ്ങൾ കാത്തിരിക്കും",
+            "de": "Seit dem Start von HexHoot nichts gehört; Nachrichten warten, bis die Person online ist",
+            "fr": "Pas de nouvelles depuis le démarrage de HexHoot ; les messages attendent qu’elle soit en ligne",
+            "it": "Nessuna notizia dall’avvio di HexHoot; i messaggi aspettano che sia online"
+        },
+        "linkDirect": {
+            "en": "Direct · local network · {ago}",
+            "ml": "നേരിട്ട് · ലോക്കൽ നെറ്റ്‌വർക്ക് · {ago}",
+            "de": "Direkt · lokales Netzwerk · {ago}",
+            "fr": "Direct · réseau local · {ago}",
+            "it": "Diretto · rete locale · {ago}"
+        },
+        "linkInternet": {
+            "en": "Over the internet · {ago}",
+            "ml": "ഇന്റർനെറ്റ് വഴി · {ago}",
+            "de": "Über das Internet · {ago}",
+            "fr": "Par Internet · {ago}",
+            "it": "Via internet · {ago}"
+        },
+        "startTitle": {
+            "en": "The start of your chain with {name}",
+            "ml": "{name}-മായുള്ള നിങ്ങളുടെ ചങ്ങലയുടെ തുടക്കം",
+            "de": "Der Anfang Ihrer Kette mit {name}",
+            "fr": "Le début de votre chaîne avec {name}",
+            "it": "L’inizio della tua catena con {name}"
+        },
+        "startText": {
+            "en": "Messages go straight to {name}, encrypted end to end. If {name} is offline, they wait here.",
+            "ml": "സന്ദേശങ്ങൾ എൻഡ്-ടു-എൻഡ് എൻക്രിപ്റ്റ് ചെയ്ത് നേരിട്ട് {name}-ന് പോകുന്നു. {name} ഓഫ്‌ലൈനാണെങ്കിൽ, അവ ഇവിടെ കാത്തിരിക്കും.",
+            "de": "Nachrichten gehen direkt an {name}, Ende-zu-Ende-verschlüsselt. Ist {name} offline, warten sie hier.",
+            "fr": "Les messages vont directement à {name}, chiffrés de bout en bout. Si {name} est hors ligne, ils attendent ici.",
+            "it": "I messaggi vanno direttamente a {name}, cifrati end-to-end. Se {name} è offline, aspettano qui."
+        },
+        "waitingTitle": {
+            "en": "Waiting for {name} to let you in",
+            "ml": "{name} നിങ്ങളെ അകത്തേക്ക് വിടുന്നതിനായി കാത്തിരിക്കുന്നു",
+            "de": "Warten, bis {name} Sie hereinlässt",
+            "fr": "En attendant que {name} vous fasse entrer",
+            "it": "In attesa che {name} ti faccia entrare"
+        },
+        "waitingText": {
+            "en": "Your request reaches {name} the next time you are both online. You can withdraw it until then.",
+            "ml": "നിങ്ങൾ ഇരുവരും അടുത്ത തവണ ഓൺലൈനാകുമ്പോൾ നിങ്ങളുടെ അഭ്യർത്ഥന {name}-ന് ലഭിക്കും. അതുവരെ നിങ്ങൾക്ക് അത് പിൻവലിക്കാം.",
+            "de": "Ihre Anfrage erreicht {name}, sobald Sie beide online sind. Bis dahin können Sie sie zurückziehen.",
+            "fr": "Votre demande parviendra à {name} la prochaine fois que vous serez tous deux en ligne. D’ici là, vous pouvez la retirer.",
+            "it": "La tua richiesta arriverà a {name} la prossima volta che sarete entrambi online. Fino ad allora puoi ritirarla."
+        },
+        "delivered": {
+            "en": "delivered",
+            "ml": "എത്തി",
+            "de": "zugestellt",
+            "fr": "remis",
+            "it": "consegnato"
+        },
+        "waiting": {
+            "en": "waiting",
+            "ml": "കാത്തിരിക്കുന്നു",
+            "de": "wartet",
+            "fr": "en attente",
+            "it": "in attesa"
+        },
+        "received": {
+            "en": "received",
+            "ml": "ലഭിച്ചു",
+            "de": "empfangen",
+            "fr": "reçu",
+            "it": "ricevuto"
+        },
+        "dontSend": {
+            "en": "Don’t send",
+            "ml": "അയയ്ക്കേണ്ട",
+            "de": "Nicht senden",
+            "fr": "Ne pas envoyer",
+            "it": "Non inviare"
+        },
+        "notSent": {
+            "en": "Not sent. It was removed before it left this computer.",
+            "ml": "അയച്ചില്ല. ഈ കമ്പ്യൂട്ടർ വിടുന്നതിനു മുമ്പ് അത് നീക്കം ചെയ്തു.",
+            "de": "Nicht gesendet. Die Nachricht wurde entfernt, bevor sie diesen Computer verließ.",
+            "fr": "Non envoyé. Il a été retiré avant de quitter cet ordinateur.",
+            "it": "Non inviato. È stato rimosso prima di lasciare questo computer."
+        },
+        "alreadyDelivered": {
+            "en": "Too late: it was already delivered.",
+            "ml": "വൈകിപ്പോയി: അത് ഇതിനകം എത്തിക്കഴിഞ്ഞു.",
+            "de": "Zu spät: Die Nachricht wurde bereits zugestellt.",
+            "fr": "Trop tard : il a déjà été remis.",
+            "it": "Troppo tardi: è già stato consegnato."
+        },
+        "notFriendYet": {
+            "en": "They have not let you in yet.",
+            "ml": "അവർ ഇതുവരെ നിങ്ങളെ അകത്തേക്ക് വിട്ടിട്ടില്ല.",
+            "de": "Die Person hat Sie noch nicht hereingelassen.",
+            "fr": "Cette personne ne vous a pas encore fait entrer.",
+            "it": "Questa persona non ti ha ancora fatto entrare."
+        },
+        "eventMe": {
+            "en": "You let {name} into your hive",
+            "ml": "നിങ്ങൾ {name}-നെ തേൻകൂട്ടിലേക്ക് വിട്ടു",
+            "de": "Sie haben {name} in Ihre Wabe gelassen",
+            "fr": "Vous avez fait entrer {name} dans votre ruche",
+            "it": "Hai fatto entrare {name} nel tuo alveare"
+        },
+        "eventThem": {
+            "en": "{name} let you in",
+            "ml": "{name} നിങ്ങളെ അകത്തേക്ക് വിട്ടു",
+            "de": "{name} hat Sie hereingelassen",
+            "fr": "{name} vous a fait entrer",
+            "it": "{name} ti ha fatto entrare"
+        },
+        "eventBoth": {
+            "en": "You added each other",
+            "ml": "നിങ്ങൾ പരസ്പരം ചേർത്തു",
+            "de": "Sie haben sich gegenseitig hinzugefügt",
+            "fr": "Vous vous êtes ajoutés mutuellement",
+            "it": "Vi siete aggiunti a vicenda"
+        },
+        "eventVerified": {
+            "en": "You verified the safety number",
+            "ml": "നിങ്ങൾ സുരക്ഷാ നമ്പർ പരിശോധിച്ചു",
+            "de": "Sie haben die Sicherheitsnummer verifiziert",
+            "fr": "Vous avez vérifié le numéro de sécurité",
+            "it": "Hai verificato il numero di sicurezza"
+        },
+        "eventUnverified": {
+            "en": "You removed the verified mark",
+            "ml": "നിങ്ങൾ പരിശോധിച്ചു എന്ന അടയാളം നീക്കം ചെയ്തു",
+            "de": "Sie haben die Verifizierung entfernt",
+            "fr": "Vous avez retiré la marque de vérification",
+            "it": "Hai rimosso il segno di verifica"
+        },
+        "eventRenamed": {
+            "en": "{from} is now called {to}",
+            "ml": "{from} ഇപ്പോൾ {to} എന്നറിയപ്പെടുന്നു",
+            "de": "{from} heißt jetzt {to}",
+            "fr": "{from} s’appelle maintenant {to}",
+            "it": "{from} ora si chiama {to}"
+        },
+        "eventPhoto": {
+            "en": "{name} has a new photo",
+            "ml": "{name}-ന് പുതിയ ഫോട്ടോ ഉണ്ട്",
+            "de": "{name} hat ein neues Foto",
+            "fr": "{name} a une nouvelle photo",
+            "it": "{name} ha una nuova foto"
+        }
+    },
+    "Contact": {
+        "title": {
+            "en": "Contact details and safety number",
+            "ml": "ബന്ധപ്പെടാനുള്ള വിവരങ്ങളും സുരക്ഷാ നമ്പറും",
+            "de": "Kontaktdetails und Sicherheitsnummer",
+            "fr": "Coordonnées et numéro de sécurité",
+            "it": "Dettagli del contatto e numero di sicurezza"
+        },
+        "close": {
+            "en": "Close (Esc)",
+            "ml": "അടയ്ക്കുക (Esc)",
+            "de": "Schließen (Esc)",
+            "fr": "Fermer (Échap)",
+            "it": "Chiudi (Esc)"
+        },
+        "safetyNumber": {
+            "en": "Safety number",
+            "ml": "സുരക്ഷാ നമ്പർ",
+            "de": "Sicherheitsnummer",
+            "fr": "Numéro de sécurité",
+            "it": "Numero di sicurezza"
+        },
+        "safetyHelp": {
+            "en": "Compare it with {name} in person or on a call. If you both see the same number, your messages go only to each other.",
+            "ml": "ഇത് {name}-മായി നേരിട്ടോ ഫോൺ വിളിയിലോ ഒത്തുനോക്കുക. നിങ്ങൾ ഇരുവരും ഒരേ നമ്പർ കാണുന്നുവെങ്കിൽ, നിങ്ങളുടെ സന്ദേശങ്ങൾ നിങ്ങൾക്കിടയിൽ മാത്രമേ പോകൂ.",
+            "de": "Vergleichen Sie sie mit {name} persönlich oder in einem Anruf. Wenn Sie beide dieselbe Nummer sehen, gehen Ihre Nachrichten nur an Sie beide.",
+            "fr": "Comparez-le avec {name} en personne ou lors d’un appel. Si vous voyez tous les deux le même numéro, vos messages ne vont qu’à vous deux.",
+            "it": "Confrontalo con {name} di persona o durante una chiamata. Se vedete entrambi lo stesso numero, i vostri messaggi arrivano solo a voi due."
+        },
+        "numbersMatch": {
+            "en": "The numbers match",
+            "ml": "നമ്പറുകൾ ഒന്നുതന്നെ",
+            "de": "Die Nummern stimmen überein",
+            "fr": "Les numéros correspondent",
+            "it": "I numeri corrispondono"
+        },
+        "verified": {
+            "en": "Verified",
+            "ml": "പരിശോധിച്ചു",
+            "de": "Verifiziert",
+            "fr": "Vérifié",
+            "it": "Verificato"
+        },
+        "removeMark": {
+            "en": "Remove mark",
+            "ml": "അടയാളം നീക്കുക",
+            "de": "Markierung entfernen",
+            "fr": "Retirer la marque",
+            "it": "Rimuovi il segno"
+        },
+        "address": {
+            "en": "Address",
+            "ml": "വിലാസം",
+            "de": "Adresse",
+            "fr": "Adresse",
+            "it": "Indirizzo"
+        },
+        "copyAddress": {
+            "en": "Copy address",
+            "ml": "വിലാസം കോപ്പി ചെയ്യുക",
+            "de": "Adresse kopieren",
+            "fr": "Copier l’adresse",
+            "it": "Copia l’indirizzo"
+        },
+        "remove": {
+            "en": "Remove from hive",
+            "ml": "തേൻകൂട്ടിൽ നിന്ന് നീക്കം ചെയ്യുക",
+            "de": "Aus der Wabe entfernen",
+            "fr": "Retirer de la ruche",
+            "it": "Rimuovi dall’alveare"
+        },
+        "block": {
+            "en": "Block",
+            "ml": "ബ്ലോക്ക് ചെയ്യുക",
+            "de": "Blockieren",
+            "fr": "Bloquer",
+            "it": "Blocca"
+        },
+        "removeTitle": {
+            "en": "Remove {name}?",
+            "ml": "{name}-നെ നീക്കം ചെയ്യണോ?",
+            "de": "{name} entfernen?",
+            "fr": "Retirer {name} ?",
+            "it": "Rimuovere {name}?"
+        },
+        "removeText": {
+            "en": "Their profile and your conversation are deleted from this computer. {name} is not told and can knock again.",
+            "ml": "അവരുടെ പ്രൊഫൈലും നിങ്ങളുടെ സംഭാഷണവും ഈ കമ്പ്യൂട്ടറിൽ നിന്ന് ഇല്ലാതാക്കും. {name}-നെ അറിയിക്കില്ല, അവർക്ക് വീണ്ടും മുട്ടാം.",
+            "de": "Profil und Unterhaltung werden von diesem Computer gelöscht. {name} erfährt nichts davon und kann wieder anklopfen.",
+            "fr": "Son profil et votre conversation sont supprimés de cet ordinateur. {name} n’en saura rien et pourra frapper à nouveau.",
+            "it": "Il profilo e la conversazione vengono eliminati da questo computer. {name} non lo saprà e potrà bussare di nuovo."
+        },
+        "blockTitle": {
+            "en": "Block {name}?",
+            "ml": "{name}-നെ ബ്ലോക്ക് ചെയ്യണോ?",
+            "de": "{name} blockieren?",
+            "fr": "Bloquer {name} ?",
+            "it": "Bloccare {name}?"
+        },
+        "blockText": {
+            "en": "{name} is removed and can no longer reach you: no messages, no requests. You can unblock them in Settings.",
+            "ml": "{name}-നെ നീക്കം ചെയ്യും, ഇനി നിങ്ങളെ ബന്ധപ്പെടാനാവില്ല: സന്ദേശങ്ങളില്ല, അഭ്യർത്ഥനകളില്ല. ക്രമീകരണങ്ങളിൽ നിന്ന് അൺബ്ലോക്ക് ചെയ്യാം.",
+            "de": "{name} wird entfernt und kann Sie nicht mehr erreichen: keine Nachrichten, keine Anfragen. In den Einstellungen können Sie die Blockierung aufheben.",
+            "fr": "{name} est retiré et ne peut plus vous joindre : ni messages, ni demandes. Vous pouvez le débloquer dans les réglages.",
+            "it": "{name} viene rimosso e non può più raggiungerti: niente messaggi, niente richieste. Puoi sbloccarlo nelle impostazioni."
+        },
+        "removed": {
+            "en": "{name} was removed from your hive.",
+            "ml": "{name}-നെ തേൻകൂട്ടിൽ നിന്ന് നീക്കം ചെയ്തു.",
+            "de": "{name} wurde aus Ihrer Wabe entfernt.",
+            "fr": "{name} a été retiré de votre ruche.",
+            "it": "{name} è stato rimosso dal tuo alveare."
+        },
+        "blocked": {
+            "en": "{name} is blocked.",
+            "ml": "{name}-നെ ബ്ലോക്ക് ചെയ്തു.",
+            "de": "{name} ist blockiert.",
+            "fr": "{name} est bloqué.",
+            "it": "{name} è bloccato."
+        }
+    },
+    "Settings": {
+        "title": {
+            "en": "Settings",
+            "ml": "ക്രമീകരണങ്ങൾ",
+            "de": "Einstellungen",
+            "fr": "Réglages",
+            "it": "Impostazioni"
+        },
+        "profile": {
+            "en": "Profile",
+            "ml": "പ്രൊഫൈൽ",
+            "de": "Profil",
+            "fr": "Profil",
+            "it": "Profilo"
+        },
+        "profileIntro": {
+            "en": "What your friends see. Changes go to everyone in your hive.",
+            "ml": "നിങ്ങളുടെ സുഹൃത്തുക്കൾ കാണുന്നത്. മാറ്റങ്ങൾ തേൻകൂട്ടിലെ എല്ലാവർക്കും പോകും.",
+            "de": "Was Ihre Freunde sehen. Änderungen gehen an alle in Ihrer Wabe.",
+            "fr": "Ce que vos amis voient. Les changements sont envoyés à toute votre ruche.",
+            "it": "Ciò che vedono i tuoi amici. Le modifiche arrivano a tutto il tuo alveare."
+        },
+        "security": {
+            "en": "Account and security",
+            "ml": "അക്കൗണ്ടും സുരക്ഷയും",
+            "de": "Konto und Sicherheit",
+            "fr": "Compte et sécurité",
+            "it": "Account e sicurezza"
+        },
+        "securityIntro": {
+            "en": "Your name and password are your account: there is no server that could reset them.",
+            "ml": "നിങ്ങളുടെ പേരും പാസ്‌വേഡുമാണ് നിങ്ങളുടെ അക്കൗണ്ട്: അവ പുനഃസജ്ജമാക്കാൻ ഒരു സെർവറുമില്ല.",
+            "de": "Ihr Name und Ihr Passwort sind Ihr Konto: Es gibt keinen Server, der sie zurücksetzen könnte.",
+            "fr": "Votre nom et votre mot de passe sont votre compte : aucun serveur ne peut les réinitialiser.",
+            "it": "Il tuo nome e la password sono il tuo account: non c’è alcun server che possa reimpostarli."
+        },
+        "backup": {
+            "en": "Backup",
+            "ml": "ബാക്കപ്പ്",
+            "de": "Sicherung",
+            "fr": "Sauvegarde",
+            "it": "Backup"
+        },
+        "backupIntro": {
+            "en": "A backup file holds your contacts, messages and keys, encrypted with a passphrase.",
+            "ml": "ഒരു ബാക്കപ്പ് ഫയലിൽ നിങ്ങളുടെ കോൺടാക്റ്റുകളും സന്ദേശങ്ങളും കീകളും ഒരു പാസ്‌ഫ്രേസ് ഉപയോഗിച്ച് എൻക്രിപ്റ്റ് ചെയ്ത് സൂക്ഷിക്കുന്നു.",
+            "de": "Eine Sicherungsdatei enthält Ihre Kontakte, Nachrichten und Schlüssel, verschlüsselt mit einer Passphrase.",
+            "fr": "Un fichier de sauvegarde contient vos contacts, messages et clés, chiffrés avec une phrase secrète.",
+            "it": "Un file di backup contiene contatti, messaggi e chiavi, cifrati con una passphrase."
+        },
+        "appearance": {
+            "en": "Appearance",
+            "ml": "രൂപം",
+            "de": "Darstellung",
+            "fr": "Apparence",
+            "it": "Aspetto"
+        },
+        "appearanceIntro": {
+            "en": "Night or day, or follow your computer.",
+            "ml": "രാത്രി അല്ലെങ്കിൽ പകൽ, അല്ലെങ്കിൽ നിങ്ങളുടെ കമ്പ്യൂട്ടറിനെ പിന്തുടരുക.",
+            "de": "Nacht oder Tag, oder wie Ihr Computer.",
+            "fr": "Nuit ou jour, ou comme votre ordinateur.",
+            "it": "Notte o giorno, oppure come il tuo computer."
+        },
+        "theme_night": {
+            "en": "Night",
+            "ml": "രാത്രി",
+            "de": "Nacht",
+            "fr": "Nuit",
+            "it": "Notte"
+        },
+        "theme_day": {
+            "en": "Day",
+            "ml": "പകൽ",
+            "de": "Tag",
+            "fr": "Jour",
+            "it": "Giorno"
+        },
+        "theme_system": {
+            "en": "Follow my computer",
+            "ml": "എന്റെ കമ്പ്യൂട്ടറിനെ പിന്തുടരുക",
+            "de": "Wie mein Computer",
+            "fr": "Comme mon ordinateur",
+            "it": "Come il mio computer"
+        },
+        "motion": {
+            "en": "Animations follow your computer’s “reduce motion” setting.",
+            "ml": "ആനിമേഷനുകൾ നിങ്ങളുടെ കമ്പ്യൂട്ടറിന്റെ “ചലനം കുറയ്ക്കുക” ക്രമീകരണം പിന്തുടരുന്നു.",
+            "de": "Animationen folgen der Einstellung „Bewegung reduzieren“ Ihres Computers.",
+            "fr": "Les animations suivent le réglage « réduire les animations » de votre ordinateur.",
+            "it": "Le animazioni seguono l’impostazione “riduci movimento” del tuo computer."
+        },
+        "language": {
+            "en": "Language",
+            "ml": "ഭാഷ",
+            "de": "Sprache",
+            "fr": "Langue",
+            "it": "Lingua"
+        },
+        "languageIntro": {
+            "en": "The window redraws in the new language at once; nothing else changes.",
+            "ml": "വിൻഡോ ഉടൻ പുതിയ ഭാഷയിൽ വീണ്ടും വരയ്ക്കും; മറ്റൊന്നും മാറില്ല.",
+            "de": "Das Fenster erscheint sofort in der neuen Sprache; sonst ändert sich nichts.",
+            "fr": "La fenêtre s’affiche aussitôt dans la nouvelle langue ; rien d’autre ne change.",
+            "it": "La finestra si aggiorna subito nella nuova lingua; non cambia nient’altro."
+        },
+        "blocked": {
+            "en": "Blocked",
+            "ml": "ബ്ലോക്ക് ചെയ്തവർ",
+            "de": "Blockiert",
+            "fr": "Bloqués",
+            "it": "Bloccati"
+        },
+        "blockedIntro": {
+            "en": "Blocked addresses cannot send you messages or requests.",
+            "ml": "ബ്ലോക്ക് ചെയ്ത വിലാസങ്ങൾക്ക് നിങ്ങൾക്ക് സന്ദേശങ്ങളോ അഭ്യർത്ഥനകളോ അയയ്ക്കാനാവില്ല.",
+            "de": "Blockierte Adressen können Ihnen weder Nachrichten noch Anfragen senden.",
+            "fr": "Les adresses bloquées ne peuvent vous envoyer ni messages ni demandes.",
+            "it": "Gli indirizzi bloccati non possono inviarti messaggi né richieste."
+        },
+        "about": {
+            "en": "About",
+            "ml": "വിവരം",
+            "de": "Über",
+            "fr": "À propos",
+            "it": "Informazioni"
+        },
+        "aboutIntro": {
+            "en": "HexHoot is free software: a messenger with no server in the middle.",
+            "ml": "HexHoot ഒരു സ്വതന്ത്ര സോഫ്റ്റ്‌വെയറാണ്: നടുവിൽ സെർവറില്ലാത്ത ഒരു മെസഞ്ചർ.",
+            "de": "HexHoot ist freie Software: ein Messenger ohne Server in der Mitte.",
+            "fr": "HexHoot est un logiciel libre : une messagerie sans serveur au milieu.",
+            "it": "HexHoot è software libero: un messenger senza server nel mezzo."
+        },
+        "changePhoto": {
+            "en": "Change photo",
+            "ml": "ഫോട്ടോ മാറ്റുക",
+            "de": "Foto ändern",
+            "fr": "Changer de photo",
+            "it": "Cambia foto"
+        },
+        "removePhoto": {
+            "en": "Remove photo",
+            "ml": "ഫോട്ടോ നീക്കം ചെയ്യുക",
+            "de": "Foto entfernen",
+            "fr": "Retirer la photo",
+            "it": "Rimuovi la foto"
+        },
+        "photoReady": {
+            "en": "New photo ready ({size} KB, shrunk to fit in a message). Save to send it to your friends.",
+            "ml": "പുതിയ ഫോട്ടോ തയ്യാർ ({size} KB, ഒരു സന്ദേശത്തിൽ ഒതുങ്ങാൻ ചെറുതാക്കി). സുഹൃത്തുക്കൾക്ക് അയയ്ക്കാൻ സേവ് ചെയ്യുക.",
+            "de": "Neues Foto bereit ({size} KB, verkleinert, damit es in eine Nachricht passt). Speichern Sie, um es Ihren Freunden zu senden.",
+            "fr": "Nouvelle photo prête ({size} Ko, réduite pour tenir dans un message). Enregistrez pour l’envoyer à vos amis.",
+            "it": "Nuova foto pronta ({size} KB, ridotta per stare in un messaggio). Salva per inviarla ai tuoi amici."
+        },
+        "photoUnreadable": {
+            "en": "That file could not be read as a photo.",
+            "ml": "ആ ഫയൽ ഒരു ഫോട്ടോയായി വായിക്കാനായില്ല.",
+            "de": "Die Datei konnte nicht als Foto gelesen werden.",
+            "fr": "Ce fichier n’a pas pu être lu comme une photo.",
+            "it": "Quel file non può essere letto come foto."
+        },
+        "nameHint": {
+            "en": "How your name is shown. It does not change the name you sign in with.",
+            "ml": "നിങ്ങളുടെ പേര് എങ്ങനെ കാണിക്കുന്നു എന്നത്. സൈൻ ഇൻ ചെയ്യുന്ന പേര് ഇത് മാറ്റില്ല.",
+            "de": "So wird Ihr Name angezeigt. Der Name, mit dem Sie sich anmelden, ändert sich nicht.",
+            "fr": "La façon dont votre nom est affiché. Cela ne change pas le nom de connexion.",
+            "it": "Come viene mostrato il tuo nome. Non cambia il nome con cui accedi."
+        },
+        "save": {
+            "en": "Save",
+            "ml": "സേവ് ചെയ്യുക",
+            "de": "Speichern",
+            "fr": "Enregistrer",
+            "it": "Salva"
+        },
+        "saved": {
+            "en": "Saved, and sent to your friends.",
+            "ml": "സേവ് ചെയ്തു, സുഹൃത്തുക്കൾക്ക് അയച്ചു.",
+            "de": "Gespeichert und an Ihre Freunde gesendet.",
+            "fr": "Enregistré et envoyé à vos amis.",
+            "it": "Salvato e inviato ai tuoi amici."
+        },
+        "yourAddress": {
+            "en": "Your address",
+            "ml": "നിങ്ങളുടെ വിലാസം",
+            "de": "Ihre Adresse",
+            "fr": "Votre adresse",
+            "it": "Il tuo indirizzo"
+        },
+        "checkTitle": {
+            "en": "Password check",
+            "ml": "പാസ്‌വേഡ് പരിശോധന",
+            "de": "Passwortprüfung",
+            "fr": "Vérification du mot de passe",
+            "it": "Verifica della password"
+        },
+        "checkText": {
+            "en": "Practise remembering your password. HexHoot also asks now and then.",
+            "ml": "പാസ്‌വേഡ് ഓർത്തുവെക്കാൻ പരിശീലിക്കുക. HexHoot ഇടയ്ക്കിടെ ചോദിക്കുകയും ചെയ്യും.",
+            "de": "Üben Sie, sich an Ihr Passwort zu erinnern. HexHoot fragt auch ab und zu.",
+            "fr": "Entraînez-vous à retenir votre mot de passe. HexHoot le demande aussi de temps en temps.",
+            "it": "Esercitati a ricordare la password. Anche HexHoot te lo chiede ogni tanto."
+        },
+        "checkNow": {
+            "en": "Check now",
+            "ml": "ഇപ്പോൾ പരിശോധിക്കുക",
+            "de": "Jetzt prüfen",
+            "fr": "Vérifier maintenant",
+            "it": "Verifica ora"
+        },
+        "signedInTitle": {
+            "en": "Staying signed in",
+            "ml": "സൈൻ ഇൻ ചെയ്ത നിലയിൽ തുടരുന്നു",
+            "de": "Angemeldet bleiben",
+            "fr": "Rester connecté",
+            "it": "Restare connesso"
+        },
+        "signedInText": {
+            "en": "Your keys are protected by your computer’s keychain where there is one, so HexHoot opens without asking for your password.",
+            "ml": "ലഭ്യമാണെങ്കിൽ നിങ്ങളുടെ കീകൾ കമ്പ്യൂട്ടറിന്റെ കീചെയിൻ സംരക്ഷിക്കുന്നു, അതിനാൽ HexHoot പാസ്‌വേഡ് ചോദിക്കാതെ തുറക്കും.",
+            "de": "Ihre Schlüssel werden, wo vorhanden, durch den Schlüsselbund Ihres Computers geschützt; daher öffnet sich HexHoot ohne Passwortabfrage.",
+            "fr": "Vos clés sont protégées par le trousseau de votre ordinateur s’il en a un ; HexHoot s’ouvre donc sans demander votre mot de passe.",
+            "it": "Le tue chiavi sono protette dal portachiavi del computer, se presente, così HexHoot si apre senza chiedere la password."
+        },
+        "removeTitle": {
+            "en": "Remove account from this computer",
+            "ml": "ഈ കമ്പ്യൂട്ടറിൽ നിന്ന് അക്കൗണ്ട് നീക്കം ചെയ്യുക",
+            "de": "Konto von diesem Computer entfernen",
+            "fr": "Retirer le compte de cet ordinateur",
+            "it": "Rimuovi l’account da questo computer"
+        },
+        "removeText": {
+            "en": "Deletes your keys, contacts and messages here. Your name and password still work, but contacts and messages come back only from a backup.",
+            "ml": "ഇവിടെയുള്ള നിങ്ങളുടെ കീകളും കോൺടാക്റ്റുകളും സന്ദേശങ്ങളും ഇല്ലാതാക്കുന്നു. പേരും പാസ്‌വേഡും ഇപ്പോഴും പ്രവർത്തിക്കും, പക്ഷേ കോൺടാക്റ്റുകളും സന്ദേശങ്ങളും ഒരു ബാക്കപ്പിൽ നിന്ന് മാത്രമേ തിരികെ ലഭിക്കൂ.",
+            "de": "Löscht Ihre Schlüssel, Kontakte und Nachrichten hier. Name und Passwort funktionieren weiterhin, aber Kontakte und Nachrichten kommen nur aus einer Sicherung zurück.",
+            "fr": "Supprime vos clés, contacts et messages ici. Votre nom et votre mot de passe fonctionnent toujours, mais contacts et messages ne reviennent que depuis une sauvegarde.",
+            "it": "Elimina chiavi, contatti e messaggi da qui. Nome e password continuano a funzionare, ma contatti e messaggi tornano solo da un backup."
+        },
+        "removeAsk": {
+            "en": "Remove account…",
+            "ml": "അക്കൗണ്ട് നീക്കം ചെയ്യുക…",
+            "de": "Konto entfernen …",
+            "fr": "Retirer le compte…",
+            "it": "Rimuovi l’account…"
+        },
+        "removeAck": {
+            "en": "I have a backup, or I accept that my contacts and messages on this computer will be gone.",
+            "ml": "എനിക്ക് ഒരു ബാക്കപ്പ് ഉണ്ട്, അല്ലെങ്കിൽ ഈ കമ്പ്യൂട്ടറിലെ എന്റെ കോൺടാക്റ്റുകളും സന്ദേശങ്ങളും ഇല്ലാതാകുമെന്ന് ഞാൻ അംഗീകരിക്കുന്നു.",
+            "de": "Ich habe eine Sicherung, oder ich akzeptiere, dass meine Kontakte und Nachrichten auf diesem Computer verloren gehen.",
+            "fr": "J’ai une sauvegarde, ou j’accepte que mes contacts et messages sur cet ordinateur disparaissent.",
+            "it": "Ho un backup, oppure accetto che i miei contatti e messaggi su questo computer vadano persi."
+        },
+        "removeConfirm": {
+            "en": "Remove from this computer",
+            "ml": "ഈ കമ്പ്യൂട്ടറിൽ നിന്ന് നീക്കം ചെയ്യുക",
+            "de": "Von diesem Computer entfernen",
+            "fr": "Retirer de cet ordinateur",
+            "it": "Rimuovi da questo computer"
+        },
+        "passphrase": {
+            "en": "Passphrase for the backup file",
+            "ml": "ബാക്കപ്പ് ഫയലിനുള്ള പാസ്‌ഫ്രേസ്",
+            "de": "Passphrase für die Sicherungsdatei",
+            "fr": "Phrase secrète du fichier de sauvegarde",
+            "it": "Passphrase per il file di backup"
+        },
+        "passphraseMin": {
+            "en": "At least {n} characters",
+            "ml": "കുറഞ്ഞത് {n} അക്ഷരങ്ങൾ",
+            "de": "Mindestens {n} Zeichen",
+            "fr": "Au moins {n} caractères",
+            "it": "Almeno {n} caratteri"
+        },
+        "passphraseMore": {
+            "en": "{n} more characters",
+            "ml": "{n} അക്ഷരങ്ങൾ കൂടി",
+            "de": "Noch {n} Zeichen",
+            "fr": "Encore {n} caractères",
+            "it": "Ancora {n} caratteri"
+        },
+        "passphraseOk": {
+            "en": "Long enough. Keep it somewhere safe: without it the file cannot be opened.",
+            "ml": "മതിയായ നീളമുണ്ട്. സുരക്ഷിതമായി സൂക്ഷിക്കുക: ഇതില്ലാതെ ഫയൽ തുറക്കാനാവില്ല.",
+            "de": "Lang genug. Bewahren Sie sie sicher auf: Ohne sie lässt sich die Datei nicht öffnen.",
+            "fr": "Assez longue. Gardez-la en lieu sûr : sans elle, le fichier ne peut pas être ouvert.",
+            "it": "Abbastanza lunga. Conservala in un posto sicuro: senza di essa il file non si apre."
+        },
+        "saveBackup": {
+            "en": "Save backup file…",
+            "ml": "ബാക്കപ്പ് ഫയൽ സേവ് ചെയ്യുക…",
+            "de": "Sicherungsdatei speichern …",
+            "fr": "Enregistrer la sauvegarde…",
+            "it": "Salva il file di backup…"
+        },
+        "saving": {
+            "en": "Encrypting…",
+            "ml": "എൻക്രിപ്റ്റ് ചെയ്യുന്നു…",
+            "de": "Wird verschlüsselt …",
+            "fr": "Chiffrement…",
+            "it": "Cifratura in corso…"
+        },
+        "backupSaved": {
+            "en": "Saved hexhoot_backup.hexhoot2 ({size} KB).",
+            "ml": "hexhoot_backup.hexhoot2 സേവ് ചെയ്തു ({size} KB).",
+            "de": "hexhoot_backup.hexhoot2 gespeichert ({size} KB).",
+            "fr": "hexhoot_backup.hexhoot2 enregistré ({size} Ko).",
+            "it": "hexhoot_backup.hexhoot2 salvato ({size} KB)."
+        },
+        "restoreHow": {
+            "en": "To restore, choose “Restore a backup” on the welcome screen of a new installation.",
+            "ml": "പുനഃസ്ഥാപിക്കാൻ, പുതിയ ഇൻസ്റ്റലേഷന്റെ സ്വാഗത സ്ക്രീനിൽ “ബാക്കപ്പ് പുനഃസ്ഥാപിക്കുക” തിരഞ്ഞെടുക്കുക.",
+            "de": "Zum Wiederherstellen wählen Sie auf dem Startbildschirm einer neuen Installation „Sicherung wiederherstellen“.",
+            "fr": "Pour restaurer, choisissez « Restaurer une sauvegarde » sur l’écran d’accueil d’une nouvelle installation.",
+            "it": "Per ripristinare, scegli “Ripristina un backup” nella schermata di benvenuto di una nuova installazione."
+        },
+        "unblock": {
+            "en": "Unblock",
+            "ml": "അൺബ്ലോക്ക് ചെയ്യുക",
+            "de": "Blockierung aufheben",
+            "fr": "Débloquer",
+            "it": "Sblocca"
+        },
+        "unblocked": {
+            "en": "{name} is unblocked.",
+            "ml": "{name}-നെ അൺബ്ലോക്ക് ചെയ്തു.",
+            "de": "Die Blockierung von {name} ist aufgehoben.",
+            "fr": "{name} est débloqué.",
+            "it": "{name} è sbloccato."
+        },
+        "noneBlocked": {
+            "en": "Nobody is blocked.",
+            "ml": "ആരെയും ബ്ലോക്ക് ചെയ്തിട്ടില്ല.",
+            "de": "Niemand ist blockiert.",
+            "fr": "Personne n’est bloqué.",
+            "it": "Nessuno è bloccato."
+        },
+        "version": {
+            "en": "Version",
+            "ml": "പതിപ്പ്",
+            "de": "Version",
+            "fr": "Version",
+            "it": "Versione"
+        },
+        "follow": {
+            "en": "Follow HexHoot",
+            "ml": "HexHoot പിന്തുടരുക",
+            "de": "HexHoot folgen",
+            "fr": "Suivre HexHoot",
+            "it": "Segui HexHoot"
+        },
+        "license": {
+            "en": "Licensed under the GNU AGPL v3.",
+            "ml": "GNU AGPL v3 പ്രകാരം ലൈസൻസ് ചെയ്തത്.",
+            "de": "Lizenziert unter der GNU AGPL v3.",
+            "fr": "Sous licence GNU AGPL v3.",
+            "it": "Distribuito con licenza GNU AGPL v3."
+        }
+    },
+    "Welcome": {
+        "title": {
+            "en": "Welcome to HexHoot",
+            "ml": "HexHoot-ലേക്ക് സ്വാഗതം",
+            "de": "Willkommen bei HexHoot",
+            "fr": "Bienvenue sur HexHoot",
+            "it": "Benvenuto su HexHoot"
+        },
+        "text": {
+            "en": "Choose a name and a password. Together they are your account: there is no email and no server that could reset them, so pick a password you will remember.",
+            "ml": "ഒരു പേരും പാസ്‌വേഡും തിരഞ്ഞെടുക്കുക. ഇവ ഒരുമിച്ചാണ് നിങ്ങളുടെ അക്കൗണ്ട്: അവ പുനഃസജ്ജമാക്കാൻ ഇമെയിലോ സെർവറോ ഇല്ല, അതിനാൽ ഓർമ്മിക്കാവുന്ന ഒരു പാസ്‌വേഡ് തിരഞ്ഞെടുക്കുക.",
+            "de": "Wählen Sie einen Namen und ein Passwort. Zusammen sind sie Ihr Konto: Es gibt keine E-Mail und keinen Server, der sie zurücksetzen könnte. Wählen Sie also ein Passwort, das Sie sich merken.",
+            "fr": "Choisissez un nom et un mot de passe. Ensemble, ils forment votre compte : aucun e-mail ni serveur ne peut les réinitialiser, alors choisissez un mot de passe dont vous vous souviendrez.",
+            "it": "Scegli un nome e una password. Insieme sono il tuo account: non c’è email né server che possa reimpostarli, quindi scegli una password che ricorderai."
+        },
+        "show": {
+            "en": "Show",
+            "ml": "കാണിക്കുക",
+            "de": "Anzeigen",
+            "fr": "Afficher",
+            "it": "Mostra"
+        },
+        "hide": {
+            "en": "Hide",
+            "ml": "മറയ്ക്കുക",
+            "de": "Verbergen",
+            "fr": "Masquer",
+            "it": "Nascondi"
+        },
+        "ruleName": {
+            "en": "A name of at least {n} characters",
+            "ml": "കുറഞ്ഞത് {n} അക്ഷരങ്ങളുള്ള ഒരു പേര്",
+            "de": "Ein Name mit mindestens {n} Zeichen",
+            "fr": "Un nom d’au moins {n} caractères",
+            "it": "Un nome di almeno {n} caratteri"
+        },
+        "ruleLength": {
+            "en": "A password of at least {n} characters",
+            "ml": "കുറഞ്ഞത് {n} അക്ഷരങ്ങളുള്ള ഒരു പാസ്‌വേഡ്",
+            "de": "Ein Passwort mit mindestens {n} Zeichen",
+            "fr": "Un mot de passe d’au moins {n} caractères",
+            "it": "Una password di almeno {n} caratteri"
+        },
+        "ruleNotName": {
+            "en": "The password does not contain the name",
+            "ml": "പാസ്‌വേഡിൽ പേര് അടങ്ങിയിട്ടില്ല",
+            "de": "Das Passwort enthält den Namen nicht",
+            "fr": "Le mot de passe ne contient pas le nom",
+            "it": "La password non contiene il nome"
+        },
+        "start": {
+            "en": "Open my hive",
+            "ml": "എന്റെ തേൻകൂട് തുറക്കുക",
+            "de": "Meine Wabe öffnen",
+            "fr": "Ouvrir ma ruche",
+            "it": "Apri il mio alveare"
+        },
+        "sameEverywhere": {
+            "en": "Already use HexHoot elsewhere? The same name and password open the same account here; restore a backup to bring your contacts and messages too.",
+            "ml": "മറ്റെവിടെയെങ്കിലും HexHoot ഉപയോഗിക്കുന്നുണ്ടോ? അതേ പേരും പാസ്‌വേഡും ഇവിടെ അതേ അക്കൗണ്ട് തുറക്കും; കോൺടാക്റ്റുകളും സന്ദേശങ്ങളും കൊണ്ടുവരാൻ ഒരു ബാക്കപ്പ് പുനഃസ്ഥാപിക്കുക.",
+            "de": "Nutzen Sie HexHoot schon anderswo? Derselbe Name und dasselbe Passwort öffnen hier dasselbe Konto; stellen Sie eine Sicherung wieder her, um auch Kontakte und Nachrichten mitzunehmen.",
+            "fr": "Vous utilisez déjà HexHoot ailleurs ? Le même nom et le même mot de passe ouvrent ici le même compte ; restaurez une sauvegarde pour retrouver aussi vos contacts et messages.",
+            "it": "Usi già HexHoot altrove? Lo stesso nome e la stessa password aprono qui lo stesso account; ripristina un backup per portare anche contatti e messaggi."
+        },
+        "failed": {
+            "en": "Something went wrong. Please try again.",
+            "ml": "എന്തോ പിശക് സംഭവിച്ചു. ദയവായി വീണ്ടും ശ്രമിക്കുക.",
+            "de": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+            "fr": "Un problème est survenu. Veuillez réessayer.",
+            "it": "Qualcosa è andato storto. Riprova."
+        },
+        "unlockTitle": {
+            "en": "Welcome back",
+            "ml": "വീണ്ടും സ്വാഗതം",
+            "de": "Willkommen zurück",
+            "fr": "Bon retour",
+            "it": "Bentornato"
         }
     }
 }

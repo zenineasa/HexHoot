@@ -50,10 +50,10 @@ for (const setup of setups) {
                     await bob.send(`b${i}`);
                 }
                 const shown = (app) => app.evaluate(`document
-                    .querySelectorAll('#messageReader > div').length`);
+                    .querySelectorAll('#chainBody .msg').length`);
                 for (const app of [alice, bob]) {
                     await app.waitFor(`document.querySelectorAll(
-                        '#messageReader > div').length >= ${2 * COUNT}`,
+                        '#chainBody .msg').length >= ${2 * COUNT}`,
                     120000);
                 }
                 await new Promise((resolve) => setTimeout(resolve, 1000));

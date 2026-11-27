@@ -1,0 +1,10 @@
+{
+    "coprightMessage": "Copyright © 2026 Zenin Easa Panthakkalakath",
+    "internal": [
+        "DBMessenger",
+        "UI",
+        "Sanitize",
+        "Html"
+    ],
+    "external": []
+}

@@ -40,7 +40,7 @@ The mockup is a private design canvas ([source](https://claude.ai/artifact/8TrbD
 Rules:
 
 - **Esc always goes one step back:** dialog, then panel, then Settings or Requests, then conversation to Home.
-- **Keyboard:** Ctrl/⌘+K focuses the friend search, Ctrl/⌘+N adds a friend, Ctrl/⌘+, opens Settings. In the hive, arrow keys move between cells and Enter opens one (to build).
+- **Keyboard:** Ctrl/⌘+K focuses the friend search, Ctrl/⌘+N adds a friend, Ctrl/⌘+, opens Settings. In the hive, arrow keys move between cells by their position on screen, and Enter opens one.
 - **Nothing navigates away under you.** A message arriving in another chat marks its cell and Latest entry; it never switches the open chat.
 - **Every action ends somewhere visible:** letting someone in opens their chain, knocking selects their waiting cell, declining moves to the next request, removing the account opens Welcome. A short toast confirms each.
 
@@ -50,76 +50,84 @@ The same places, one at a time: the hive is the root; a conversation, request or
 
 # Scenarios
 
-Status: **designed** (in the mockup), **to check** (during the build), or **needs Core** (a Core addition first). After iteration 3 every scenario is designed; the connected prototype shows most of them, with a "simulate" option for a background message, the engine restarting and being offline.
+Status: **built** (in the app since UI commit 2), **designed** (in the mockup, not built yet), **to check**, or **needs Core**. The connected prototype in the mockup shows most of them.
 
 ## First run and account
 
 | Scenario | Status |
 |---|---|
-| New account: name, password, live requirements, show password, creating keys | designed |
-| Same name and password on another computer (the app cannot tell, so the wording fits both) | designed |
-| Weak password: too short, contains the name, too repetitive | designed |
-| Slow computer: warn before, honest progress | designed |
+| New account: name, password, live requirements, show password, creating keys | built |
+| Same name and password on another computer (the app cannot tell, so the wording fits both) | built |
+| Weak password: too short, contains the name, too repetitive | built (the first two as you type, the third from Core, shown inline) |
+| Slow computer: warn before, honest progress | built (Core's estimate picks the message) |
 | Not enough memory (under 2 GiB) | designed |
-| Restore a backup: choose file, wrong file, wrong passphrase, success | designed |
-| No keychain (Linux): unlock with the password on every start, wrong password | designed |
+| Restore a backup: choose file, wrong file, wrong passphrase, success | built |
+| No keychain (Linux): unlock with the password on every start, wrong password | built |
 
 ## The hive
 
 | Scenario | Status |
 |---|---|
-| New user with an empty hive: three steps to a first conversation | designed |
-| Nobody selected: your status, your address, the password check | designed |
-| Unread messages on a cell, and the Latest list | designed |
-| Many friends: smaller cells, search, Hive/List switch | designed |
-| Search with no results | designed |
-| Your computer offline: banner, dimmed hive, everything waits | designed |
-| Desktop notifications while HexHoot is in the background; clicking opens the chat | designed |
-| Keyboard: arrow keys move between cells, Enter opens; each cell has a full label for screen readers | designed |
+| New user with an empty hive: three steps to a first conversation | built |
+| Nobody selected: your status, your address, the password check | built |
+| Unread messages on a cell, and the Latest list | built (a mark, not a count) |
+| Many friends: smaller cells, search, Hive/List switch | built, except the List switch |
+| Search with no results | built |
+| Your computer offline: banner, dimmed hive, everything waits | built |
+| Desktop notifications while HexHoot is in the background; clicking opens the chat | built |
+| Keyboard: arrow keys move between cells, Enter opens; each cell has a full label for screen readers | built |
 
 ## Friend requests
 
 | Scenario | Status |
 |---|---|
-| One or several knocking; Let in / Not now; Not now tells nobody | designed |
-| Hostile or very long names: plain text, shortened, full name on hover | designed |
-| A request you sent, still waiting | designed |
-| Both added each other: friends at once | designed |
-| Withdraw a request you sent | designed; needs Core |
+| One or several knocking; Let in / Not now; Not now tells nobody | built |
+| Hostile or very long names: plain text, shortened, full name on hover | built |
+| A request you sent, still waiting | built |
+| Both added each other: friends at once | built |
+| Withdraw a request you sent | built |
 
 ## The conversation
 
 | Scenario | Status |
 |---|---|
-| Just became friends: the start of the chain, suggested first lines | designed |
-| A message waiting days for an offline friend; "Don't send" | designed; Don't send needs Core |
+| Just became friends: the start of the chain, suggested first lines | built, without suggested lines |
+| A message waiting days for an offline friend; "Don't send" | built |
 | Long messages collapse ("Show all"); emoji-only messages shown large | designed |
 | Links shown as links that open only after a confirmation showing the full address | designed |
-| Near the 64 KB limit: a counter | designed |
-| Events on the chain: verified, request accepted | designed |
-| Events on the chain: a friend changed their name or photo | designed; needs Core |
+| Near the 64 KB limit: a counter | designed (the limit is enforced; the counter is not built) |
+| Events on the chain: verified, request accepted | built |
+| Events on the chain: a friend changed their name or photo | built |
 | Long history: "N new messages" jump | designed |
-| The link per friend (direct, internet, unreachable) | designed; needs Core (reported per contact) |
+| The link per friend (direct, internet, unreachable) | built |
 
 ## People, adding friends, settings and system
 
 | Scenario | Status |
 |---|---|
-| Safety number, mark verified, remove the mark (contact panel) | designed |
-| Remove a friend; block someone (contact panel, with confirmation) | designed; needs Core |
-| Share your address (grouped, copy, QR code); paste theirs, checked as you type; your own address refused | designed |
-| Someone already a friend ("Open the chat") or already waiting ("Show") | designed |
+| Safety number, mark verified, remove the mark (contact panel) | built |
+| Remove a friend; block someone (contact panel, with confirmation) | built |
+| Share your address (grouped, copy, QR code); paste theirs, checked as you type; your own address refused | built, except the QR code |
+| Someone already a friend ("Open the chat") or already waiting ("Show") | built |
 | Scan a QR code with a camera | needs Core (and a camera permission) |
-| Settings: profile, backup, language, about, remove account (with confirmation) | designed |
-| Appearance: night, day, follow the computer | designed |
-| Password check: right, right after a miss, dismissed | designed |
-| Password check answered wrongly: the reassuring message, then "You've got it now!" | designed |
-| Photo too large: shrunk to fit, with a note | designed |
-| Core restarting: a banner; typed text kept; sending resumes | designed |
-| Long translations (Malayalam, German): buttons wrap, cards grow, cells use initials | designed |
-| Reduced motion: the only animations (panel slide, progress) follow the system setting | designed |
-| Backup: passphrase strength, saved confirmation | designed |
+| Settings: profile, backup, language, about, remove account (with confirmation) | built, with a Blocked section |
+| Appearance: night, day, follow the computer | built |
+| Password check: right, right after a miss, dismissed | built |
+| Password check answered wrongly: the reassuring message, then "You've got it now!" | built |
+| Photo too large: shrunk to fit, with a note | built (320 px JPEG) |
+| Core restarting: a banner; typed text kept; sending resumes | built, without the banner: the window reloads when Core restarts, and drafts are kept per contact |
+| Long translations (Malayalam, German): buttons wrap, cards grow, cells use initials | built |
+| Reduced motion: the only animations (panel slide, progress) follow the system setting | built |
+| Backup: passphrase strength, saved confirmation | built (length) |
 | Contrast measured in both themes, and a screen-reader pass | to check while building |
+
+# Decisions made while building
+
+- **Cells keep their place.** Friends are in alphabetical order, so a cell stays where you last saw it; Latest gives the order by recency.
+- **An event never navigates.** A background event (a request withdrawn, a profile changed) only adjusts the pane if the user has not moved since it arrived, and a request that was let in rather than withdrawn never sends the window Home.
+- **Problems are shown where they happen.** The welcome screen, Add a friend and backup show errors inline; the app opens no alert boxes.
+- **Fonts are bundled** (`modules/Fonts`, SIL Open Font License), so the CSP allows fonts and styles only from the app itself and nothing is fetched from Google.
+- **On a narrow window, the hive is Home.** The address and shortcuts that Home shows on a wide window are in Add a friend and Settings.
 
 # Core additions the design asks for
 

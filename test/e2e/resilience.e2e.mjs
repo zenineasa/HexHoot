@@ -34,13 +34,10 @@ describe('Restarts over the LAN', () => {
     });
 
     network.test('bob marks alice verified', async ({bob, alice}) => {
-        await bob.click('#messageSenderInfo');
-        await bob.waitFor(`document.querySelector('#verification button')`);
-        await bob.click('#verification [name=verify]');
-        await bob.waitFor(`document.getElementById('verification')
-            .dataset.verified === 'true'`);
-        await bob.click('#backButton');
-        await bob.waitFor(`document.getElementById('friendsList')`);
+        await bob.openContact();
+        await bob.verify();
+        await bob.press('Escape');
+        await bob.waitFor(`document.getElementById('contactPanel').hidden`);
     });
 
     network.test('Messages sent while bob is away reach him when he is back',
@@ -56,7 +53,7 @@ describe('Restarts over the LAN', () => {
                 [false, false, false, false]);
             });
             // The OS keyring signs bob in; the session was stored
-            await bob.waitFor(`document.getElementById('friendsList')`);
+            await bob.ready();
             await bob.waitForTransports();
             await bob.openChat(alice.key);
             await bob.waitForMessage('out', 60000);
@@ -67,7 +64,7 @@ describe('Restarts over the LAN', () => {
                     all.every((m) => m.message.delivered))`, 30000);
             // The mark survived, and shows in the chat header
             assert.equal(await bob.evaluate(`document.querySelector(
-                '#messageSenderInfo .verified')?.textContent`), '✓');
+                '#chainHeader .verified')?.textContent`), '✓');
         });
 
     network.test('Both restart; the conversation goes on', async ({alice,
@@ -75,7 +72,7 @@ describe('Restarts over the LAN', () => {
         await alice.restart();
         await bob.restart();
         for (const app of [alice, bob]) {
-            await app.waitFor(`document.getElementById('friendsList')`);
+            await app.ready();
             await app.waitForTransports();
         }
         await alice.openChat(bob.key);

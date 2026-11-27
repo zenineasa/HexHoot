@@ -1,0 +1,15 @@
+{
+    "coprightMessage": "Copyright © 2026 Zenin Easa Panthakkalakath",
+    "internal": [
+        "DBMessenger",
+        "PasswordCheck",
+        "I18n",
+        "App",
+        "UI",
+        "ImagePack",
+        "Sanitize",
+        "Social",
+        "Html"
+    ],
+    "external": []
+}

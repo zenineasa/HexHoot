@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <!-- Copyright (c) 2022-2026 Zenin Easa Panthakkalakath -->
-<html>
+<html lang="en" data-theme="night">
     <head>
         <!--
-            Scripts come only from the app (no eval). Inline style attributes
-            are allowed because the logo SVG uses them; <style> elements are
-            not.
+            Everything comes from the app itself: scripts (no eval), styles
+            and the bundled fonts. Inline style attributes are allowed for
+            the logo SVG and computed colours; <style> elements are not.
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; font-src 'self'; img-src 'self' data:; media-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
         <title>HexHoot</title>
         <link rel="icon" type="image/png" href="../ImagePack/images/favicon.png">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../Fonts/fonts.css">
         <link rel="stylesheet" href="style.css">
         <script type="module" src="renderer.mjs"></script>
     </head>

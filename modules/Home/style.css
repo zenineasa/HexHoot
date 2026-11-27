@@ -1,0 +1,72 @@
+/* Copyright (c) 2026 Zenin Easa Panthakkalakath */
+
+#home {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+}
+#home .halo {
+    position: relative;
+    width: 120px;
+    height: 136px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+#home .halo > * {
+    position: absolute;
+}
+#home .halo .ring {
+    inset: 0;
+    background: var(--success);
+}
+#app[data-offline=true] #home .halo .ring {
+    background: var(--faint);
+}
+#home .halo .gap {
+    inset: 8px 7px;
+    background: var(--app-bg);
+}
+#home .halo .me {
+    left: 19px;
+    top: 22px;
+}
+#home h1 {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+#home p {
+    margin: 0 0 16px;
+    line-height: 1.5;
+    max-width: 440px;
+}
+#home .steps {
+    text-align: left;
+    margin: 0 0 18px;
+    padding-left: 22px;
+    line-height: 1.7;
+    max-width: 420px;
+}
+#home .address {
+    font-size: 13px;
+    color: var(--muted);
+    user-select: all;
+    max-width: 420px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+.hh-row.center {
+    justify-content: center;
+}
+#home .keys {
+    margin-top: 28px;
+    font-size: 12px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+}

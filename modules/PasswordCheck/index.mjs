@@ -16,10 +16,13 @@ const BOX_ID = 'passwordCheck';
 export default class PasswordCheck {
     /**
      * Show the box if a check is due and it is not already showing
+     * @param {Object} [options] {force: show it even if no check is due
+     * (Settings, "Check now")}
      */
-    static async render() {
+    static async render({force = false} = {}) {
         if (document.getElementById(BOX_ID) ||
-            !(await dbMessenger.getPasswordCheck()).due) {
+            (!force && !(await dbMessenger.getPasswordCheck()).due)) {
+            document.querySelector(`#${BOX_ID} input`)?.focus();
             return;
         }
         await loadStyle(new URL('./style.css', import.meta.url));
@@ -28,20 +31,26 @@ export default class PasswordCheck {
         }
         const box = document.createElement('div');
         box.id = BOX_ID;
-        box.setAttribute('role', 'status');
+        box.setAttribute('role', 'region');
+        box.setAttribute('aria-label', i18n.getText('PasswordCheck.title'));
+        box.className = 'slide-in';
         box.innerHTML = html`
             <div class="title">${i18n.getText('PasswordCheck.title')}</div>
             <div class="text">${i18n.getText('PasswordCheck.text')}</div>
-            <input class="HexHoot_Input" name="password" type="password"
+            <input class="hh-input" name="password" type="password"
                 autocomplete="off"
+                aria-label="${i18n.getText('Login.password')}"
                 placeholder="${i18n.getText('Login.password')}" />
             <div class="buttons">
-                <button class="HexHoot_Button" name="check">
-                    ${i18n.getText('PasswordCheck.check')}</button>
-                <button class="HexHoot_Button" name="later">
+                <button class="hh-btn hh-quiet" name="later">
                     ${i18n.getText('PasswordCheck.later')}</button>
+                <button class="hh-btn hh-primary" name="check">
+                    ${i18n.getText('PasswordCheck.check')}</button>
             </div>`.toString();
         document.body.appendChild(box);
+        if (force) {
+            box.querySelector('[name=password]').focus();
+        }
 
         const input = box.querySelector('[name=password]');
         const check = box.querySelector('[name=check]');
@@ -86,11 +95,14 @@ export default class PasswordCheck {
         }
         input.remove();
         box.dataset.state = result.correct ? 'right' : 'wrong';
+        box.querySelector('.title').textContent = i18n.getText(
+            result.correct ? 'PasswordCheck.rightTitle' :
+                'PasswordCheck.wrongTitle');
         text.textContent = i18n.getText(!result.correct ?
             'PasswordCheck.wrong' : result.afterMiss ?
                 'PasswordCheck.rightAfterMiss' : 'PasswordCheck.right');
         const close = document.createElement('button');
-        close.className = 'HexHoot_Button';
+        close.className = 'hh-btn hh-secondary';
         close.name = 'close';
         close.textContent = i18n.getText('PasswordCheck.close');
         close.onclick = () => box.remove();

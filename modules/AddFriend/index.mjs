@@ -1,115 +1,182 @@
-/* Copyright (c) 2022-2026 Zenin Easa Panthakkalakath */
+/* Copyright (c) 2026 Zenin Easa Panthakkalakath */
 
-import Layout from '../Layout/index.mjs';
+// "Add a friend": a dialog over anything. Paste their address (checked as
+// you type: your own address, someone already in your hive, someone you
+// already knocked on), and share yours. Knocking selects their new
+// "waiting" cell.
+
 import dbMessenger, {errorCode} from '../DBMessenger/index.mjs';
+import {t, icon, groupedAddress, displayName, toast, copyWithFeedback}
+    from '../UI/index.mjs';
 import * as sanitize from '../Sanitize/index.mjs';
-import i18n from '../I18n/index.mjs';
 import {html, loadStyle} from '../Html/index.mjs';
 
+const styleLoaded = loadStyle(new URL('./style.css', import.meta.url));
+
 /**
- * This class implements the functionality for adding a friend
+ * The Add a friend dialog
  */
-class AddFriend {
+export default class AddFriend {
     /**
-     * This function renders the page into the UI.
-     * @param {function} backCallback the callback function that is executed
-     * when back button is clicked
+     * Open the dialog
+     * @param {Object} app the App
      */
-    async render(backCallback) {
-        await Layout.render();
-        await loadStyle(new URL('./style.css', import.meta.url));
-        const publicKey = await dbMessenger.getMyAddress();
-
-        // Sidebar related
-        document.getElementById('sidebar').insertAdjacentHTML('beforeend',
-            html`<button class="HexHoot_Button" id="backButton">&larr;
-                ${i18n.getText('AddFriend.back')}</button>`.toString());
-        document.getElementById('backButton').onclick = backCallback;
-
-        // Main content related
-        const keyPlaceholder = i18n.getText('AddFriend.publicKey');
-        const mainContentDOMNode = document.getElementById('mainContent');
-        mainContentDOMNode.innerHTML = html`
-            <div id="title">${i18n.getText('AddFriend.addFriend')}</div>
-            <div id="tabs">
-                <div class="tabContentContainer">
-                    <div class="tabContent" id="myCode">
-                        <input class="HexHoot_Input" name="myPublicKey"
-                            type="text" value="${publicKey}" readonly />
-                        <div class="hint">
-                            ${i18n.getText('AddFriend.myHint')}</div>
-                        <button class="HexHoot_Button"
-                            id="copyToClipboardButton">
-                            ${i18n.getText('AddFriend.copyToClipboard')}
-                        </button>
-                    </div>
-                    <div class="tabContent" id="theirCode">
-                        <input class="HexHoot_Input" id="theirPublicKey"
-                            name="theirPublicKey" type="text"
-                            placeholder="${keyPlaceholder}" />
-                        <div class="hint">
-                            ${i18n.getText('AddFriend.theirHint')}</div>
-                        <button class="HexHoot_Button" id="addFriendButton">
-                            ${i18n.getText('AddFriend.add')}</button>
-                    </div>
-                </div>
-                <div class="tabContainer">
-                    <div class="tab" name="myCode">
-                        ${i18n.getText('AddFriend.myCode')}</div>
-                    <div class="tab" name="theirCode">
-                        ${i18n.getText('AddFriend.theirCode')}</div>
-                </div>
-            </div>`;
-
-        const tabs = [...mainContentDOMNode.getElementsByClassName('tab')];
-        const showTab = (tabName) => {
-            for (const content of mainContentDOMNode
-                .getElementsByClassName('tabContent')) {
-                content.style.display =
-                    content.id === tabName ? 'flex' : 'none';
-            }
-            for (const tab of tabs) {
-                tab.classList.toggle('active',
-                    tab.getAttribute('name') === tabName);
-            }
-        };
-        for (const tab of tabs) {
-            tab.onclick = () => showTab(tab.getAttribute('name'));
+    static async open(app) {
+        await styleLoaded;
+        if (document.getElementById('addFriendDialog')) {
+            return;
         }
-        // Adding someone is the usual reason to come here
-        showTab('theirCode');
-        document.getElementById('theirPublicKey').focus();
+        const mine = app.data.me.key;
+        const dialog = document.createElement('dialog');
+        dialog.id = 'addFriendDialog';
+        dialog.className = 'hh-dialog';
+        dialog.setAttribute('aria-labelledby', 'addFriendTitle');
+        dialog.innerHTML = html`
+            <div class="head">
+                <h2 id="addFriendTitle">${t('Hive.addFriend')}</h2>
+                <button class="hh-icon" name="close"
+                    aria-label="${t('Contact.close')}">
+                    ${icon('close', 18)}</button>
+            </div>
+            <div class="body">
+                <label class="hh-label" for="theirPublicKey">
+                    ${t('AddFriend.theirAddress')}</label>
+                <div class="their">
+                    <input id="theirPublicKey" class="hh-input mono"
+                        placeholder="hh21…" spellcheck="false"
+                        autocomplete="off">
+                    <button class="hh-btn hh-primary" id="knockButton"
+                        disabled>${t('AddFriend.knock')}</button>
+                </div>
+                <div class="hh-hint" id="addFriendHint" aria-live="polite">
+                    ${t('AddFriend.spaces')}</div>
+            </div>
+            <div class="foot">
+                <div class="hh-label">${t('AddFriend.yourAddress')}</div>
+                <div class="mine mono" data-testid="my-address">
+                    ${groupedAddress(mine)}</div>
+                <div class="hh-row">
+                    <button class="hh-btn hh-secondary" name="copy">
+                        ${t('AddFriend.copyToClipboard')}</button>
+                </div>
+                <div class="hh-hint">${t('AddFriend.myHint')}</div>
+            </div>`.toString();
+        document.body.appendChild(dialog);
 
-        // Button callback
-        const copyButton = document.getElementById('copyToClipboardButton');
-        copyButton.onclick = async () => {
-            await navigator.clipboard.writeText(publicKey);
-            copyButton.textContent = i18n.getText('AddFriend.copied');
-            setTimeout(() => {
-                copyButton.textContent =
-                    i18n.getText('AddFriend.copyToClipboard');
-            }, 2000);
+        const input = dialog.querySelector('#theirPublicKey');
+        const knock = dialog.querySelector('#knockButton');
+        const close = () => {
+            dialog.close();
+            dialog.remove();
         };
-        document.getElementById('addFriendButton').onclick = async () => {
-            const key = document.getElementById('theirPublicKey').value
-                .replace(/\s+/g, '').toLowerCase();
-            if (!sanitize.isValidAddress(key) || key === publicKey) {
-                alert(i18n.getText('AddFriend.invalidKey'));
-                return;
-            }
-            try {
-                // Accepts their request instead, if they sent one first
-                await dbMessenger.addFriend(key);
-            } catch (err) {
-                if (errorCode(err).code === 'BAD_ADDRESS') {
-                    alert(i18n.getText('AddFriend.invalidKey'));
-                    return;
-                }
-                throw err;
-            }
-            backCallback();
+        dialog.querySelector('[name=close]').onclick = close;
+        dialog.oncancel = (event) => {
+            event.preventDefault();
+            close();
         };
+        // A click on the backdrop (outside the box) closes it
+        dialog.addEventListener('click', (event) => {
+            if (event.target === dialog) {
+                close();
+            }
+        });
+        const copy = dialog.querySelector('[name=copy]');
+        copy.onclick = () => copyWithFeedback(mine, copy);
+        input.oninput = () => AddFriend.check(app, dialog, close);
+        input.onkeydown = (event) => {
+            if (event.key === 'Enter' && !knock.disabled) {
+                knock.click();
+            }
+        };
+        knock.onclick = () => AddFriend.knock(app, dialog, close);
+        dialog.showModal();
+        input.focus();
+    }
+
+    /**
+     * Check the address as it is typed
+     * @param {Object} app the App
+     * @param {HTMLDialogElement} dialog the dialog
+     * @param {function} close closes it
+     * @return {string} the cleaned address, if it may be knocked on
+     */
+    static check(app, dialog, close) {
+        const input = dialog.querySelector('#theirPublicKey');
+        const knock = dialog.querySelector('#knockButton');
+        const hint = dialog.querySelector('#addFriendHint');
+        const key = input.value.replace(/\s+/g, '').toLowerCase();
+        const contact = app.contact(key);
+        let text = t('AddFriend.spaces');
+        let tone = '';
+        let ok = false;
+        let open = null;
+        if (key && !'hh21'.startsWith(key.slice(0, 4))) {
+            text = t('AddFriend.prefix');
+            tone = 'warn';
+        } else if (key === app.data.me.key) {
+            text = t('AddFriend.ownAddress');
+            tone = 'warn';
+        } else if (contact && !contact.pending) {
+            text = t('AddFriend.alreadyFriend', {name: displayName(contact)});
+            open = [t('AddFriend.openChat'), contact.key];
+        } else if (contact) {
+            text = t('AddFriend.alreadyWaiting', {name: displayName(contact)});
+            open = [t('AddFriend.show'), contact.key];
+        } else if (app.data.pending[key]) {
+            text = t('AddFriend.theyKnocked');
+            tone = 'ok';
+            ok = true;
+        } else if (sanitize.isValidAddress(key)) {
+            text = t('AddFriend.looksRight');
+            tone = 'ok';
+            ok = true;
+        } else if (key.length > 62) {
+            text = t('AddFriend.tooLong');
+            tone = 'warn';
+        }
+        hint.dataset.tone = tone;
+        hint.textContent = text;
+        if (open) {
+            const button = document.createElement('button');
+            button.className = 'hh-link';
+            button.textContent = open[0];
+            button.onclick = () => {
+                close();
+                app.go('chat', {id: open[1]});
+            };
+            hint.append(' ', button);
+        }
+        knock.disabled = !ok;
+        return ok ? key : '';
+    }
+
+    /**
+     * Send the request, then select the new "waiting" cell
+     * @param {Object} app the App
+     * @param {HTMLDialogElement} dialog the dialog
+     * @param {function} close closes it
+     */
+    static async knock(app, dialog, close) {
+        const key = AddFriend.check(app, dialog, close);
+        if (!key) {
+            return;
+        }
+        const wasKnocking = Boolean(app.data.pending[key]);
+        const knock = dialog.querySelector('#knockButton');
+        knock.disabled = true;
+        try {
+            // Accepts their request instead, if they sent one first
+            await dbMessenger.addFriend(key);
+        } catch (err) {
+            const hint = dialog.querySelector('#addFriendHint');
+            hint.dataset.tone = 'warn';
+            hint.textContent = errorCode(err).code === 'BAD_ADDRESS' ?
+                t('AddFriend.typo') : String(err.message);
+            return;
+        }
+        close();
+        await app.refresh();
+        await app.go('chat', {id: key});
+        toast(wasKnocking ? t('AddFriend.letInToo') : t('AddFriend.knocked'));
     }
 }
-
-export default new AddFriend();

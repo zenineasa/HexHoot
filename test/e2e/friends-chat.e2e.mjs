@@ -77,25 +77,21 @@ describe('A hostile display name stays text (S1)', () => {
                 mallory.waitForTransports()]);
             await mallory.addFriend(bob.key);
 
-            const request = `[data-testid="pending-request"]` +
-                `[data-key="${mallory.key}"]`;
-            await bob.waitFor(`document.querySelector(
-                ${JSON.stringify(request)})`, 30000);
-            assert.deepEqual(await bob.evaluate(`(() => {
-                const li = document.querySelector(${JSON.stringify(request)});
-                return {name: li.querySelector('.name').textContent,
-                    images: li.getElementsByTagName('img').length};
-            })()`), {name: XSS_NAME, images: 0});
+            assert.deepEqual(await bob.waitForKnock(mallory.key),
+                {name: XSS_NAME, images: 0});
+            await bob.click(`.cell[data-key="${mallory.key}"]`);
+            await bob.waitFor(`document.querySelector('#request .name')`);
+            assert.equal(await bob.evaluate(`document.querySelector(
+                '#request .name').textContent`), `${XSS_NAME} is knocking`);
 
             await bob.acceptFriendRequest(mallory.key);
             await bob.waitForFriend(mallory.key, XSS_NAME);
             await bob.openChat(mallory.key);
             assert.equal(await bob.evaluate(`document.querySelector(
-                '#messageSenderInfo .name').textContent`), XSS_NAME);
-            await bob.click('#messageSenderInfo');
-            await bob.waitFor(`document.querySelector('#viewProfile')`);
+                '#chainHeader .name').textContent`), XSS_NAME);
+            await bob.openContact();
             assert.equal(await bob.evaluate(`document.querySelector(
-                '#viewProfile [name=displayName]').value`), XSS_NAME);
+                '#contact .who .name').textContent`), XSS_NAME);
             // Both sides see the same safety number
             const number = await bob.evaluate(`document.querySelector(
                 '[data-testid="safety-number"]').dataset.value`);
@@ -106,9 +102,7 @@ describe('A hostile display name stays text (S1)', () => {
             assert.equal(await bob.evaluate(`document.querySelectorAll(
                 '[data-testid="safety-number"] span').length`), 16);
             // bob marks the numbers as compared; Core keeps it
-            await bob.click('#verification [name=verify]');
-            await bob.waitFor(`document.getElementById('verification')
-                .dataset.verified === 'true'`);
+            await bob.verify();
             assert.equal((await bob.core('getUserInfo', mallory.key))
                 .verified, true);
             assert.equal(await bob.evaluate('window.__hexhootPwned'),

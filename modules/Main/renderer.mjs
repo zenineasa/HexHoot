@@ -4,20 +4,20 @@
 // reached through window.hexhoot, which preload.js provides.
 
 import i18n from '../I18n/index.mjs';
-import Social from '../Social/index.mjs';
-import Copyright from '../Copyright/index.mjs';
+import dbMessenger from '../DBMessenger/index.mjs';
 import Login from '../Login/index.mjs';
-import Chat from '../Chat/index.mjs';
+import App from '../App/index.mjs';
+import {loadTheme} from '../App/theme.mjs';
 import PasswordCheck from '../PasswordCheck/index.mjs';
 
 /**
- * Render the app for the current state (logged in or not)
+ * Render the app for the current state (signed in or not)
  */
 async function render() {
-    await i18n.render();
+    await loadTheme();
     const login = new Login();
     if (await login.isLoggedIn()) {
-        await new Chat().render();
+        await App.render();
         // Not awaited: the check never holds up the app
         PasswordCheck.render().catch(() => {});
     } else {
@@ -26,20 +26,29 @@ async function render() {
     }
 }
 
-// Renders must not overlap, so they are queued.
+// Renders must not overlap, so they are queued; requests made before the
+// next render starts share it.
 let queue = Promise.resolve();
+let waiting = null;
 window.reload = function() {
-    const result = queue.then(render);
+    if (waiting) {
+        return waiting;
+    }
+    const result = waiting = queue.then(() => {
+        waiting = null;
+        return render();
+    });
     queue = result.then(function() {}, function(err) {
         console.error('Render failed:', err);
     });
     return result;
 };
 
+// Removing the account (Settings) or restoring elsewhere changes the state
+dbMessenger.on('account', () => window.reload());
+
 await i18n.selectLanguageFromPreferences();
 window.reload();
-Social.render();
-Copyright.render();
 // A check can fall due while the app stays open
 setInterval(async () => {
     if (await new Login().isLoggedIn()) {

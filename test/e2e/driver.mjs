@@ -228,6 +228,14 @@ export async function launchApp(options = {}) {
                 `${JSON.stringify(args)})`),
             screenshot,
             /**
+             * Show the page at another size, like a smaller window
+             * @param {number} width CSS pixels
+             * @param {number} height CSS pixels
+             */
+            resize: (width, height) => cdp.send(
+                'Emulation.setDeviceMetricsOverride',
+                {width, height, deviceScaleFactor: 1, mobile: false}),
+            /**
              * Write the log, page errors, dialogs and a screenshot
              * @param {string} dir directory, created if needed
              */

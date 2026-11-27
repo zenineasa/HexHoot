@@ -70,6 +70,7 @@ class Core {
         this.makeCarriers = options.carriers || (() => []);
         this.scryptParams = options.scryptParams;
         this.retryMs = options.retryMs;
+        this.version = options.version || '';
         this.watchNetwork = Boolean(options.watchNetwork);
         this.now = options.now || Date.now;
         this.log = options.log || console.log;
@@ -145,6 +146,7 @@ class Core {
             state: this.state,
             address: this.identity?.address,
             scryptSlow: outlook.likelySlow,
+            version: this.version,
         };
     }
 
