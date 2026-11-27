@@ -286,10 +286,11 @@ export async function launchApp(options = {}) {
              * Show the page at another size, like a smaller window
              * @param {number} width CSS pixels
              * @param {number} height CSS pixels
+             * @param {number} [deviceScaleFactor] 2 for a Retina screen
              */
-            resize: (width, height) => cdp.send(
+            resize: (width, height, deviceScaleFactor = 1) => cdp.send(
                 'Emulation.setDeviceMetricsOverride',
-                {width, height, deviceScaleFactor: 1, mobile: false}),
+                {width, height, deviceScaleFactor, mobile: false}),
             /**
              * Write the log, page errors, dialogs and a screenshot
              * @param {string} dir directory, created if needed

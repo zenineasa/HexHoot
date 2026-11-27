@@ -12,6 +12,21 @@ HexHoot is an open-source, peer-to-peer messenger with no central servers. Your 
 
 > **Status: HexHoot 2.0 is in development and has not been independently reviewed yet.** Please don't rely on it for sensitive conversations until the external cryptographic review is done ([SECURITY.md](SECURITY.md)). The installers on the [releases page](https://github.com/zenineasa/HexHoot/releases/latest) are version 1, which cannot talk to version 2.
 
+## Screenshots
+
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/chat-day.png">
+        <img src="./docs/screenshots/chat.png" alt="A conversation in HexHoot: the hive of friends on the left, the chat with a verified friend on the right" width="800">
+    </picture>
+</p>
+
+| Your hive | Safety number | Getting started |
+|---|---|---|
+| ![Home, with six friends in the hive and the latest messages](docs/screenshots/hive.png) | ![The contact panel with an 80-digit safety number, marked verified](docs/screenshots/contact.png) | ![The welcome screen: a name and a password are the whole account](docs/screenshots/welcome.png) |
+
+The people and messages are made up; `node scripts/screenshots.mjs` recreates these screenshots with seven copies of the app on one computer.
+
 ## Why HexHoot?
 
 The following question is something that people would ask me quite often when I talk to them about HexHoot. If you look around, you can see quite a lot of software, like WhatsApp, Slack, Microsoft Teams, Zoom, etc., that helps in communication. Why would one attempt to create yet another tool that solves the same problem?
