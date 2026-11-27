@@ -5,7 +5,7 @@
 // are on, so HEXHOOT_* variables configure Core; see Main/testHooks.js.
 // --use-mock-keychain keeps safeStorage away from the real OS keychain.
 
-import {spawn, execFileSync} from 'node:child_process';
+import {spawn, spawnSync, execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -35,6 +35,32 @@ async function poll(get, what, timeout) {
         await sleep(100);
     }
     throw new Error('Timed out waiting for ' + what);
+}
+
+/**
+ * Quit the app the way closing its window does, so Core stops with it;
+ * force it if it is still there after ten seconds
+ * @param {ChildProcess} child the app
+ * @param {Promise} exited resolves when it has exited
+ */
+async function quit(child, exited) {
+    const gone = () => Promise.race([exited.then(() => true),
+        sleep(10000, false, {ref: false})]);
+    if (process.platform === 'win32') {
+        // kill() is TerminateProcess there: Core, a child process, would
+        // live on with the database and the LAN port open. taskkill without
+        // /F closes the window; /T takes the child processes along.
+        spawnSync('taskkill', ['/PID', String(child.pid), '/T']);
+        if (!await gone()) {
+            spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F']);
+        }
+    } else {
+        child.kill();
+        if (!await gone()) {
+            child.kill('SIGKILL');
+        }
+    }
+    await exited;
 }
 
 /**
@@ -120,9 +146,8 @@ export async function launchApp(options = {}) {
     const exited = new Promise((resolve) => child.once('exit', resolve));
 
     const close = async () => {
-        if (child.exitCode === null) {
-            child.kill();
-            await exited;
+        if (child.exitCode === null && child.signalCode === null) {
+            await quit(child, exited);
         }
         if (!options.userData) {
             fs.rmSync(userData, {recursive: true, force: true,
@@ -171,9 +196,15 @@ export async function launchApp(options = {}) {
          * @param {string} expression JavaScript
          * @return {*} the (JSON-serializable) result
          */
-        const evaluate = async (expression) => {
-            const result = await cdp.send('Runtime.evaluate', {
-                expression, awaitPromise: true, returnByValue: true});
+        const evaluate = async (expression, timeout = 60000) => {
+            // A page call that never answers (Core gone) fails the test
+            // instead of hanging the run
+            const result = await Promise.race([cdp.send('Runtime.evaluate',
+                {expression, awaitPromise: true, returnByValue: true}),
+            sleep(timeout, undefined, {ref: false}).then(() => {
+                throw new Error(`No answer in ${timeout / 1000} s from ` +
+                    `${name}: ${expression.slice(0, 200)}`);
+            })]);
             if (result.exceptionDetails) {
                 throw new Error(result.exceptionDetails.exception
                     ?.description || result.exceptionDetails.text);

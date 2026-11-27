@@ -315,7 +315,8 @@ test('Appearance: night, day, or the computer\'s choice', async () => {
 
 test('About lists the version, social links and copyright', async () => {
     await app.click('.nav[data-section=about]');
-    await app.waitFor(`document.getElementById('settings-about')`);
+    // Drawn once the account state is in
+    await app.waitFor(`document.querySelector('#social .social')`);
     // Each social icon links to the page its image names
     const icons = await app.evaluate(`[...document.querySelectorAll(
         '#social .social')].map((button) => [button.querySelector('img')

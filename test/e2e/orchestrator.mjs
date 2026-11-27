@@ -177,7 +177,9 @@ function addActions(app, otherPeers) {
             const open = `${q('#chain')}?.dataset.chat ===
                 ${JSON.stringify(key)}`;
             if (!await app.evaluate(open)) {
-                // Clicking the open chat's cell would go Home instead
+                // Clicking the open chat's cell would go Home instead.
+                // After a restart the Hive may not have drawn it yet.
+                await app.waitFor(q(cell(key)));
                 await app.click(cell(key));
             }
             // data-chat is set once the chat has loaded and is wired
