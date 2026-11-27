@@ -14,9 +14,15 @@ import {audit, auditBothThemes} from './a11y.mjs';
 let app;
 // Kept across a restart of the app
 const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'hexhoot-ui-'));
-const launch = (days = 0) => launchApp({name: 'ui', userData,
-    env: {HEXHOOT_TRANSPORTS: 'none',
-        HEXHOOT_TEST_CLOCK_OFFSET_DAYS: String(days)}});
+const launch = async (days = 0) => {
+    const launched = await launchApp({name: 'ui', userData,
+        env: {HEXHOOT_TRANSPORTS: 'none',
+            HEXHOOT_TEST_CLOCK_OFFSET_DAYS: String(days)}});
+    // The wide layout, whatever the screen: without a window manager (Xvfb)
+    // maximize() does nothing and the window stays at a narrow 800 px
+    await launched.resize(1280, 800);
+    return launched;
+};
 const PASSWORD = 'ThisIsProbablyAGoodPassword';
 // A valid address that is nobody in this test (test/crypto/identity.test.js)
 const STRANGER = 'hh21plj59s5zh6nwax5gvxmt3wv90ft2hq6k2g65whjef9xmw5m45' +
