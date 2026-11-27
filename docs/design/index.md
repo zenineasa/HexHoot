@@ -6,3 +6,4 @@
 * [Keyring](keyring.md) - Vault backed by the OS keychain through Electron safeStorage, with a scrypt (N=2²⁰) passphrase fallback, AES-256-GCM records, and encrypted backups.
 * [Wire protocol v2](wire-protocol-v2.md) - Framing, envelope types, and the inner message schema for Hyperswarm and LAN.
 * [Testing infrastructure](testing-infrastructure.md) - Five test layers, including a Konjugate-style harness that launches several HexHoot apps that message each other over a local DHT testnet.
+* [The Hive UI](ui-hive.md) - The v2 interface: contacts as a honeycomb, conversations as a chain, every scenario it must handle, and the navigation between screens.
