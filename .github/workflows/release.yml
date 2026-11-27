@@ -1,0 +1,154 @@
+# Copyright (c) 2026 Zenin Easa Panthakkalakath
+
+# Build HexHoot for macOS, Windows and Linux, test each build, and publish
+# them as a GitHub Release. A version tag (v*) publishes; a manual run (the
+# Actions tab) only builds and tests, and keeps the installers as artifacts
+# for a look before tagging. ci.yml stays the everyday check on every push.
+#
+# Each build runs on a runner of its own OS and architecture, so nothing is
+# cross-compiled (hyperswarm's native modules come prebuilt per platform).
+
+name: Release
+
+on:
+  push:
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-latest is Apple silicon; macos-15-intel adds the Intel
+        # build (GitHub keeps Intel runners until about August 2027).
+        # Linux is built on the oldest supported Ubuntu LTS, so the packages
+        # run on distributions at least that old; move it forward when
+        # 22.04 leaves standard support (April 2027).
+        os: [macos-latest, macos-15-intel, windows-latest, ubuntu-22.04,
+          ubuntu-22.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+      - name: Install Linux packaging tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm fakeroot dpkg
+      - run: npm ci
+      - name: Build the installers
+        run: npm run make
+      - name: Gather them into out/release
+        run: node scripts/collect-release.mjs
+
+      - name: Check the Windows installer installs, makes a shortcut and uninstalls
+        if: runner.os == 'Windows'
+        # Squirrel installs for the current user without asking, then starts
+        # the app (--squirrel-firstrun); that window is closed here.
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem out\release\*-setup.exe | Select-Object -First 1
+          $process = Start-Process -FilePath $setup.FullName -ArgumentList '--silent' -PassThru
+          $process.WaitForExit(180000) | Out-Null
+          if (-not $process.HasExited) { Write-Error 'The installer did not finish within 3 minutes.'; exit 1 }
+          if ($process.ExitCode -ne 0) { Write-Error "The installer exited with $($process.ExitCode)."; exit 1 }
+          Start-Sleep -Seconds 10
+          Get-Process hexhoot -ErrorAction SilentlyContinue | Stop-Process -Force
+          $installDir = Join-Path $env:LOCALAPPDATA 'hexhoot'
+          $exe = Get-ChildItem "$installDir\app-*\hexhoot.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $exe) { Write-Error "hexhoot.exe was not installed under $installDir."; exit 1 }
+          $programs = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
+          $shortcut = Get-ChildItem $programs -Recurse -Filter '*.lnk' | Where-Object { $_.Name -like '*HexHoot*' } | Select-Object -First 1
+          if (-not $shortcut) { Write-Error 'No Start menu shortcut was made.'; exit 1 }
+          Write-Host "Installed $($exe.FullName), shortcut $($shortcut.FullName)"
+          Start-Process -FilePath (Join-Path $installDir 'Update.exe') -ArgumentList '--uninstall', '-s' -Wait
+          Start-Sleep -Seconds 10
+          if (Test-Path $shortcut.FullName) { Write-Error 'Uninstalling left the Start menu shortcut.'; exit 1 }
+          Write-Host 'Uninstalled.'
+
+      - uses: actions/upload-artifact@v7
+        with:
+          # runner.arch tells the two macOS and two Linux builds apart
+          name: release-${{ runner.os }}-${{ runner.arch }}
+          path: out/release/*
+          if-no-files-found: error
+
+      # L5: smoke tests against the build (test/packaged): fuses, only the
+      # app shipped, test hooks inert, login at the real scrypt cost.
+      - name: Turn off App Nap
+        # Nobody looks at a runner's window, so macOS could nap the app and
+        # slow its timers.
+        if: runner.os == 'macOS'
+        run: defaults write NSGlobalDomain NSAppSleepDisabled -bool YES
+      - name: Smoke tests against the build
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            xvfb-run --auto-servernum npm run test:packaged
+          else
+            npm run test:packaged
+          fi
+
+  release:
+    needs: build
+    # Only a tag publishes; a manual run stops after the builds
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: out/release
+          pattern: release-*
+          merge-multiple: true
+      - name: Write the release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          repository: ${{ github.repository }}
+          tag: ${{ github.ref_name }}
+        run: |
+          link() {
+            local matches=(out/release/$1)
+            if [ ! -f "${matches[0]}" ]; then
+              echo "No release file matches $1." >&2
+              exit 1
+            fi
+            local file="${matches[0]##*/}"
+            echo "- $2: [$file](https://github.com/$repository/releases/download/$tag/$file)"
+          }
+          {
+            cat <<'EOF'
+          > **Installing:** HexHoot is not code-signed yet, so your system may warn you the first time you open it. The download is not damaged.
+          >
+          > - **macOS:** if it says HexHoot "is damaged and can't be opened", move HexHoot to Applications, then run `xattr -cr /Applications/HexHoot.app` in Terminal. Or open System Settings → Privacy & Security → Open Anyway.
+          > - **Windows:** if a blue "Windows protected your PC" box appears, click **More info**, then **Run anyway**.
+          > - **Linux:** `sudo apt install ./hexhoot_*.deb` (Debian, Ubuntu) or `sudo dnf install ./hexhoot-*.rpm` (Fedora).
+
+          EOF
+            gh api "repos/$repository/releases/generate-notes" \
+              -f tag_name="$tag" --jq .body
+            echo
+            echo "## Downloads"
+            echo
+            link '*-mac-arm64.dmg' 'macOS (Apple silicon)'
+            link '*-mac-x64.dmg' 'macOS (Intel)'
+            link '*-windows-x64-setup.exe' 'Windows'
+            link '*_amd64.deb' 'Debian and Ubuntu (x86-64)'
+            link '*_arm64.deb' 'Debian and Ubuntu (ARM64)'
+            link '*.x86_64.rpm' 'Fedora and openSUSE (x86-64)'
+            link '*.aarch64.rpm' 'Fedora and openSUSE (ARM64)'
+          } > "$RUNNER_TEMP/notes.md"
+          cat "$RUNNER_TEMP/notes.md"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: out/release/*
+          body_path: ${{ runner.temp }}/notes.md

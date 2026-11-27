@@ -26,7 +26,9 @@ const root = path.resolve(import.meta.dirname, '../..');
 async function poll(get, what, timeout) {
     const end = Date.now() + timeout;
     while (Date.now() < end) {
-        const value = await get();
+        // A page call that never answers (Core gone) must not hang the run
+        const value = await Promise.race([get(),
+            sleep(Math.max(end - Date.now(), 100), undefined, {ref: false})]);
         if (value) {
             return value;
         }

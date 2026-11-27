@@ -11,6 +11,12 @@ const testHooks = require('./testHooks');
 const createSealer = require('./sealer');
 const {links: socialLinks} = require('../Social/links.json');
 
+// Windows: Squirrel starts the app with --squirrel-install, -updated,
+// -uninstall or -obsolete. electron-squirrel-startup then makes or removes
+// the Start menu and desktop shortcuts, and says the app should not start.
+const squirrelEvent = process.platform === 'win32' &&
+    require('electron-squirrel-startup');
+
 // The renderer is served from app://hexhoot/modules/..., which gives it a
 // proper origin for ES modules and the CSP 'self'.
 const appOrigin = 'app://hexhoot';
@@ -178,7 +184,14 @@ function createWindow() {
     win.loadURL(appOrigin + '/modules/Main/index.html');
 }
 
+if (squirrelEvent) {
+    app.quit();
+}
+
 app.whenReady().then(() => {
+    if (squirrelEvent) {
+        return;
+    }
     protocol.handle('app', serveAppFile);
     // Notifications and copying our address are the only permissions
     // the app uses.

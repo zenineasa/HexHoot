@@ -46,6 +46,6 @@ No third-party crypto library is shipped at runtime. Every primitive comes from 
 
 # Platform
 
-- Node engines floor: **22.13**. CI matrix: 22.x and 24.x on Ubuntu, macOS, and Windows.
+- Node engines floor: **22.13**. CI runs one Node version, the newest LTS (`lts/*`), on Ubuntu, macOS, and Windows (changed 2026-11-27; before, 22.x and 24.x). The app itself runs on Electron's own Node.
 - `actions/checkout@v3` and `actions/setup-node@v3` → current major versions.
 - Commit `package-lock.json`.

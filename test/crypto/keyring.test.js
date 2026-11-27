@@ -80,7 +80,11 @@ test('With a strong OS keyring, no passphrase is needed', async (t) => {
     assert.deepEqual(keyring.info(), {unlocked: true,
         unlockers: ['os-keyring'], passphraseRequired: false});
     assert.equal(await roundTrip(keyring, options, {}), 'secret');
-    assert.equal((fs.statSync(options.file).mode & 0o777), 0o600);
+    // Only the owner may read it. Windows has no such mode bits (files in
+    // the user's profile are protected by its ACL instead).
+    if (process.platform !== 'win32') {
+        assert.equal((fs.statSync(options.file).mode & 0o777), 0o600);
+    }
     await assert.rejects(Keyring.create(options), {code: 'EXISTS'});
 });
 

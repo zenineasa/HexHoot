@@ -16,6 +16,8 @@ import {glob} from 'glob';
 const root = path.resolve(import.meta.dirname, '..');
 const artifacts = process.env.HEXHOOT_E2E_ARTIFACTS ||
     path.join(root, 'test-results', 'e2e');
+// A file that hangs is stopped, so the others still run and report
+const fileTimeout = 10 * 60 * 1000;
 const only = (process.env.HEXHOOT_TEST_ONLY || '').split(',')
     .map((name) => name.trim()).filter(Boolean);
 
@@ -36,7 +38,12 @@ function run(file) {
     const start = Date.now();
     const result = spawnSync(process.execPath,
         ['--test', '--test-concurrency=1', file],
-        {cwd: root, stdio: 'inherit', env: process.env});
+        {cwd: root, stdio: 'inherit', env: process.env,
+            timeout: fileTimeout, killSignal: 'SIGKILL'});
+    if (result.error?.code === 'ETIMEDOUT') {
+        console.log(`\n=== ${file} still running after ` +
+            `${fileTimeout / 60000} minutes; stopped`);
+    }
     return {passed: result.status === 0, seconds: (Date.now() - start) / 1e3};
 }
 

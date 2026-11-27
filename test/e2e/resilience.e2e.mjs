@@ -52,7 +52,7 @@ describe('Restarts over the LAN', () => {
                     .map(([, , delivered]) => delivered),
                 [false, false, false, false]);
             });
-            // The OS keyring signs bob in; the session was stored
+            // The OS keyring signs bob in (or, without one, his password)
             await bob.ready();
             await bob.waitForTransports();
             await bob.openChat(alice.key);

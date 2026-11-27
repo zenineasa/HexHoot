@@ -79,12 +79,25 @@ function addActions(app, otherPeers) {
             await app.click('#loginButton');
             await app.waitFor(`document.getElementById('hive')`);
             app.key = await app.core('getMyAddress');
+            app.password = password; // for the unlock screen after restart
             return app.key;
         },
 
-        /** Wait until the signed-in app (the hive) is shown */
+        /**
+         * Wait until the signed-in app (the hive) is shown. Where the OS
+         * keyring cannot sign in (Linux without a secret service, as on CI),
+         * the app asks for the password again; type it, as a person would.
+         */
         async ready() {
-            await app.waitFor(`document.querySelector('#hive .cells')`);
+            const screen = await app.waitFor(`document.querySelector(
+                '#hive .cells') ? 'hive' : document.getElementById(
+                'unlockButton') ? 'unlock' : ''`);
+            if (screen === 'unlock') {
+                await app.type('[name=password]', app.password);
+                await app.click('#unlockButton');
+                await app.waitFor(`document.querySelector('#hive .cells')`,
+                    30000);
+            }
         },
 
         /**
